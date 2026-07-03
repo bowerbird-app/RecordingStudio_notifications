@@ -8,6 +8,7 @@ class RootResolverTest < Minitest::Test
   FakeRecordable = Struct.new(:root)
 
   def setup
+    @original_recording_studio = RecordingStudio if defined?(RecordingStudio)
     Object.send(:remove_const, :RecordingStudio) if defined?(RecordingStudio)
 
     recording_studio = Module.new do
@@ -24,6 +25,7 @@ class RootResolverTest < Minitest::Test
 
   def teardown
     Object.send(:remove_const, :RecordingStudio) if defined?(RecordingStudio)
+    Object.const_set(:RecordingStudio, @original_recording_studio) if @original_recording_studio
   end
 
   def test_resolves_explicit_root_before_recording_or_recordable
