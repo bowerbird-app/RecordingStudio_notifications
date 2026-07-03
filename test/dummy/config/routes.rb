@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  recording_studio_admin_for :admin, at: "/admin"
+  mount RecordingStudioAccessible::Engine, at: "/admin/access"
   devise_for :users
 
   # RecordingStudio engine is data/API-focused and has no browser root route.
@@ -6,7 +8,11 @@ Rails.application.routes.draw do
   get "/recording_studio", to: redirect("/"), as: nil
   mount RecordingStudio::Engine, at: "/recording_studio"
   mount RecordingStudioRootSwitchable::Engine, at: "/recording_studio_root_switchable"
+
   mount RecordingStudioNotifications::Engine, at: "/notifications"
+
+  # Legacy path from mounted index; keep old links working.
+  get "/notifications/notifications", to: redirect("/notifications")
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

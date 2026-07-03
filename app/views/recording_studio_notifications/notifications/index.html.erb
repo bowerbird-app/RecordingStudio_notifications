@@ -1,16 +1,16 @@
 <div class="mx-auto flex w-full max-w-5xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Notifications",
-    subtitle: "Recent in-app notifications for your Recording Studio workspace.",
+    subtitle: @inbox_scope == "current_root" ? "Inbox for the selected workspace root plus global notifications." : "All in-app notifications visible to the current actor.",
     variant: :h1
   ) %>
 
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div class="flex flex-wrap gap-2">
-      <%= link_to notifications_path(scope: :all) do %>
+      <%= link_to root_path(inbox_scope: :all) do %>
         <%= render FlatPack::Button::Component.new(text: "All", style: @inbox_scope == "all" ? :primary : :secondary, size: :sm) %>
       <% end %>
-      <%= link_to notifications_path(scope: :current_root) do %>
+      <%= link_to root_path(inbox_scope: :current_root) do %>
         <%= render FlatPack::Button::Component.new(text: "Current root", style: @inbox_scope == "current_root" ? :primary : :secondary, size: :sm) %>
       <% end %>
     </div>
@@ -21,36 +21,112 @@
 
   <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
     <% card.body do %>
-      <% if @notifications.any? %>
-        <div class="flex flex-col gap-3">
-          <% @notifications.each do |notification| %>
-            <div class="rounded-lg border border-[var(--border-color)] p-4">
-              <div class="flex items-start justify-between gap-4">
-                <div class="min-w-0">
-                  <p class="font-medium text-[var(--surface-content-color)]"><%= notification.title %></p>
-                  <% if notification.body.present? %>
-                    <p class="mt-1 text-sm text-[var(--surface-muted-content-color)]"><%= notification.body %></p>
-                  <% end %>
-                  <% if notification.rootless? %>
-                    <p class="mt-2 text-xs text-[var(--surface-muted-content-color)]">Global</p>
-                  <% end %>
+      <div class="flex flex-wrap items-center gap-2">
+        <%= render FlatPack::Badge::Component.new(text: "Total: #{@notifications.size}") %>
+        <%= render FlatPack::Badge::Component.new(text: "Unread: #{@notifications.count(&:unread?)}") %>
+        <% if @inbox_scope == "current_root" %>
+          <% root_label = @current_root_recording&.recordable&.try(:name).presence || @current_root_recording&.recordable&.try(:title).presence || "Current root" %>
+          <%= render FlatPack::Badge::Component.new(text: "Scope: #{root_label}") %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% unread_notifications = @notifications.select(&:unread?) %>
+  <% read_notifications = @notifications.reject(&:unread?) %>
+
+  <% if @notifications.any? %>
+    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+      <% card.body do %>
+        <div class="mb-3 flex items-center justify-between gap-3">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-[var(--surface-muted-content-color)]">Unread</h2>
+          <%= render FlatPack::Badge::Component.new(text: unread_notifications.size.to_s) %>
+        </div>
+
+        <% if unread_notifications.any? %>
+          <div class="flex flex-col gap-3">
+            <% unread_notifications.each do |notification| %>
+              <article class="rounded-lg border border-[var(--border-color)] p-4">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="min-w-0">
+                    <p class="font-medium text-[var(--surface-content-color)]"><%= notification.title %></p>
+                    <% if notification.body.present? %>
+                      <p class="mt-1 text-sm text-[var(--surface-muted-content-color)]"><%= notification.body %></p>
+                    <% end %>
+                    <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-[var(--surface-muted-content-color)]">
+                      <span><%= notification.rootless? ? "Global" : "Root" %></span>
+                      <span>•</span>
+                      <span><%= time_ago_in_words(notification.created_at) %> ago</span>
+                    </div>
+                  </div>
+                  <%= render FlatPack::Badge::Component.new(text: "Unread") %>
                 </div>
-                <%= render FlatPack::Badge::Component.new(text: notification.read? ? "Read" : "Unread") %>
-              </div>
-              <div class="mt-4 flex flex-wrap gap-2">
-                <%= link_to notification_path(notification) do %>
-                  <%= render FlatPack::Button::Component.new(text: "Open", style: :secondary, size: :sm) %>
-                <% end %>
-                <% if notification.unread? %>
-                  <%= button_to mark_read_notification_path(notification), method: :patch do %>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <%= link_to notification_path(notification) do %>
+                    <%= render FlatPack::Button::Component.new(text: "Open", style: :secondary, size: :sm) %>
+                  <% end %>
+                  <%= link_to mark_read_notification_path(notification), data: { turbo_method: :patch } do %>
                     <%= render FlatPack::Button::Component.new(text: "Mark read", style: :ghost, size: :sm) %>
                   <% end %>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
+                  <%= link_to archive_notification_path(notification), data: { turbo_method: :patch } do %>
+                    <%= render FlatPack::Button::Component.new(text: "Archive", style: :ghost, size: :sm) %>
+                  <% end %>
+                </div>
+              </article>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-sm text-[var(--surface-muted-content-color)]">No unread notifications.</p>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+      <% card.body do %>
+        <div class="mb-3 flex items-center justify-between gap-3">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-[var(--surface-muted-content-color)]">Read</h2>
+          <%= render FlatPack::Badge::Component.new(text: read_notifications.size.to_s) %>
         </div>
-      <% else %>
+
+        <% if read_notifications.any? %>
+          <div class="flex flex-col gap-3">
+            <% read_notifications.each do |notification| %>
+              <article class="rounded-lg border border-[var(--border-color)] p-4">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="min-w-0">
+                    <p class="font-medium text-[var(--surface-content-color)]"><%= notification.title %></p>
+                    <% if notification.body.present? %>
+                      <p class="mt-1 text-sm text-[var(--surface-muted-content-color)]"><%= notification.body %></p>
+                    <% end %>
+                    <div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-[var(--surface-muted-content-color)]">
+                      <span><%= notification.rootless? ? "Global" : "Root" %></span>
+                      <span>•</span>
+                      <span><%= time_ago_in_words(notification.created_at) %> ago</span>
+                    </div>
+                  </div>
+                  <%= render FlatPack::Badge::Component.new(text: "Read") %>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <%= link_to notification_path(notification) do %>
+                    <%= render FlatPack::Button::Component.new(text: "Open", style: :secondary, size: :sm) %>
+                  <% end %>
+                  <%= link_to mark_unread_notification_path(notification), data: { turbo_method: :patch } do %>
+                    <%= render FlatPack::Button::Component.new(text: "Mark unread", style: :ghost, size: :sm) %>
+                  <% end %>
+                </div>
+              </article>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-sm text-[var(--surface-muted-content-color)]">No read notifications yet.</p>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+      <% card.body do %>
         <p class="text-sm text-[var(--surface-muted-content-color)]">No notifications yet.</p>
       <% end %>
     <% end %>

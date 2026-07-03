@@ -10,6 +10,11 @@ require "recording_studio_notifications/services/notify"
 require "recording_studio_notifications/services/root_resolver"
 require "recording_studio_notifications/services/notification_authorization"
 
+if defined?(RecordingStudioAdmin)
+  require "recording_studio_notifications/admin/all_notifications_screen"
+  require "recording_studio_notifications/admin/all_notifications_section"
+end
+
 module RecordingStudioNotifications
   class << self
     def configuration

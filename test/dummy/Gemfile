@@ -34,7 +34,10 @@ gem "jbuilder"
 gem "tailwindcss-rails"
 
 # FlatPack UI component library [https://github.com/bowerbird-app/flatpack]
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.84"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.103"
+
+# Admin panel for Recording Studio
+gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "1.0.0"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"

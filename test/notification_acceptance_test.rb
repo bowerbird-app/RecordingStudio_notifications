@@ -123,13 +123,16 @@ class NotificationAcceptanceTest < Minitest::Test
     application_controller = File.read(File.expand_path("../app/controllers/recording_studio_notifications/application_controller.rb", __dir__))
     model = File.read(File.expand_path("../app/models/recording_studio_notifications/notification.rb", __dir__))
     initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_notifications.rb", __dir__))
+    accessible_initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_accessible.rb", __dir__))
 
-    assert_includes controller, 'params[:scope].presence_in(%w[all current_root])'
+    assert_includes controller, 'params[:inbox_scope].presence_in(%w[all current_root])'
+    assert_includes controller, 'def recording_studio_root_switchable_scope_key'
     assert_includes model, "for_current_root_inbox"
     assert_includes model, "rootless_or_global"
     assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
     assert_includes application_controller, "actor || RecordingStudioNotifications.configuration.resolve_actor"
     assert_includes initializer, "config.current_root_resolver"
+    assert_includes accessible_initializer, "current_root.id.to_s == recording.id.to_s"
   end
 
   def test_settings_ui_and_routes_exist_without_bell_or_custom_css
@@ -151,7 +154,7 @@ class NotificationAcceptanceTest < Minitest::Test
 
     assert_includes readme, "notify_each"
     assert_includes readme, "required_channels"
-    assert_includes readme, "scope=current_root"
+    assert_includes readme, "inbox_scope=current_root"
     assert_includes readme, "CaptainHook"
     assert_includes readme, "not RecordingStudio recordings or recordables"
   end

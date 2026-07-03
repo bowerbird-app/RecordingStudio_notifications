@@ -10,10 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_03_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_03_093000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "admin_roots", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "folders", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -25,6 +30,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_000000) do
     t.datetime "created_at", null: false
     t.string "title"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "recording_studio_accesses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "actor_id", null: false
+    t.string "actor_type", null: false
+    t.datetime "created_at", null: false
+    t.integer "role", default: 0, null: false
+    t.index ["actor_type", "actor_id", "role"], name: "index_recording_studio_accesses_on_actor_and_role"
+    t.index ["actor_type", "actor_id"], name: "index_recording_studio_accesses_on_actor"
   end
 
   create_table "recording_studio_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -60,9 +74,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_000000) do
   end
 
   create_table "recording_studio_notifications_notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.datetime "archived_at"
     t.uuid "actor_id"
     t.string "actor_type"
+    t.datetime "archived_at"
     t.text "body"
     t.datetime "created_at", null: false
     t.string "idempotency_key"
@@ -80,7 +94,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_000000) do
     t.string "url"
     t.index ["recipient_type", "recipient_id", "idempotency_key"], name: "idx_dummy_rsn_notifications_idempotency", unique: true, where: "(idempotency_key IS NOT NULL)"
     t.index ["recipient_type", "recipient_id", "notification_type"], name: "idx_dummy_rsn_notifications_recipient"
-    t.index ["recording_id"], name: "index_recording_studio_notifications_notifications_on_recording_id"
+    t.index ["recording_id"], name: "idx_dummy_rsn_notifications_recording"
     t.index ["root_recording_id", "created_at"], name: "idx_dummy_rsn_notifications_root_created"
   end
 

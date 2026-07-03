@@ -33,7 +33,8 @@ class CreateRecordingStudioNotifications < ActiveRecord::Migration[8.1]
               name: "idx_rsn_notifications_idempotency"
     add_index :recording_studio_notifications_notifications, %i[root_recording_id created_at],
               name: "idx_rsn_notifications_root_created"
-    add_index :recording_studio_notifications_notifications, :recording_id
+    add_index :recording_studio_notifications_notifications, :recording_id,
+          name: "idx_rsn_notifications_recording"
 
     create_table :recording_studio_notifications_deliveries, id: :uuid, default: -> { "gen_random_uuid()" } do |t|
       t.uuid :notification_id, null: false

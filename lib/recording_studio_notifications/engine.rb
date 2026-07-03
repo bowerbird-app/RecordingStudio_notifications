@@ -128,6 +128,18 @@ module RecordingStudioNotifications
       end
     end
 
+    initializer "recording_studio_notifications.register_admin_capabilities", after: "recording_studio_notifications.load_config" do |_app|
+      next unless defined?(RecordingStudioAdmin)
+
+      require "recording_studio_notifications/admin/all_notifications_screen"
+      require "recording_studio_notifications/admin/all_notifications_section"
+
+      config.to_prepare do
+        RecordingStudioAdmin.register_screen(RecordingStudioNotifications::Admin::AllNotificationsScreen)
+        RecordingStudioAdmin.register_section(RecordingStudioNotifications::Admin::AllNotificationsSection)
+      end
+    end
+
     # Apply model extensions when models are loaded
     initializer "recording_studio_notifications.apply_model_extensions" do
       config.to_prepare do

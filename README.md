@@ -119,7 +119,7 @@ The engine registers Accessible actions for viewing notifications and managing p
 
 The engine provides:
 
-- `/notifications` inbox (`scope=all` or `scope=current_root`)
+- `/notifications` inbox (`inbox_scope=all` or `inbox_scope=current_root`)
 - `/settings` notification channel preferences
 
 Both views use FlatPack components and Tailwind utility classes only.

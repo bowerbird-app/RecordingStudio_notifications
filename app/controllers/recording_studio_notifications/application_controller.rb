@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module RecordingStudioNotifications
-  class ApplicationController < ActionController::Base
+  parent_controller = defined?(::ApplicationController) ? ::ApplicationController : ActionController::Base
+
+  class ApplicationController < parent_controller
     include ::RecordingStudio::RootSwitchable::ControllerSupport if defined?(::RecordingStudio::RootSwitchable::ControllerSupport)
 
     protect_from_forgery with: :exception

@@ -51,6 +51,25 @@
         icon: :eye
       ) %>
 
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Inbox",
+        href: recording_studio_notifications.root_path,
+        icon: :inbox
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Notification settings",
+        href: recording_studio_notifications.settings_path,
+        icon: :adjustments_horizontal
+      ) %>
+
+      <% if request.path.start_with?("/admin") %>
+        <%= render FlatPack::Sidebar::Item::Component.new(
+          label: "Admin",
+          href: recording_studio_admin.root_path,
+          icon: :shield
+        ) %>
+      <% end %>
     </nav>
   <% end %>
 

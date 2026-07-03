@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
   before_action :set_current_actor
+  before_action :set_current_impersonator
 
   private
 
@@ -20,5 +21,11 @@ class ApplicationController < ActionController::Base
 
   def set_current_actor
     Current.actor = current_user
+  end
+
+  def set_current_impersonator
+    return unless session[:impersonator_user_id].present?
+
+    Current.impersonator = User.find_by(id: session[:impersonator_user_id])
   end
 end
