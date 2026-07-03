@@ -38,6 +38,9 @@ module RecordingStudioNotifications
       private
 
       def create_and_deliver!
+        notification = nil
+        should_deliver = false
+
         ActiveSupport::Notifications.instrument(
           "notify.recording_studio_notifications",
           notification_type: @notification_type,
@@ -48,10 +51,13 @@ module RecordingStudioNotifications
           Notification.transaction do
             notification = find_idempotent_notification || create_notification!
             create_deliveries!(notification)
-            enqueue_or_deliver!(notification) if notification.previously_new_record? || notification.deliveries.pending.exists?
+            should_deliver = notification.previously_new_record? || notification.deliveries.pending.exists?
             notification
           end
         end
+
+        enqueue_or_deliver!(notification) if should_deliver
+        notification
       end
 
       def validate_inputs!
@@ -59,6 +65,7 @@ module RecordingStudioNotifications
         raise ArgumentError, "title is required" if @title.to_s.blank?
         raise ArgumentError, "notification_type is not registered" unless type_definition
         raise ArgumentError, "root_recording is required" if type_definition.scope == :root && resolved_root_recording.blank?
+        raise ArgumentError, "root_recording does not match recording or notifiable" unless consistent_root_scope?
         raise ArgumentError, "at least one channel is required" if channel_keys.empty?
 
         unregistered_channel = channel_keys.find { |channel| !RecordingStudioNotifications.channels.registered?(channel) }
@@ -163,10 +170,10 @@ module RecordingStudioNotifications
 
       def channel_keys
         @channel_keys ||= begin
-          optional = requested_optional_channels
           required = type_definition.required_channels
+          optional = selected_optional_channels
           selected = (optional + required).uniq
-          selected.select { |channel| required.include?(channel) || preference_enabled?(channel) }
+          selected.select { |channel| required.include?(channel) || preference_enabled?(channel, default: true) }
         end
       end
 
@@ -175,15 +182,34 @@ module RecordingStudioNotifications
         channels.map { |channel| channel.to_s.strip.to_sym }.uniq - type_definition.required_channels
       end
 
-      def preference_enabled?(channel)
-        return true unless defined?(RecordingStudioNotifications::Preference)
-        return true unless RecordingStudioNotifications::Preference.table_exists?
+      def selected_optional_channels
+        requested = requested_optional_channels
+        candidates = type_definition.available_channels ? type_definition.optional_channels : requested
+
+        candidates.select do |channel|
+          preference_enabled?(channel, default: requested.include?(channel))
+        end
+      end
+
+      def preference_enabled?(channel, default:)
+        return default unless defined?(RecordingStudioNotifications::Preference)
+        return default unless RecordingStudioNotifications::Preference.table_exists?
 
         RecordingStudioNotifications::Preference.enabled_for?(
           recipient: @recipient,
           notification_type: @notification_type,
           channel: channel,
-          default: true
+          default: default
+        )
+      end
+
+      def consistent_root_scope?
+        return true if type_definition.scope == :global
+
+        RootResolver.consistent?(
+          root_recording: resolved_root_recording,
+          recording: @recording,
+          recordable: @notifiable
         )
       end
 

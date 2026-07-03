@@ -2,6 +2,8 @@
 
 module RecordingStudioNotifications
   class ApplicationController < ActionController::Base
+    include ::RecordingStudio::RootSwitchable::ControllerSupport if defined?(::RecordingStudio::RootSwitchable::ControllerSupport)
+
     protect_from_forgery with: :exception
 
     helper_method :current_notifications_actor, :current_notifications_root_recording
@@ -9,11 +11,8 @@ module RecordingStudioNotifications
     private
 
     def current_notifications_actor
-      if respond_to?(:current_user, true)
-        current_user
-      else
-        RecordingStudioNotifications.configuration.resolve_actor
-      end
+      actor = current_user if respond_to?(:current_user, true)
+      actor || RecordingStudioNotifications.configuration.resolve_actor
     end
 
     def current_notifications_root_recording

@@ -89,6 +89,12 @@ module RecordingStudioNotifications
         errors.add(:root_recording, "is required")
       elsif type.scope == :global && root_recording.present?
         errors.add(:root_recording, "must be blank for global notifications")
+      elsif type.scope != :global && !Services::RootResolver.consistent?(
+        root_recording: root_recording,
+        recording: recording,
+        recordable: notifiable
+      )
+        errors.add(:root_recording, "must match recording and notifiable root")
       end
     end
 

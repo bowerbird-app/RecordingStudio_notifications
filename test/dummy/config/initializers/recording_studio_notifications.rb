@@ -2,6 +2,9 @@
 
 RecordingStudioNotifications.configure do |config|
   config.actor_resolver = -> { Current.actor }
+  config.current_root_resolver = lambda do |controller:|
+    controller.send(:current_root_recording) if controller.respond_to?(:current_root_recording, true)
+  end
 
   config.notification_types.register(
     :page_comment,
