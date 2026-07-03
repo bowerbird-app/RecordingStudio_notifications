@@ -77,6 +77,9 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes source, "Preference.enabled_for?"
     assert_includes source, "creation_action"
     assert_includes source, "notify.recording_studio_notifications"
+    assert_includes source, "RootResolver.consistent?"
+    assert_includes source, "default: requested.include?(channel)"
+    assert_includes source, "enqueue_or_deliver!(notification) if should_deliver"
   end
 
   def test_delivery_uses_channel_architecture_and_instrumentation
@@ -117,11 +120,16 @@ class NotificationAcceptanceTest < Minitest::Test
 
   def test_inbox_supports_all_and_current_root_with_rootless_notifications
     controller = File.read(File.expand_path("../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__))
+    application_controller = File.read(File.expand_path("../app/controllers/recording_studio_notifications/application_controller.rb", __dir__))
     model = File.read(File.expand_path("../app/models/recording_studio_notifications/notification.rb", __dir__))
+    initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_notifications.rb", __dir__))
 
     assert_includes controller, 'params[:scope].presence_in(%w[all current_root])'
     assert_includes model, "for_current_root_inbox"
     assert_includes model, "rootless_or_global"
+    assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
+    assert_includes application_controller, "actor || RecordingStudioNotifications.configuration.resolve_actor"
+    assert_includes initializer, "config.current_root_resolver"
   end
 
   def test_settings_ui_and_routes_exist_without_bell_or_custom_css
