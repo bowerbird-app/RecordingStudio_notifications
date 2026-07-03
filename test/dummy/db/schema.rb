@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_12_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_03_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -44,6 +44,44 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_12_000000) do
     t.uuid "recording_id", null: false
     t.index ["recording_id", "idempotency_key"], name: "index_recording_studio_events_on_recording_and_idempotency_key", unique: true, where: "(idempotency_key IS NOT NULL)"
     t.index ["recording_id"], name: "index_recording_studio_events_on_recording_id"
+  end
+
+  create_table "recording_studio_notifications_deliveries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "channel", null: false
+    t.datetime "created_at", null: false
+    t.datetime "delivered_at"
+    t.text "error_message"
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "notification_id", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["channel", "status"], name: "idx_dummy_rsn_deliveries_channel_status"
+    t.index ["notification_id", "channel"], name: "idx_dummy_rsn_deliveries_notification_channel", unique: true
+  end
+
+  create_table "recording_studio_notifications_notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "archived_at"
+    t.uuid "actor_id"
+    t.string "actor_type"
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.string "idempotency_key"
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "notifiable_id"
+    t.string "notifiable_type"
+    t.string "notification_type", null: false
+    t.datetime "read_at"
+    t.uuid "recipient_id", null: false
+    t.string "recipient_type", null: false
+    t.uuid "recording_id"
+    t.uuid "root_recording_id"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.string "url"
+    t.index ["recipient_type", "recipient_id", "idempotency_key"], name: "idx_dummy_rsn_notifications_idempotency", unique: true, where: "(idempotency_key IS NOT NULL)"
+    t.index ["recipient_type", "recipient_id", "notification_type"], name: "idx_dummy_rsn_notifications_recipient"
+    t.index ["recording_id"], name: "index_recording_studio_notifications_notifications_on_recording_id"
+    t.index ["root_recording_id", "created_at"], name: "idx_dummy_rsn_notifications_root_created"
   end
 
   create_table "recording_studio_recordings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -98,6 +136,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_12_000000) do
   end
 
   add_foreign_key "recording_studio_events", "recording_studio_recordings", column: "recording_id"
+  add_foreign_key "recording_studio_notifications_deliveries", "recording_studio_notifications_notifications", column: "notification_id"
   add_foreign_key "recording_studio_recordings", "recording_studio_recordings", column: "parent_recording_id"
   add_foreign_key "recording_studio_recordings", "recording_studio_recordings", column: "root_recording_id"
 end

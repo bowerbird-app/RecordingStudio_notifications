@@ -1,0 +1,40 @@
+<div class="mx-auto flex w-full max-w-3xl flex-col gap-6">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: @notification.title,
+    subtitle: @notification.notification_type.humanize,
+    variant: :h1
+  ) %>
+
+  <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+    <% card.body do %>
+      <% if @notification.body.present? %>
+        <p class="text-sm leading-6 text-[var(--surface-content-color)]"><%= @notification.body %></p>
+      <% end %>
+
+      <% if @notification.url.present? %>
+        <div class="mt-4">
+          <%= link_to @notification.url do %>
+            <%= render FlatPack::Button::Component.new(text: "Open related item", style: :primary, size: :md) %>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% card.footer do %>
+      <div class="flex flex-wrap gap-2">
+        <%= link_to notifications_path do %>
+          <%= render FlatPack::Button::Component.new(text: "Back", style: :secondary, size: :sm) %>
+        <% end %>
+        <% if @notification.unread? %>
+          <%= button_to mark_read_notification_path(@notification), method: :patch do %>
+            <%= render FlatPack::Button::Component.new(text: "Mark read", style: :ghost, size: :sm) %>
+          <% end %>
+        <% else %>
+          <%= button_to mark_unread_notification_path(@notification), method: :patch do %>
+            <%= render FlatPack::Button::Component.new(text: "Mark unread", style: :ghost, size: :sm) %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

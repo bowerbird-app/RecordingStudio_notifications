@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
-# Use the gem_template engine
-gem "gem_template", path: "../.."
+# Use the recording_studio_notifications engine
+gem "recording_studio_notifications", path: "../.."
 
 # RecordingStudio engine
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "recording_studio/v3.0.0"

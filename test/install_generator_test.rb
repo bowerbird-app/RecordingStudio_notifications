@@ -3,23 +3,23 @@
 require "test_helper"
 require "fileutils"
 require "tmpdir"
-require "generators/gem_template/install/install_generator"
+require "generators/recording_studio_notifications/install/install_generator"
 
 class InstallGeneratorTest < Minitest::Test
   INSTALL_TEMPLATE_PATH = File.expand_path(
-    "../lib/generators/gem_template/install/templates/INSTALL.md",
+    "../lib/generators/recording_studio_notifications/install/templates/INSTALL.md",
     __dir__
   )
 
   def with_temp_app
-    Dir.mktmpdir do |dir|
+    Dir.mktmpdir("generator-test", File.expand_path("..", __dir__)) do |dir|
       FileUtils.mkdir_p(File.join(dir, "app/assets/tailwind"))
       yield dir
     end
   end
 
   def build_generator(destination_root, options = {})
-    GemTemplate::Generators::InstallGenerator.new(
+    RecordingStudioNotifications::Generators::InstallGenerator.new(
       [],
       options,
       destination_root: destination_root
@@ -27,14 +27,14 @@ class InstallGeneratorTest < Minitest::Test
   end
 
   def test_mount_engine_uses_configured_mount_path
-    generator = build_generator("/tmp", mount_path: "/addons/recording")
+    generator = build_generator(File.expand_path("..", __dir__), mount_path: "/addons/recording")
     routes = []
 
     generator.stub(:route, ->(value) { routes << value }) do
       generator.mount_engine
     end
 
-    assert_equal ["mount GemTemplate::Engine, at: \"/addons/recording\""], routes
+    assert_equal ["mount RecordingStudioNotifications::Engine, at: \"/addons/recording\""], routes
   end
 
   def test_add_tailwind_source_injects_engine_and_flatpack_sources
@@ -60,8 +60,8 @@ class InstallGeneratorTest < Minitest::Test
       css_path = File.join(dir, "app/assets/tailwind/application.css")
       File.write(css_path, <<~CSS)
         @import "tailwindcss";
-        @source "../../vendor/bundle/**/gem_template/app/views/**/*.erb";
-        @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/gem_template-*/app/views/**/*.erb";
+        @source "../../vendor/bundle/**/recording_studio_notifications/app/views/**/*.erb";
+        @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";
         @source "../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}";
         @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
       CSS
@@ -123,7 +123,7 @@ class InstallGeneratorTest < Minitest::Test
   end
 
   def test_show_readme_displays_install_guide_for_invoke_behavior
-    generator = build_generator("/tmp")
+    generator = build_generator(File.expand_path("..", __dir__))
     shown_templates = []
 
     generator.stub(:behavior, :invoke) do
@@ -138,7 +138,7 @@ class InstallGeneratorTest < Minitest::Test
   def test_install_guide_includes_migration_and_host_setup_steps
     install_guide = File.read(INSTALL_TEMPLATE_PATH)
 
-    assert_includes install_guide, "bin/rails generate gem_template:migrations"
+    assert_includes install_guide, "bin/rails generate recording_studio_notifications:migrations"
     assert_includes install_guide, "bin/rails db:migrate"
     assert_includes install_guide, "auth, layout, and current actor integration"
   end
@@ -159,8 +159,8 @@ class InstallGeneratorTest < Minitest::Test
 
   def tailwind_source_lines
     [
-      '@source "../../vendor/bundle/**/gem_template/app/views/**/*.erb";',
-      '@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/gem_template-*/app/views/**/*.erb";',
+      '@source "../../vendor/bundle/**/recording_studio_notifications/app/views/**/*.erb";',
+      '@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
       '@source "../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}";',
       '@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";'
     ]
