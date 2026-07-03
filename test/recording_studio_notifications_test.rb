@@ -20,13 +20,14 @@ class RecordingStudioNotificationsTest < Minitest::Test
 
     assert_includes gemspec, 'spec.name        = "recording_studio_notifications"'
     assert_includes gemspec, "RecordingStudioNotifications::VERSION"
-    refute_includes gemspec, "RecordingStudioNotifications"
+    refute_includes gemspec, "GemTemplate"
   end
 
   def test_engine_routes_notifications_as_root
     routes = File.read(File.expand_path("../config/routes.rb", __dir__))
 
     assert_includes routes, 'resources :notifications'
+    assert_includes routes, 'resource :settings'
     assert_includes routes, 'root "notifications#index"'
   end
 
@@ -38,6 +39,7 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_includes migration, "t.uuid :actor_id"
     assert_includes migration, "t.uuid :notifiable_id"
     assert_includes migration, "idx_rsn_notifications_idempotency"
+    assert_includes migration, "recording_studio_notifications_preferences"
   end
 
   def test_dummy_app_mounts_engine_and_registers_example_types

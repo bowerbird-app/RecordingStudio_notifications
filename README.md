@@ -5,17 +5,18 @@ RecordingStudioNotifications is a Recording Studio addon Rails engine for root-a
 ## Features
 
 - `RecordingStudioNotifications.notify` and `notify_each` public APIs
-- Notification type registry and pluggable channel registry
-- Bundled `:in_app` channel adapter
-- UUID primary keys and UUID polymorphic recipient/actor/notifiable IDs
-- Recording Studio root resolution from `root_recording`, `recording`, or a root recordable
-- URL safety validation for relative paths and explicitly allowed hosts
-- ActiveJob delivery jobs
-- Accessible action registration for `:view_notifications`
-- FlatPack/Tailwind engine views
+- Notification type registry with `default_channels`, `required_channels`, `available_channels`, `scope`, and optional `creation_action`
+- Pluggable channel registry with bundled `:in_app` adapter
+- UUID notifications, deliveries, and preferences tables
+- Nullable `root_recording_id` for global/rootless notifications
+- Root-aware inbox scopes: `:all` and `:current_root`; current-root results include global/rootless notifications
+- Per-recipient settings for optional channels; required channels ignore preferences
+- Accessible integration for root visibility, preference management, and optional creation authorization
+- ActiveSupport instrumentation for notification creation and delivery
+- FlatPack/Tailwind inbox and settings UI
 - Install and migrations generators
 
-No notification bell component/helper and no custom CSS are included.
+No notification bell component/helper and no custom CSS are included. Notifications are stored in their own engine tables and are not RecordingStudio recordings or recordables; Recording Studio events remain separate.
 
 ## Installation
 
@@ -31,11 +32,18 @@ bin/rails generate recording_studio_notifications:migrations
 bin/rails db:migrate
 ```
 
+Mount the engine in your app routes:
+
+```ruby
+mount RecordingStudioNotifications::Engine, at: "/notifications"
+```
+
 ## Configuration
 
 ```ruby
 RecordingStudioNotifications.configure do |config|
   config.actor_resolver = -> { Current.actor }
+  config.current_root_resolver = ->(controller:) { controller.send(:current_root_recording) }
   config.allowed_url_hosts = ["example.com"]
   config.default_channels = [:in_app]
 
@@ -43,10 +51,20 @@ RecordingStudioNotifications.configure do |config|
     :page_comment,
     label: "Page comment",
     description: "A collaborator commented on a page.",
-    default_channels: [:in_app]
+    default_channels: [:in_app],
+    required_channels: [],
+    available_channels: [:in_app, :email],
+    scope: :root,
+    creation_action: :create_page_comment_notification
   )
 end
 ```
+
+Notification type scopes are:
+
+- `:global` - always rootless.
+- `:root` - requires a root recording.
+- `:optional_root` - may be root-scoped or rootless/global.
 
 ## Usage
 
@@ -59,7 +77,8 @@ notification = RecordingStudioNotifications.notify(
   title: "New comment",
   body: "A collaborator commented on your page.",
   url: "/pages/#{page.id}",
-  idempotency_key: "comments/#{comment.id}/recipient/#{user.id}"
+  idempotency_key: "comments/#{comment.id}/recipient/#{user.id}",
+  deliver_later: true
 )
 ```
 
@@ -74,9 +93,9 @@ RecordingStudioNotifications.notify_each(
 )
 ```
 
-## Channels
+## Channels and preferences
 
-The bundled `:in_app` adapter records a delivery and marks it delivered. Register additional adapters with:
+The bundled `:in_app` adapter uses the channel architecture and marks an in-app delivery as delivered. Register additional adapters with:
 
 ```ruby
 RecordingStudioNotifications.register_channel(:email, MyEmailAdapter.new)
@@ -88,17 +107,29 @@ Adapters must respond to:
 deliver(notification:, delivery:)
 ```
 
-Webhook delivery is intentionally left as a seam. This gem does not depend on CaptainHook/provider gems or send webhooks directly unless a host app registers an adapter backed by a public outgoing provider API.
+Required channels are always delivered. Optional channels are delivered only when selected by the type/default request and not disabled by the recipient's preference.
+
+Webhook delivery is intentionally deferred: host apps may register a custom adapter backed by CaptainHook or another approved outgoing provider API.
 
 ## Authorization
 
-The engine registers `:view_notifications` with RecordingStudioAccessible when available. The default policy allows actors to view their own notifications. Host apps can override the action policy:
+The engine registers Accessible actions for viewing notifications and managing preferences when `RecordingStudioAccessible` is available. Root-scoped inbox visibility checks Accessible `:view` on the root recording. Preference pages use `:"recording_studio_notifications.manage_preferences"`. Types with `creation_action:` require that Accessible action before creation.
 
-```ruby
-RecordingStudioAccessible.define_action(:view_notifications) do |actor:, recording:, context:, **|
-  actor == context[:recipient] || RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :admin)
-end
-```
+## UI
+
+The engine provides:
+
+- `/notifications` inbox (`scope=all` or `scope=current_root`)
+- `/settings` notification channel preferences
+
+Both views use FlatPack components and Tailwind utility classes only.
+
+## Instrumentation
+
+Subscribe to:
+
+- `notify.recording_studio_notifications`
+- `deliver.recording_studio_notifications`
 
 ## Validation
 

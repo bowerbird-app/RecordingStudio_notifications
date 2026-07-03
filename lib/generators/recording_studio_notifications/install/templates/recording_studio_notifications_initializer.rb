@@ -12,7 +12,9 @@ RecordingStudioNotifications.configure do |config|
     :generic,
     label: "Generic notification",
     description: "Default in-app notification",
-    default_channels: [:in_app]
+    default_channels: [:in_app],
+    available_channels: [:in_app],
+    scope: :optional_root
   )
 
   # Register custom channels here. The bundled :in_app channel is enabled by default.

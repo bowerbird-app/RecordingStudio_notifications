@@ -53,5 +53,22 @@ class CreateRecordingStudioNotifications < ActiveRecord::Migration[8.1]
     add_foreign_key :recording_studio_notifications_deliveries,
                     :recording_studio_notifications_notifications,
                     column: :notification_id
+
+    create_table :recording_studio_notifications_preferences, id: :uuid, default: -> { "gen_random_uuid()" } do |t|
+      t.string :recipient_type, null: false
+      t.uuid :recipient_id, null: false
+      t.string :notification_type, null: false
+      t.string :channel, null: false
+      t.boolean :enabled, null: false, default: true
+
+      t.timestamps
+    end
+
+    add_index :recording_studio_notifications_preferences,
+              %i[recipient_type recipient_id notification_type channel],
+              unique: true,
+              name: "idx_dummy_rsn_preferences_recipient"
+    add_index :recording_studio_notifications_preferences, %i[notification_type channel],
+              name: "idx_dummy_rsn_preferences_type_channel"
   end
 end

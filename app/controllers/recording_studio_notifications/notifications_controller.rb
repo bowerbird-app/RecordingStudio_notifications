@@ -8,15 +8,21 @@ module RecordingStudioNotifications
     def index
       return unless authorize_notifications!(recipient: @recipient)
 
-      @notifications = Notification.for_recipient(@recipient).active.newest_first.limit(100)
+      @inbox_scope = params[:scope].presence_in(%w[all current_root]) || "all"
+      @current_root_recording = current_notifications_root_recording
+      @notifications = visible_notifications(scoped_notifications.limit(100))
     end
 
     def show
       return unless authorize_notifications!(recipient: @recipient, notification: @notification)
+      return if visible_notification?(@notification)
+
+      head :forbidden
     end
 
     def mark_read
       return unless authorize_notifications!(recipient: @recipient, notification: @notification)
+      return head :forbidden unless visible_notification?(@notification)
 
       @notification.mark_read!
       redirect_back fallback_location: notification_path(@notification), notice: "Notification marked read."
@@ -24,6 +30,7 @@ module RecordingStudioNotifications
 
     def mark_unread
       return unless authorize_notifications!(recipient: @recipient, notification: @notification)
+      return head :forbidden unless visible_notification?(@notification)
 
       @notification.mark_unread!
       redirect_back fallback_location: notification_path(@notification), notice: "Notification marked unread."
@@ -31,6 +38,7 @@ module RecordingStudioNotifications
 
     def archive
       return unless authorize_notifications!(recipient: @recipient, notification: @notification)
+      return head :forbidden unless visible_notification?(@notification)
 
       @notification.archive!
       redirect_to notifications_path, notice: "Notification archived."
@@ -45,6 +53,24 @@ module RecordingStudioNotifications
 
     def set_notification
       @notification = Notification.for_recipient(@recipient).find(params[:id])
+    end
+
+    def scoped_notifications
+      notifications = Notification.for_recipient(@recipient).active
+      notifications = notifications.for_current_root_inbox(@current_root_recording) if @inbox_scope == "current_root"
+      notifications.newest_first
+    end
+
+    def visible_notifications(notifications)
+      notifications.select { |notification| visible_notification?(notification) }
+    end
+
+    def visible_notification?(notification)
+      Services::NotificationAuthorization.visible_notification?(
+        actor: current_notifications_actor,
+        notification: notification,
+        controller: self
+      )
     end
   end
 end

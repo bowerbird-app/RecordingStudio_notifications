@@ -15,6 +15,14 @@ module RecordingStudioNotifications
 
       private
 
+      def define_default_accessible_action(action, &block)
+        return unless RecordingStudioAccessible.respond_to?(:define_action)
+        return if RecordingStudioAccessible.respond_to?(:action_defined?) &&
+                  RecordingStudioAccessible.action_defined?(action)
+
+        RecordingStudioAccessible.define_action(action, &block)
+      end
+
       def apply_extensions(target, extensions)
         return unless target
 
@@ -97,16 +105,26 @@ module RecordingStudioNotifications
         source: "recording_studio_notifications",
         recording_required: false
       )
+      RecordingStudioAccessible.register_action(
+        :"recording_studio_notifications.manage_preferences",
+        label: "Manage notification preferences",
+        description: "Manage RecordingStudioNotifications channel preferences.",
+        source: "recording_studio_notifications",
+        recording_required: false
+      )
 
-      if RecordingStudioAccessible.respond_to?(:define_action) &&
-         (!RecordingStudioAccessible.respond_to?(:action_defined?) ||
-           !RecordingStudioAccessible.action_defined?(:view_notifications))
-        RecordingStudioAccessible.define_action(:view_notifications) do |actor:, context: {}, **|
-          recipient = context[:recipient]
-          actor.present? && recipient.present? &&
-            actor.class.name == recipient.class.name &&
-            actor.id.to_s == recipient.id.to_s
-        end
+      RecordingStudioNotifications::Engine.send(:define_default_accessible_action, :view_notifications) do |actor:, context: {}, **|
+        recipient = context[:recipient]
+        actor.present? && recipient.present? &&
+          actor.class.name == recipient.class.name &&
+          actor.id.to_s == recipient.id.to_s
+      end
+
+      RecordingStudioNotifications::Engine.send(:define_default_accessible_action, :"recording_studio_notifications.manage_preferences") do |actor:, context: {}, **|
+        recipient = context[:recipient]
+        actor.present? && recipient.present? &&
+          actor.class.name == recipient.class.name &&
+          actor.id.to_s == recipient.id.to_s
       end
     end
 

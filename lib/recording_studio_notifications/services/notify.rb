@@ -20,34 +20,97 @@ module RecordingStudioNotifications
         @notifiable = notifiable
         @recording = recording
         @root_recording = root_recording
-        @channels = channels
+        @requested_channels = channels
         @idempotency_key = idempotency_key.presence
         @deliver_later = deliver_later
       end
 
       def call
         validate_inputs!
+        authorize_creation!
 
-        Notification.transaction do
-          notification = find_idempotent_notification || create_notification!
-          create_deliveries!(notification)
-          enqueue_or_deliver!(notification) if notification.previously_new_record? || notification.deliveries.pending.exists?
-          notification
-        end
+        hooks.run(:before_service, self.class, service_payload)
+        result = hooks.run_around(:around_service, self) { create_and_deliver! }
+        hooks.run(:after_service, self.class, result)
+        result
       end
 
       private
+
+      def create_and_deliver!
+        ActiveSupport::Notifications.instrument(
+          "notify.recording_studio_notifications",
+          notification_type: @notification_type,
+          recipient: @recipient,
+          channels: channel_keys,
+          root_recording_id: resolved_root_recording&.id
+        ) do
+          Notification.transaction do
+            notification = find_idempotent_notification || create_notification!
+            create_deliveries!(notification)
+            enqueue_or_deliver!(notification) if notification.previously_new_record? || notification.deliveries.pending.exists?
+            notification
+          end
+        end
+      end
 
       def validate_inputs!
         raise ArgumentError, "recipient is required" unless @recipient
         raise ArgumentError, "title is required" if @title.to_s.blank?
         raise ArgumentError, "notification_type is not registered" unless type_definition
+        raise ArgumentError, "root_recording is required" if type_definition.scope == :root && resolved_root_recording.blank?
         raise ArgumentError, "at least one channel is required" if channel_keys.empty?
 
         unregistered_channel = channel_keys.find { |channel| !RecordingStudioNotifications.channels.registered?(channel) }
         raise ArgumentError, "channel is not registered: #{unregistered_channel}" if unregistered_channel
 
+        if type_definition.available_channels
+          unavailable_channel = channel_keys.find { |channel| !type_definition.available_channels.include?(channel) }
+          raise ArgumentError, "channel is not available for #{@notification_type}: #{unavailable_channel}" if unavailable_channel
+        end
+
         UrlSafety.sanitize!(@url)
+      end
+
+      def authorize_creation!
+        return unless type_definition.creation_action
+        return if accessible_action_allowed?(type_definition.creation_action)
+
+        raise RecordingStudioNotifications::Services::NotificationAuthorization::NotAuthorized,
+              "not authorized to create #{@notification_type} notifications"
+      end
+
+      def accessible_action_allowed?(action)
+        return false unless defined?(RecordingStudioAccessible)
+        return false unless RecordingStudioAccessible.respond_to?(:authorized_action?)
+
+        RecordingStudioAccessible.authorized_action?(
+          actor: @actor,
+          action: action,
+          recording: resolved_root_recording || @recording,
+          context: {
+            recipient: @recipient,
+            notification_type: @notification_type.to_sym,
+            notifiable: @notifiable,
+            metadata: @metadata
+          }
+        )
+      end
+
+      def hooks
+        RecordingStudioNotifications.configuration.hooks
+      end
+
+      def service_payload
+        {
+          notification_type: @notification_type,
+          recipient: @recipient,
+          actor: @actor,
+          notifiable: @notifiable,
+          recording: @recording,
+          root_recording: resolved_root_recording,
+          channels: channel_keys
+        }
       end
 
       def type_definition
@@ -66,8 +129,8 @@ module RecordingStudioNotifications
           recipient: @recipient,
           actor: @actor,
           notifiable: @notifiable,
-          recording: @recording,
-          root_recording: resolved_root_recording,
+          recording: type_definition.scope == :global ? nil : @recording,
+          root_recording: type_definition.scope == :global ? nil : resolved_root_recording,
           title: @title,
           body: @body,
           url: @url,
@@ -81,6 +144,8 @@ module RecordingStudioNotifications
       end
 
       def resolved_root_recording
+        return nil if type_definition&.scope == :global
+
         @resolved_root_recording ||= RootResolver.call(
           root_recording: @root_recording,
           recording: @recording,
@@ -97,9 +162,29 @@ module RecordingStudioNotifications
       end
 
       def channel_keys
-        Array(@channels || type_definition.default_channels || RecordingStudioNotifications.configuration.default_channels)
-          .map { |channel| channel.to_s.strip.to_sym }
-          .uniq
+        @channel_keys ||= begin
+          optional = requested_optional_channels
+          required = type_definition.required_channels
+          selected = (optional + required).uniq
+          selected.select { |channel| required.include?(channel) || preference_enabled?(channel) }
+        end
+      end
+
+      def requested_optional_channels
+        channels = Array(@requested_channels || type_definition.default_channels || RecordingStudioNotifications.configuration.default_channels)
+        channels.map { |channel| channel.to_s.strip.to_sym }.uniq - type_definition.required_channels
+      end
+
+      def preference_enabled?(channel)
+        return true unless defined?(RecordingStudioNotifications::Preference)
+        return true unless RecordingStudioNotifications::Preference.table_exists?
+
+        RecordingStudioNotifications::Preference.enabled_for?(
+          recipient: @recipient,
+          notification_type: @notification_type,
+          channel: channel,
+          default: true
+        )
       end
 
       def enqueue_or_deliver!(notification)

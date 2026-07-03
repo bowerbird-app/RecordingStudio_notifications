@@ -1,9 +1,23 @@
 <div class="mx-auto flex w-full max-w-5xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Notifications",
-    subtitle: "Recent in-app notifications for your current Recording Studio workspace.",
+    subtitle: "Recent in-app notifications for your Recording Studio workspace.",
     variant: :h1
   ) %>
+
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap gap-2">
+      <%= link_to notifications_path(scope: :all) do %>
+        <%= render FlatPack::Button::Component.new(text: "All", style: @inbox_scope == "all" ? :primary : :secondary, size: :sm) %>
+      <% end %>
+      <%= link_to notifications_path(scope: :current_root) do %>
+        <%= render FlatPack::Button::Component.new(text: "Current root", style: @inbox_scope == "current_root" ? :primary : :secondary, size: :sm) %>
+      <% end %>
+    </div>
+    <%= link_to settings_path do %>
+      <%= render FlatPack::Button::Component.new(text: "Settings", style: :secondary, size: :sm) %>
+    <% end %>
+  </div>
 
   <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
     <% card.body do %>
@@ -16,6 +30,9 @@
                   <p class="font-medium text-[var(--surface-content-color)]"><%= notification.title %></p>
                   <% if notification.body.present? %>
                     <p class="mt-1 text-sm text-[var(--surface-muted-content-color)]"><%= notification.body %></p>
+                  <% end %>
+                  <% if notification.rootless? %>
+                    <p class="mt-2 text-xs text-[var(--surface-muted-content-color)]">Global</p>
                   <% end %>
                 </div>
                 <%= render FlatPack::Badge::Component.new(text: notification.read? ? "Read" : "Unread") %>

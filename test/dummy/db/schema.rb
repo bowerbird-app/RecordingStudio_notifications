@@ -84,6 +84,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_000000) do
     t.index ["root_recording_id", "created_at"], name: "idx_dummy_rsn_notifications_root_created"
   end
 
+  create_table "recording_studio_notifications_preferences", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "channel", null: false
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: true, null: false
+    t.string "notification_type", null: false
+    t.uuid "recipient_id", null: false
+    t.string "recipient_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notification_type", "channel"], name: "idx_dummy_rsn_preferences_type_channel"
+    t.index ["recipient_type", "recipient_id", "notification_type", "channel"], name: "idx_dummy_rsn_preferences_recipient", unique: true
+  end
+
   create_table "recording_studio_recordings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "parent_recording_id"

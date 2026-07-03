@@ -4,7 +4,7 @@ module RecordingStudioNotifications
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
 
-    helper_method :current_notifications_actor
+    helper_method :current_notifications_actor, :current_notifications_root_recording
 
     private
 
@@ -16,12 +16,27 @@ module RecordingStudioNotifications
       end
     end
 
+    def current_notifications_root_recording
+      @current_notifications_root_recording ||= RecordingStudioNotifications.configuration.resolve_current_root(controller: self)
+    end
+
     def authorize_notifications!(recipient:, notification: nil, recording: nil)
       return true if Services::NotificationAuthorization.allowed?(
         actor: current_notifications_actor,
         recipient: recipient,
         notification: notification,
         recording: recording,
+        controller: self
+      )
+
+      head :forbidden
+      false
+    end
+
+    def authorize_preferences!(recipient:)
+      return true if Services::NotificationAuthorization.preferences_allowed?(
+        actor: current_notifications_actor,
+        recipient: recipient,
         controller: self
       )
 

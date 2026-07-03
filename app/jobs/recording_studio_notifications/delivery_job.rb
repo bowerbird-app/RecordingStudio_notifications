@@ -13,10 +13,18 @@ module RecordingStudioNotifications
     private
 
     def deliver_one(notification, delivery)
-      adapter = RecordingStudioNotifications.channels.fetch(delivery.channel.to_sym)
-      adapter.deliver(notification: notification, delivery: delivery)
+      ActiveSupport::Notifications.instrument(
+        "deliver.recording_studio_notifications",
+        notification_id: notification.id,
+        delivery_id: delivery.id,
+        channel: delivery.channel
+      ) do
+        adapter = RecordingStudioNotifications.channels.fetch(delivery.channel.to_sym)
+        adapter.deliver(notification: notification, delivery: delivery)
+        delivery.mark_delivered! if delivery.reload.pending?
+      end
     rescue StandardError => e
-      delivery.mark_failed!(e.message) if delivery&.persisted?
+      delivery.mark_failed!(e) if delivery&.persisted?
       raise if RecordingStudioNotifications.configuration.raise_on_delivery_error
     end
   end

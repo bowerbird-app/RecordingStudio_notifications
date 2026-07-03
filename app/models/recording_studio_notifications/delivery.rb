@@ -5,6 +5,7 @@ module RecordingStudioNotifications
     self.table_name = "recording_studio_notifications_deliveries"
 
     STATUSES = %w[pending delivered failed].freeze
+    GENERIC_FAILURE_MESSAGE = "Delivery failed"
 
     belongs_to :notification, class_name: "RecordingStudioNotifications::Notification"
 
@@ -33,8 +34,8 @@ module RecordingStudioNotifications
       update!(status: "delivered", delivered_at: delivered_at || at, error_message: nil)
     end
 
-    def mark_failed!(error)
-      update!(status: "failed", error_message: error.to_s)
+    def mark_failed!(_error = nil)
+      update!(status: "failed", error_message: GENERIC_FAILURE_MESSAGE)
     end
 
     private

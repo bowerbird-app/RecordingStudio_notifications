@@ -6,12 +6,13 @@ require_relative "channel_registry"
 
 module RecordingStudioNotifications
   class Configuration
-    attr_accessor :actor_resolver, :allowed_url_hosts, :default_channels, :deliver_later,
-                  :queue_name, :raise_on_delivery_error
+    attr_accessor :actor_resolver, :current_root_resolver, :allowed_url_hosts, :default_channels,
+                  :deliver_later, :queue_name, :raise_on_delivery_error
     attr_reader :hooks, :notification_types, :channels
 
     def initialize
       @actor_resolver = -> { Current.actor if defined?(Current) && Current.respond_to?(:actor) }
+      @current_root_resolver = ->(controller:) { resolve_controller_root(controller) }
       @allowed_url_hosts = []
       @default_channels = [:in_app]
       @deliver_later = true
@@ -25,7 +26,9 @@ module RecordingStudioNotifications
         :generic,
         label: "Generic notification",
         description: "Default notification type for host applications.",
-        default_channels: default_channels
+        default_channels: default_channels,
+        available_channels: default_channels,
+        scope: :optional_root
       )
     end
 
@@ -54,6 +57,22 @@ module RecordingStudioNotifications
 
     def resolve_actor
       actor_resolver&.call
+    end
+
+    def resolve_current_root(controller:)
+      current_root_resolver&.call(controller: controller)
+    end
+
+    private
+
+    def resolve_controller_root(controller)
+      return unless controller
+
+      %i[current_root_recording current_recording root_recording].each do |method_name|
+        return controller.send(method_name) if controller.respond_to?(method_name, true)
+      end
+
+      nil
     end
   end
 end
