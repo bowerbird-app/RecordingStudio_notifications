@@ -3,6 +3,7 @@ module ApplicationHelper
 
 	NOTIFICATION_ICON_BY_TYPE = {
 		"page_comment" => :chat_bubble_left_ellipsis,
+		"page_created" => :document_text,
 		"mention" => :at_symbol,
 		"approval_requested" => :check_circle,
 		"approval_granted" => :check_circle,

@@ -16,12 +16,23 @@ class PagesController < ApplicationController
 
   def create
     @page = Page.new(page_params)
+    current_root = current_root_for_create
+    page_recording = nil
 
-    if @page.save
-      redirect_to pages_path, notice: "Page created."
-    else
-      render :new, status: :unprocessable_entity
+    ActiveRecord::Base.transaction do
+      @page.save!
+      page_recording = ensure_page_recording!(@page, current_root: current_root)
     end
+
+    notify_workspace_users_page_created!(
+      page: @page,
+      page_recording: page_recording,
+      root_recording: current_root
+    )
+
+    redirect_to pages_path, notice: "Page created."
+  rescue ActiveRecord::RecordInvalid
+    render :new, status: :unprocessable_entity
   end
 
   def comment
@@ -72,5 +83,61 @@ class PagesController < ApplicationController
       recordable: @page,
       trashed_at: nil
     )
+  end
+
+  def ensure_page_recording!(page, current_root:)
+    return if current_root.blank?
+
+    existing = RecordingStudio::Recording.find_by(
+      root_recording: current_root,
+      recordable: page,
+      trashed_at: nil
+    )
+    return existing if existing
+
+    RecordingStudio.record!(
+      action: "created",
+      recordable: page,
+      root_recording: current_root,
+      parent_recording: current_root
+    ).recording
+  end
+
+  def current_root_for_create
+    return nil unless respond_to?(:current_root_recording, true)
+
+    send(:current_root_recording)
+  end
+
+  def notify_workspace_users_page_created!(page:, page_recording:, root_recording:)
+    return if root_recording.blank? || page_recording.blank?
+
+    workspace_recipients_for(root_recording).each do |recipient|
+      next if recipient == current_user
+
+      RecordingStudioNotifications.notify(
+        notification_type: :page_created,
+        recipient: recipient,
+        actor: current_user,
+        recording: page_recording,
+        root_recording: root_recording,
+        title: "New page created: #{page.title}",
+        body: "#{current_user.display_name} created a new page in this workspace.",
+        url: page_path(page),
+        idempotency_key: "page-created-#{page.id}-#{recipient.id}"
+      )
+    end
+  end
+
+  def workspace_recipients_for(root_recording)
+    RecordingStudio::Recording.unscoped
+      .where(
+        parent_recording_id: root_recording.id,
+        recordable_type: "RecordingStudio::Access",
+        trashed_at: nil
+      )
+      .map { |recording| recording.recordable&.actor }
+      .compact
+      .uniq { |actor| [actor.class.name, actor.id] }
   end
 end
