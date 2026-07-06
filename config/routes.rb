@@ -5,6 +5,7 @@ RecordingStudioNotifications::Engine.routes.draw do
 
   resources :notifications, only: %i[index show] do
     member do
+      get :open
       patch :mark_read
       patch :mark_unread
       patch :archive

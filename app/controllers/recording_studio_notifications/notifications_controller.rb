@@ -3,7 +3,7 @@
 module RecordingStudioNotifications
   class NotificationsController < ApplicationController
     before_action :set_recipient
-    before_action :set_notification, only: %i[show mark_read mark_unread archive]
+    before_action :set_notification, only: %i[show open mark_read mark_unread archive]
 
     def index
       return unless authorize_notifications!(recipient: @recipient)
@@ -18,6 +18,16 @@ module RecordingStudioNotifications
       return if visible_notification?(@notification)
 
       head :forbidden
+    end
+
+    def open
+      return unless authorize_notifications!(recipient: @recipient, notification: @notification)
+      return head :forbidden unless visible_notification?(@notification)
+
+      @notification.mark_read! if @notification.unread?
+
+      destination = @notification.url.presence || notification_path(@notification)
+      redirect_to destination, allow_other_host: true
     end
 
     def mark_read

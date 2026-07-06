@@ -27,3 +27,13 @@
 
 /* Include the engine's views in the Tailwind build */
 @source "../../../../../app/views/**/*.erb";
+
+/* Keep FlatPack notification popover within viewport to avoid negative top placement on scroll. */
+[id^="flat-pack-notification-"][id$="-popover"] .max-h-96 {
+  max-height: calc(100vh - 14rem);
+}
+
+/* Pull the popover closer to the notification bell trigger. */
+[id^="flat-pack-notification-"][id$="-popover"]:not(.hidden) {
+  margin-top: -8px;
+}
