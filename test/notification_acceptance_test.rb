@@ -119,14 +119,21 @@ class NotificationAcceptanceTest < Minitest::Test
   end
 
   def test_inbox_supports_all_and_current_root_with_rootless_notifications
-    controller = File.read(File.expand_path("../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__))
-    application_controller = File.read(File.expand_path("../app/controllers/recording_studio_notifications/application_controller.rb", __dir__))
+    controller = File.read(File.expand_path(
+                             "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
+                           ))
+    application_controller = File.read(File.expand_path(
+                                         "../app/controllers/recording_studio_notifications/application_controller.rb", __dir__
+                                       ))
     model = File.read(File.expand_path("../app/models/recording_studio_notifications/notification.rb", __dir__))
-    initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_notifications.rb", __dir__))
-    accessible_initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_accessible.rb", __dir__))
+    initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_notifications.rb",
+                                             __dir__))
+    accessible_initializer = File.read(File.expand_path(
+                                         "../test/dummy/config/initializers/recording_studio_accessible.rb", __dir__
+                                       ))
 
-    assert_includes controller, 'params[:inbox_scope].presence_in(%w[all current_root])'
-    assert_includes controller, 'def recording_studio_root_switchable_scope_key'
+    assert_includes controller, "params[:inbox_scope].presence_in(%w[all current_root])"
+    assert_includes controller, "def recording_studio_root_switchable_scope_key"
     assert_includes model, "for_current_root_inbox"
     assert_includes model, "rootless_or_global"
     assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
@@ -137,8 +144,11 @@ class NotificationAcceptanceTest < Minitest::Test
 
   def test_settings_ui_and_routes_exist_without_bell_or_custom_css
     routes = File.read(File.expand_path("../config/routes.rb", __dir__))
-    settings = File.read(File.expand_path("../app/views/recording_studio_notifications/settings/show.html.erb", __dir__))
-    views = Dir[File.expand_path("../app/views/recording_studio_notifications/**/*.erb", __dir__)].map { |path| File.read(path) }.join("
+    settings = File.read(File.expand_path("../app/views/recording_studio_notifications/settings/show.html.erb",
+                                          __dir__))
+    views = Dir[File.expand_path("../app/views/recording_studio_notifications/**/*.erb", __dir__)].map do |path|
+      File.read(path)
+    end.join("
 ")
 
     assert_includes routes, "resource :settings"
@@ -177,24 +187,29 @@ class NotificationAcceptanceTest < Minitest::Test
   end
 
   def test_commentable_hook_wires_notification
-    initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_commentable.rb", __dir__))
+    initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_commentable.rb",
+                                             __dir__))
     model = File.read(File.expand_path("../test/dummy/app/models/page.rb", __dir__))
 
     assert_includes model, "include RecordingStudioCommentable::Commentable"
     assert_includes initializer, "RecordingStudioCommentable.configuration.hooks.after_service"
     assert_includes initializer, "RecordingStudioCommentable::Services::CreateComment"
     assert_includes initializer, "RecordingStudioNotifications.notify"
-    assert_includes initializer, 'notification_type: :page_comment'
+    assert_includes initializer, "notification_type: :page_comment"
     assert_includes initializer, "recording_comments_path"
   end
 
   def test_pages_routes_and_views_use_flatpack
     routes = File.read(File.expand_path("../test/dummy/config/routes.rb", __dir__))
+    controller = File.read(File.expand_path("../test/dummy/app/controllers/pages_controller.rb", __dir__))
     index_view = File.read(File.expand_path("../test/dummy/app/views/pages/index.html.erb", __dir__))
     show_view = File.read(File.expand_path("../test/dummy/app/views/pages/show.html.erb", __dir__))
 
     assert_includes routes, "mount RecordingStudioCommentable::Engine"
-    assert_includes routes, 'resources :pages'
+    assert_includes routes, "resources :pages"
+    assert_includes controller, "notify_workspace_users_page_created!"
+    assert_includes controller, "notification_type: :page_created"
+    assert_includes controller, "next if recipient == current_user"
     assert_includes index_view, "FlatPack::Table::Component"
     assert_includes index_view, '"Add Page"'
     assert_includes show_view, "FlatPack::PageTitle::Component"

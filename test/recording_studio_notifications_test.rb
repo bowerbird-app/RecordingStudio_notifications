@@ -26,13 +26,14 @@ class RecordingStudioNotificationsTest < Minitest::Test
   def test_engine_routes_notifications_as_root
     routes = File.read(File.expand_path("../config/routes.rb", __dir__))
 
-    assert_includes routes, 'resources :notifications'
-    assert_includes routes, 'resource :settings'
+    assert_includes routes, "resources :notifications"
+    assert_includes routes, "resource :settings"
     assert_includes routes, 'root "notifications#index"'
   end
 
   def test_migration_uses_uuid_polymorphic_columns_and_idempotency
-    migration = File.read(File.expand_path("../db/migrate/20250101000001_create_recording_studio_notifications.rb", __dir__))
+    migration = File.read(File.expand_path("../db/migrate/20250101000001_create_recording_studio_notifications.rb",
+                                           __dir__))
 
     assert_includes migration, "id: :uuid"
     assert_includes migration, "t.uuid :recipient_id"
@@ -50,6 +51,7 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_includes routes, "mount RecordingStudioNotifications::Engine"
     assert_includes initializer, "config.notification_types.register"
     assert_includes initializer, ":page_comment"
+    assert_includes initializer, ":page_created"
     assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/flat_pack", application)'
   end
 
