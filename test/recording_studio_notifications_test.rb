@@ -45,10 +45,12 @@ class RecordingStudioNotificationsTest < Minitest::Test
   def test_dummy_app_mounts_engine_and_registers_example_types
     routes = File.read(File.expand_path("dummy/config/routes.rb", __dir__))
     initializer = File.read(File.expand_path("dummy/config/initializers/recording_studio_notifications.rb", __dir__))
+    controllers_index = File.read(File.expand_path("dummy/app/javascript/controllers/index.js", __dir__))
 
     assert_includes routes, "mount RecordingStudioNotifications::Engine"
     assert_includes initializer, "config.notification_types.register"
     assert_includes initializer, ":page_comment"
+    assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/flat_pack", application)'
   end
 
   def test_engine_views_use_flatpack_without_custom_css_or_bell

@@ -149,6 +149,23 @@ class NotificationAcceptanceTest < Minitest::Test
     refute_includes views, "<style"
   end
 
+  def test_dummy_top_nav_uses_flatpack_notification_component
+    helper = File.read(File.expand_path("../test/dummy/app/helpers/application_helper.rb", __dir__))
+    top_nav = File.read(File.expand_path("../test/dummy/app/views/layouts/flat_pack/_top_nav.html.erb", __dir__))
+    tailwind = File.read(File.expand_path("../test/dummy/app/assets/tailwind/application.css", __dir__))
+
+    assert_includes helper, "FlatPack::Notification::Component"
+    assert_includes helper, "def demo_notification_path"
+    assert_includes helper, "def demo_notifications"
+    assert_includes helper, "render FlatPack::Notification::Component.new("
+    assert_includes helper, "unread_count: unread_count"
+    assert_includes helper, "see_all_href: demo_notification_path"
+    assert_includes helper, "notifications: demo_notifications"
+    assert_includes helper, "defined?(FlatPack::Notification::Component)"
+    assert_includes top_nav, "recording_studio_notifications_menu"
+    assert_includes tailwind, '[id^="flat-pack-notification-"][id$="-popover"] .max-h-96'
+  end
+
   def test_readme_documents_usage_and_integration
     readme = File.read(File.expand_path("../README.md", __dir__))
 
@@ -157,5 +174,32 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes readme, "inbox_scope=current_root"
     assert_includes readme, "CaptainHook"
     assert_includes readme, "not RecordingStudio recordings or recordables"
+  end
+
+  def test_commentable_hook_wires_notification
+    initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_commentable.rb", __dir__))
+    model = File.read(File.expand_path("../test/dummy/app/models/page.rb", __dir__))
+
+    assert_includes model, "include RecordingStudioCommentable::Commentable"
+    assert_includes initializer, "RecordingStudioCommentable.configuration.hooks.after_service"
+    assert_includes initializer, "RecordingStudioCommentable::Services::CreateComment"
+    assert_includes initializer, "RecordingStudioNotifications.notify"
+    assert_includes initializer, 'notification_type: :page_comment'
+    assert_includes initializer, "recording_comments_path"
+  end
+
+  def test_pages_routes_and_views_use_flatpack
+    routes = File.read(File.expand_path("../test/dummy/config/routes.rb", __dir__))
+    index_view = File.read(File.expand_path("../test/dummy/app/views/pages/index.html.erb", __dir__))
+    show_view = File.read(File.expand_path("../test/dummy/app/views/pages/show.html.erb", __dir__))
+
+    assert_includes routes, "mount RecordingStudioCommentable::Engine"
+    assert_includes routes, 'resources :pages'
+    assert_includes index_view, "FlatPack::Table::Component"
+    assert_includes index_view, '"Add Page"'
+    assert_includes show_view, "FlatPack::PageTitle::Component"
+    assert_includes show_view, "FlatPack::Card::Component"
+    refute_includes index_view, "<style"
+    refute_includes show_view, "<style"
   end
 end
