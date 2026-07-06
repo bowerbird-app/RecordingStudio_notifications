@@ -22,6 +22,12 @@
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "System notifications",
+        href: main_app.system_notifications_path,
+        icon: :megaphone
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Install",
         href: main_app.docs_install_path,
         icon: :arrow_down_tray

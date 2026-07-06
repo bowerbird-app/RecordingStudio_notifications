@@ -46,6 +46,7 @@ Rails.application.routes.draw do
       post :comment
     end
   end
+  resources :system_notifications, only: %i[index new create show]
 
   # Defines the root path route ("/")
   root "home#index"

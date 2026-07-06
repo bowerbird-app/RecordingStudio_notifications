@@ -28,6 +28,11 @@ commenter = User.find_or_create_by!(email: "commenter@commenter.com") do |u|
   u.password_confirmation = "Password"
 end
 
+private_user = User.find_or_create_by!(email: "private@private.com") do |u|
+  u.password = "Password"
+  u.password_confirmation = "Password"
+end
+
 # Create the workspace recordables
 workspace = Workspace.find_or_create_by!(name: "Studio Workspace")
 accessible_workspace = Workspace.find_or_create_by!(name: "Client Workspace")
@@ -145,6 +150,28 @@ begin
         end
       end
     end
+
+    private_admin_exists = RecordingStudio::Recording.unscoped
+      .where(
+        root_recording_id: private_root_recording.id,
+        parent_recording_id: private_root_recording.id,
+        recordable_type: "RecordingStudio::Access",
+        trashed_at: nil
+      )
+      .order(created_at: :asc, id: :asc)
+      .detect do |recording|
+        access = recording.recordable
+        access&.actor == private_user && access.role.to_s == "admin"
+      end
+
+    unless private_admin_exists
+      RecordingStudioAccessible::AccessCreationContext.allow do
+        private_root_recording.record(RecordingStudio::Access, parent_recording: private_root_recording) do |access|
+          access.actor = private_user
+          access.role = :admin
+        end
+      end
+    end
   end
 ensure
   Current.actor = previous_actor
@@ -152,6 +179,7 @@ end
 
 puts "Seeded: admin@admin.com / Password"
 puts "Seeded: commenter@commenter.com / Password"
+puts "Seeded: private@private.com / Password"
 puts "Seeded: Workspace '#{workspace.name}' with root recording ##{root_recording.id}"
 puts "Seeded: Workspace '#{accessible_workspace.name}' with root recording ##{accessible_root_recording.id}"
 puts "Seeded: Workspace '#{private_workspace.name}' with root recording ##{private_root_recording.id}"
