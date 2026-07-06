@@ -1,0 +1,19 @@
+<%= render FlatPack::PageTitle::Component.new(
+  title: "Pages",
+  subtitle: "Browse available pages",
+  variant: :h1
+) %>
+
+<div class="flex justify-end mb-4">
+  <%= link_to new_page_path do %>
+    <%= render FlatPack::Button::Component.new(text: "Add Page", style: :primary, icon: :plus, size: :md) %>
+  <% end %>
+</div>
+
+<%= render FlatPack::Table::Component.new(data: @pages) do |table| %>
+  <% table.column(title: "Title", html: ->(page) { link_to page.title, page_path(page), class: "text-[var(--color-primary)] hover:underline" }) %>
+  <% table.column(title: "Created", html: ->(page) { "#{time_ago_in_words(page.created_at)} ago" }) %>
+  <% table.column(title: "", html: ->(page) {
+    link_to "View", page_path(page), class: "inline-flex items-center justify-center gap-2 rounded-[var(--button-border-radius)] font-medium cursor-pointer transition-colors duration-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-focus-ring-color)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--button-focus-ring-offset-color)] disabled:pointer-events-none disabled:opacity-[var(--button-disabled-opacity)] px-[var(--button-padding-x-sm)] py-[var(--button-padding-y-sm)] text-xs bg-[var(--button-ghost-background-color)] hover:bg-[var(--button-ghost-hover-background-color)] text-[var(--button-ghost-text-color)] border border-[var(--button-ghost-border-color)]"
+  }) %>
+<% end %>

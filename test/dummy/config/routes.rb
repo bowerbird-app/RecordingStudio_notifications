@@ -31,6 +31,22 @@ Rails.application.routes.draw do
   get "docs/gem_views", to: "docs#gem_views", as: :docs_gem_views
   get "docs/methods", to: "docs#methods", as: :docs_methods
 
+  mount RecordingStudioCommentable::Engine, at: "/commentable"
+  scope module: :recording_studio_commentable do
+    resources :recordings, only: [] do
+      resources :comments, only: [:index, :new, :create] do
+        collection do
+          get :all, path: "all"
+        end
+      end
+    end
+  end
+  resources :pages, only: %i[index show new create] do
+    member do
+      post :comment
+    end
+  end
+
   # Defines the root path route ("/")
   root "home#index"
 end

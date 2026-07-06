@@ -22,6 +22,12 @@ user = User.find_or_create_by!(email: "admin@admin.com") do |u|
   u.password_confirmation = "Password"
 end
 
+# Create a commenter user for RS_commentable demonstration
+commenter = User.find_or_create_by!(email: "commenter@commenter.com") do |u|
+  u.password = "Password"
+  u.password_confirmation = "Password"
+end
+
 # Create the workspace recordables
 workspace = Workspace.find_or_create_by!(name: "Studio Workspace")
 accessible_workspace = Workspace.find_or_create_by!(name: "Client Workspace")
@@ -87,17 +93,6 @@ begin
     idempotency_key: "seed-system-announcement"
   )
 
-  RecordingStudioNotifications::Services::Notify.call(
-    notification_type: :page_comment,
-    recipient: user,
-    actor: user,
-    root_recording: root_recording,
-    recording: page_recording,
-    title: "New page comment",
-    body: "Comment added on Getting Started.",
-    idempotency_key: "seed-page-comment-#{page.id}"
-  )
-
   if defined?(RecordingStudioAccessible) && RecordingStudioAccessible.respond_to?(:grant_access)
     ensure_access_for = lambda do |parent_recording, role|
       root_for_parent = RecordingStudio.root_recording_or_self(parent_recording)
@@ -124,15 +119,39 @@ begin
       end
     end
 
-    ensure_access_for.call(root_recording, :view)
-    ensure_access_for.call(accessible_root_recording, :view)
+    ensure_access_for.call(root_recording, :edit)
+    ensure_access_for.call(accessible_root_recording, :edit)
     ensure_access_for.call(admin_root_recording, :admin)
+
+    # Grant commenter edit access to Studio Workspace
+    commenter_access_exists = RecordingStudio::Recording.unscoped
+      .where(
+        root_recording_id: root_recording.id,
+        parent_recording_id: root_recording.id,
+        recordable_type: "RecordingStudio::Access",
+        trashed_at: nil
+      )
+      .order(created_at: :asc, id: :asc)
+      .detect do |recording|
+        access = recording.recordable
+        access&.actor == commenter && access.role.to_s == "edit"
+      end
+
+    unless commenter_access_exists
+      RecordingStudioAccessible::AccessCreationContext.allow do
+        root_recording.record(RecordingStudio::Access, parent_recording: root_recording) do |access|
+          access.actor = commenter
+          access.role = :edit
+        end
+      end
+    end
   end
 ensure
   Current.actor = previous_actor
 end
 
 puts "Seeded: admin@admin.com / Password"
+puts "Seeded: commenter@commenter.com / Password"
 puts "Seeded: Workspace '#{workspace.name}' with root recording ##{root_recording.id}"
 puts "Seeded: Workspace '#{accessible_workspace.name}' with root recording ##{accessible_root_recording.id}"
 puts "Seeded: Workspace '#{private_workspace.name}' with root recording ##{private_root_recording.id}"

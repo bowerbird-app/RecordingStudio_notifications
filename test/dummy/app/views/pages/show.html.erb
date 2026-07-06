@@ -1,0 +1,66 @@
+<%= render FlatPack::PageTitle::Component.new(
+  title: @page.title,
+  variant: :h1
+) %>
+
+<p class="text-sm text-[var(--surface-content-color)]">
+  This is a dummy page. You can add comments below.
+</p>
+
+<% if @page_recording %>
+  <div class="mt-6">
+    <h2 class="text-lg font-semibold text-[var(--surface-content-color)] mb-4">Comments</h2>
+    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+      <% card.body do %>
+        <% comments = RecordingStudioCommentable::Comment
+             .joins("INNER JOIN recording_studio_recordings AS comment_recordings ON comment_recordings.recordable_type = 'RecordingStudioCommentable::Comment' AND comment_recordings.recordable_id = recording_studio_comments.id AND comment_recordings.trashed_at IS NULL")
+             .joins("INNER JOIN recording_studio_recordings AS parent_recordings ON parent_recordings.id = comment_recordings.parent_recording_id AND parent_recordings.trashed_at IS NULL")
+             .where(parent_recordings: { recordable_type: "Page", recordable_id: @page.id })
+             .includes(:author)
+             .order(created_at: :asc) %>
+
+        <% if comments.any? %>
+          <%= render FlatPack::List::Component.new(spacing: :default, divider: true) do %>
+            <% comments.each do |comment| %>
+              <%= render FlatPack::List::Item.new(
+                icon: :chat_bubble_left,
+                hover: false
+              ) do %>
+                <div class="text-left">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-sm font-medium text-[var(--surface-content-color)]">
+                      <%= comment.author_display_name %>
+                    </span>
+                    <span class="text-xs text-[var(--surface-muted-content-color)]">
+                      <%= time_ago_in_words(comment.created_at) %> ago
+                    </span>
+                  </div>
+                  <p class="text-sm text-[var(--surface-muted-content-color)] whitespace-pre-wrap"><%= comment.body %></p>
+                </div>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% else %>
+          <p class="text-sm text-[var(--surface-muted-content-color)]">No comments yet.</p>
+        <% end %>
+      <% end %>
+
+      <% if user_signed_in? %>
+        <% card.footer do %>
+          <%= form_with url: comment_page_path(@page), method: :post, local: true, class: "space-y-3" do %>
+            <%= text_area_tag :body, nil, placeholder: "Add a comment...", rows: 3, class: "w-full rounded-md border border-[var(--surface-border-color)] bg-[var(--surface-background-color)] px-3 py-2 text-sm text-[var(--surface-content-color)] placeholder:text-[var(--surface-muted-content-color)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]" %>
+            <div class="flex justify-end">
+              <%= submit_tag "Post comment", class: "inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-primary-text)] hover:bg-[var(--color-primary-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 transition-colors cursor-pointer" %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+    <% card.body do %>
+      <p class="text-sm text-[var(--surface-muted-content-color)]">This page has not been recorded in a workspace yet. Run seeds to create the recording.</p>
+    <% end %>
+  <% end %>
+<% end %>

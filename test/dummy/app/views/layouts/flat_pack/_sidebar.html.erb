@@ -16,6 +16,12 @@
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Pages",
+        href: main_app.pages_path,
+        icon: :document_text
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Install",
         href: main_app.docs_install_path,
         icon: :arrow_down_tray
