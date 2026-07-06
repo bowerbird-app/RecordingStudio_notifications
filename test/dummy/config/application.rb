@@ -18,15 +18,6 @@ require "action_cable/engine"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-# Stub missing helper from RS_commentable v0.2.0 (loaded before initializers)
-unless defined?(RecordingStudioCommentable::CommentRoutesHelper)
-  module RecordingStudioCommentable
-    module CommentRoutesHelper
-      extend ActiveSupport::Concern
-    end
-  end
-end
-
 module Dummy
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
