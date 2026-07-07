@@ -1,14 +1,524 @@
 <div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Config",
-    subtitle: "Replace this placeholder with the configuration settings your generated gem exposes.",
+    title: "Configuration & Usage",
+    subtitle: "How to configure RecordingStudioNotifications, register notification types and channels, and send notifications.",
     variant: :h1
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Configuration",
+    subtitle: "Configure the engine in an initializer. The install generator creates this file for you.",
+  ) %>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~CODE
+      # config/initializers/recording_studio_notifications.rb
+      RecordingStudioNotifications.configure do |config|
+        # Actor resolution — who performed the action
+        config.actor_resolver = -> { Current.actor }
+
+        # Root recording resolution — the current workspace context
+        config.current_root_resolver = lambda do |controller:|
+          controller.send(:current_root_recording) if controller.respond_to?(:current_root_recording, true)
+        end
+
+        # Allowed URL hosts (for redirect safety)
+        config.allowed_url_hosts = []
+
+        # Default channels for new notification types
+        config.default_channels = [:in_app]
+
+        # Use ActiveJob deliver_later (true) or immediate delivery (false)
+        config.deliver_later = true
+
+        # ActiveJob queue name
+        config.queue_name = :default
+
+        # Raise on delivery errors (false logs and swallows)
+        config.raise_on_delivery_error = false
+      end
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Configuration Options",
+    subtitle: "Every configurable setting on the Configuration object.",
+  ) %>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="py-2 pr-4 font-semibold">Option</th>
+          <th class="py-2 pr-4 font-semibold">Type</th>
+          <th class="py-2 pr-4 font-semibold">Default</th>
+          <th class="py-2 font-semibold">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">actor_resolver</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">Proc</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">-&gt; { Current.actor }</code></td>
+          <td class="py-2">Lambda that returns the current user/actor. Used as default when no actor is passed to notify.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">current_root_resolver</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">Proc</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">controller-based resolver</code></td>
+          <td class="py-2">Lambda that resolves the current root recording from a controller. Used for inbox scoping.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">allowed_url_hosts</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">Array</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">[]</code></td>
+          <td class="py-2">Hosts allowed for notification redirect URLs. Empty means all hosts allowed.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_channels</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">Array</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">[:in_app]</code></td>
+          <td class="py-2">Default channel list for new notification type registrations when not specified.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">deliver_later</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">Boolean</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">true</code></td>
+          <td class="py-2">Enqueue delivery via ActiveJob (true) or deliver synchronously (false).</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">queue_name</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">Symbol</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">:default</code></td>
+          <td class="py-2">ActiveJob queue name for delivery jobs.</td>
+        </tr>
+        <tr>
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">raise_on_delivery_error</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">Boolean</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">false</code></td>
+          <td class="py-2">Raise exceptions on delivery failures (true) or log and swallow (false).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Registering Notification Types",
+    subtitle: "Each notification type defines its label, channel availability, and root scope. Register types in your initializer.",
+  ) %>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~CODE
+      RecordingStudioNotifications.configure do |config|
+        # Root-scoped: must have a root recording (e.g., workspace-level event)
+        config.notification_types.register(
+          :workspace_change,
+          label: "Workspace change",
+          description: "Root-scoped notification for workspace-level updates.",
+          default_channels: [:in_app],
+          available_channels: [:in_app],
+          scope: :root
+        )
+
+        # Global: must NOT have a root recording (e.g., system-wide announcement)
+        config.notification_types.register(
+          :system_announcement,
+          label: "System announcement",
+          description: "Global rootless notification sent to all recipients.",
+          default_channels: [],
+          required_channels: [:in_app],
+          available_channels: [:in_app],
+          scope: :global
+        )
+
+        # Optional-root: either is fine (e.g., a comment on a page)
+        config.notification_types.register(
+          :page_comment,
+          label: "Page comment",
+          description: "Optional-root notification for comments on pages.",
+          default_channels: [:in_app],
+          available_channels: [:in_app],
+          scope: :optional_root
+        )
+      end
+    CODE
+  ) %>
+
+  <p class="text-sm"><strong>Registration parameters:</strong></p>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="py-2 pr-4 font-semibold">Parameter</th>
+          <th class="py-2 pr-4 font-semibold">Required</th>
+          <th class="py-2 font-semibold">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">key</code> (first arg)</td>
+          <td class="py-2 pr-4">Yes</td>
+          <td class="py-2">Symbol key used when calling notify (e.g., <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:page_comment</code>).</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">label:</code></td>
+          <td class="py-2 pr-4">Yes</td>
+          <td class="py-2">Human-readable label shown in the UI.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">description:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Optional longer description for admin/settings views.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_channels:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Channels a recipient gets by default if they have no preference. Defaults to config.default_channels.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">required_channels:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Channels that MUST be delivered regardless of recipient preferences (e.g., system-wide in-app).</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">available_channels:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">All channels this type can use. Defaults to default_channels + required_channels.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">scope:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">One of <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:root</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:global</code>, or <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code>. Default: <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code>.</td>
+        </tr>
+        <tr>
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">creation_action:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Optional RecordingStudioAccessible action symbol. If set, the actor is authorized via Accessible before creating the notification.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="text-sm"><strong>Scope rules:</strong></p>
+  <ul class="list-disc pl-6 text-sm">
+    <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:root</code> — A <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">root_recording</code> must be provided.</li>
+    <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:global</code> — Must NOT have a root recording (or notifiable/recording).</li>
+    <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code> — Either is allowed. Global notifications appear alongside root-scoped ones in the inbox.</li>
+  </ul>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Sending Notifications",
+    subtitle: "Use the notify and notify_each public APIs from anywhere in your application.",
+  ) %>
+
+  <p class="text-sm">The primary API is <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">RecordingStudioNotifications.notify</code>. Pass all attributes as keyword arguments:</p>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      RecordingStudioNotifications.notify(
+        notification_type: :page_comment,   # Registered type key
+        recipient: viewer,                   # The user who receives this notification
+        actor: current_user,                 # Who performed the action (optional; falls back to config.actor_resolver)
+        title: "New comment on #{page.title}",
+        body: comment.body.to_s.truncate(200),
+        url: page_path(page),                # Where clicking the notification takes the user
+        recording: comment_recording,         # Optional: a RecordingStudio::Recording
+        root_recording: root_recording,       # Workspace root (required for :root scope)
+        notifiable: nil,                      # Optional: the recordable that triggered this
+        metadata: { custom: "data" },         # Optional: arbitrary hash stored on the notification
+        channels: [:in_app],                  # Optional: override channels for this specific notification
+        idempotency_key: "comment-#{comment.id}-#{viewer.id}",  # Prevents duplicate notifications
+        deliver_later: true                   # Optional: override config.deliver_later
+      )
+    CODE
+  ) %>
+
+  <p class="text-sm"><strong>Notify parameters:</strong></p>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="py-2 pr-4 font-semibold">Parameter</th>
+          <th class="py-2 pr-4 font-semibold">Required</th>
+          <th class="py-2 font-semibold">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">notification_type:</code></td>
+          <td class="py-2 pr-4">Yes</td>
+          <td class="py-2">Symbol matching a registered notification type key.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">recipient:</code></td>
+          <td class="py-2 pr-4">Yes</td>
+          <td class="py-2">The user/actor who receives the notification.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">title:</code></td>
+          <td class="py-2 pr-4">Yes</td>
+          <td class="py-2">Notification title shown in the inbox.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">body:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Optional body/summary text.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">url:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Target URL when the user clicks the notification. Sanitized for cross-host redirect safety.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">actor:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">The user who performed the action. Falls back to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">config.actor_resolver</code>.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">recording:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">A RecordingStudio::Recording associated with the event.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">root_recording:</code></td>
+          <td class="py-2 pr-4">Conditional</td>
+          <td class="py-2">Required for <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:root</code> scope types. The workspace root recording.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">notifiable:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Optional recordable that triggered this notification.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">metadata:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Arbitrary hash stored on the notification for app-specific use.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">channels:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Override which channels to deliver to for this specific notification.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">idempotency_key:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">A unique key that prevents duplicate notifications for the same recipient+event pair.</td>
+        </tr>
+        <tr>
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">deliver_later:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Override <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">config.deliver_later</code> for this call.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Bulk Notifications: notify_each",
+    subtitle: "Send the same notification to multiple recipients at once.",
   ) %>
 
   <%= render FlatPack::CodeBlock::Component.new(
     language: :ruby,
     code: <<~'CODE'
-      # Add the config settings for the gem here.
+      # Notify multiple recipients with the same notification content
+      RecordingStudioNotifications.notify_each(
+        recipients: workspace_members,
+        notification_type: :workspace_change,
+        title: "Workspace settings updated",
+        body: "The workspace name has been changed to #{workspace.name}.",
+        url: workspace_path(workspace),
+        root_recording: workspace_recording,
+        idempotency_key: "workspace-change-#{workspace.id}-#{timestamp}"
+      )
+      # Returns an array of Notification objects, one per recipient
     CODE
   ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Adding a Custom Channel",
+    subtitle: "Beyond the built-in :in_app adapter, register your own delivery channels (email, Slack, push, etc.).",
+  ) %>
+
+  <p class="text-sm">A channel adapter must implement a single method: <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">deliver(notification:, delivery:)</code>. The delivery object tracks per-channel state (pending/delivered/failed) and can be marked via <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">delivery.mark_delivered!</code> or <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">delivery.mark_failed!</code>.</p>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~CODE
+      # Define your adapter (e.g., in lib/notification_channels/email_adapter.rb)
+      module NotificationChannels
+        class EmailAdapter
+          def deliver(notification:, delivery:)
+            NotificationMailer.with(
+              notification: notification,
+              delivery: delivery
+            ).notification_email.deliver_now
+
+            delivery.mark_delivered!
+            notification
+          rescue StandardError => e
+            delivery.mark_failed!
+            raise
+          end
+        end
+      end
+
+      # Register it in your initializer
+      RecordingStudioNotifications.configure do |config|
+        config.channels.register(:email, NotificationChannels::EmailAdapter.new)
+      end
+
+      # Then use it in notification type registrations
+      RecordingStudioNotifications.configure do |config|
+        config.notification_types.register(
+          :task_assigned,
+          label: "Task assigned",
+          description: "A user was assigned to a task.",
+          default_channels: [:in_app, :email],
+          available_channels: [:in_app, :email],
+          scope: :root
+        )
+      end
+    CODE
+  ) %>
+
+  <p class="text-sm">The built-in <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:in_app</code> adapter simply marks the delivery as delivered:</p>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~CODE
+      module RecordingStudioNotifications
+        module Channels
+          class InAppAdapter
+            def deliver(notification:, delivery:)
+              delivery.mark_delivered!
+              notification
+            end
+          end
+        end
+      end
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Per-Recipient Channel Preferences",
+    subtitle: "Recipients can opt out of optional channels. Required channels are always delivered.",
+  ) %>
+
+  <p class="text-sm">Each recipient has a <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">RecordingStudioNotifications::Preference</code> record per notification type + channel. When a notification is created:</p>
+  <ol class="list-decimal pl-6 text-sm">
+    <li><strong>Required channels</strong> (from the type's <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">required_channels</code>) are always delivered — preferences are ignored.</li>
+    <li><strong>Optional channels</strong> check the recipient's preference. If no preference exists, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_channels</code> from the type registration is used.</li>
+  </ol>
+
+  <p class="text-sm">Users manage their per-type preferences from the settings page at <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">/notifications/settings</code>.</p>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Using Hooks to Trigger Notifications",
+    subtitle: "Decouple notification logic from your business code by hooking into service lifecycle events.",
+  ) %>
+
+  <p class="text-sm">The engine provides a hook system. Host apps can register hooks to fire notifications when specific services complete successfully:</p>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      # Example: Notify workspace members when a comment is created
+      RecordingStudioCommentable.configuration.hooks.after_service(priority: 10) do |service_class, result|
+        next unless service_class == RecordingStudioCommentable::Services::CreateComment
+        next unless result.success?
+
+        comment = result.value
+        page = comment.page
+        root = comment.recording.root_recording
+        viewers = page.workspace_viewers - [comment.author]
+
+        viewers.each do |viewer|
+          RecordingStudioNotifications.notify(
+            notification_type: :page_comment,
+            recipient: viewer,
+            actor: comment.author,
+            title: "New comment on #{page.title}",
+            body: comment.body.to_s.truncate(200),
+            url: page_path(page),
+            recording: comment.recording,
+            root_recording: root,
+            idempotency_key: "comment-#{comment.id}-#{viewer.id}"
+          )
+        end
+      end
+    CODE
+  ) %>
+
+  <p class="text-sm"><strong>Available hook types:</strong></p>
+  <ul class="list-disc pl-6 text-sm">
+    <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">before_initialize</code> / <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">after_initialize</code> — Engine lifecycle.</li>
+    <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">on_configuration</code> — Runs after configuration is loaded.</li>
+    <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">before_service</code> / <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">after_service</code> / <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">around_service</code> — Service lifecycle hooks.</li>
+    <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">on(event_name)</code> — Custom event hooks.</li>
+    <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">extend_model</code> / <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">extend_controller</code> — Extension point hooks.</li>
+  </ul>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Idempotency",
+    subtitle: "Prevent duplicate notifications with idempotency keys.",
+  ) %>
+
+  <p class="text-sm">When you pass an <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">idempotency_key</code>, the notify service checks for an existing notification with the same type, recipient, and key. If found, it reuses that notification instead of creating a duplicate — but still creates pending deliveries for any channels that haven't been delivered yet.</p>
+
+  <p class="text-sm"><strong>Best practice:</strong> Always use idempotency keys for notifications triggered by hooks or background jobs. Combine the event identifier with the recipient ID:</p>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      idempotency_key: "comment-#{comment.id}-#{viewer.id}"
+      idempotency_key: "workspace-change-#{workspace.id}-#{user.id}"
+      idempotency_key: "task-assigned-#{task.id}-#{assignee.id}"
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Complete Example: Adding a New Notification Type",
+    subtitle: "A step-by-step checklist for wiring up a new notification scenario end-to-end.",
+  ) %>
+
+  <p class="text-sm"><strong>1. Register the type</strong> in your initializer:</p>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~CODE
+      RecordingStudioNotifications.configure do |config|
+        config.notification_types.register(
+          :task_assigned,
+          label: "Task assigned",
+          description: "A user was assigned to a task.",
+          default_channels: [:in_app],
+          available_channels: [:in_app],
+          scope: :root
+        )
+      end
+    CODE
+  ) %>
+
+  <p class="text-sm"><strong>2. Trigger the notification</strong> at your business event:</p>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      RecordingStudioNotifications.notify(
+        notification_type: :task_assigned,
+        recipient: task.assignee,
+        actor: current_user,
+        title: "Task assigned: #{task.title}",
+        body: "#{current_user.name} assigned you a task",
+        url: task_path(task),
+        recording: task.recording,
+        root_recording: task.recording.root_recording,
+        idempotency_key: "task-assigned-#{task.id}-#{task.assignee.id}"
+      )
+    CODE
+  ) %>
+
+  <p class="text-sm"><strong>3. Verify:</strong> the notification appears in the inbox, clicking marks it read and redirects, and mark_unread/archive endpoints work correctly.</p>
 </div>

@@ -1,19 +1,89 @@
 <div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Install",
-    subtitle: "Host-app setup for the mounted RecordingStudioNotifications engine and its sample migrations.",
+    subtitle: "Add RecordingStudioNotifications to your host Rails application.",
     variant: :h1
   ) %>
 
   <%= render FlatPack::SectionTitle::Component.new(
-    title: "Step 1",
-    subtitle: "Provide one section title for each step",
+    title: "1. Add the gem",
+    subtitle: "Add to your application's Gemfile.",
+  ) %>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~CODE
+      gem "recording_studio_notifications"
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "2. Install dependencies",
+    subtitle: "Run bundle install to fetch the gem and its dependencies.",
   ) %>
 
   <%= render FlatPack::CodeBlock::Component.new(
     language: :bash,
     code: <<~CODE
-      # Put the step instruction here.
+      bundle install
     CODE
   ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "3. Run the install generator",
+    subtitle: "Mounts the engine, creates a configuration initializer, and sets up Tailwind sources.",
+  ) %>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :bash,
+    code: <<~CODE
+      bin/rails generate recording_studio_notifications:install
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "4. Install and run migrations",
+    subtitle: "Copy engine migrations into your app and run them.",
+  ) %>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :bash,
+    code: <<~CODE
+      bin/rails generate recording_studio_notifications:migrations
+      bin/rails db:migrate
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "5. Verify",
+    subtitle: "Start your server and visit the mounted engine path to confirm everything is wired up.",
+  ) %>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :bash,
+    code: <<~CODE
+      bin/rails server
+      # Visit http://localhost:3000/notifications
+    CODE
+  ) %>
+
+  <%= render FlatPack::Accordion::Component.new(
+    title: "Manual installation (without the generator)",
+    open: false
+  ) do |accordion| %>
+    <% accordion.item(id: "manual-install", title: "Manual installation (without the generator)") do %>
+      <div class="flex flex-col gap-4">
+        <p class="text-sm">If you prefer to set up the engine manually, add the mount point to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">config/routes.rb</code>:</p>
+
+        <%= render FlatPack::CodeBlock::Component.new(
+          language: :ruby,
+          code: <<~CODE
+            mount RecordingStudioNotifications::Engine, at: "/notifications"
+          CODE
+        ) %>
+
+        <p class="text-sm">Optionally create <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">config/initializers/recording_studio_notifications.rb</code> for configuration. See the <%= link_to "Configuration page", docs_config_path, class: "underline" %> for available options.</p>
+      </div>
+    <% end %>
+  <% end %>
 </div>
