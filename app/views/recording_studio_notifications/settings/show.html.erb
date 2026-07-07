@@ -32,7 +32,7 @@
           <% end %>
 
           <div>
-            <%= render FlatPack::Button::Component.new(text: "Save settings", style: :primary, size: :md) %>
+            <%= render FlatPack::Button::Component.new(text: "Save settings", style: :primary, size: :md, type: "submit") %>
           </div>
         <% else %>
           <p class="text-sm text-[var(--surface-muted-content-color)]">No optional notification channels are available.</p>
