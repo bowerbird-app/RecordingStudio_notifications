@@ -40,6 +40,23 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Install"
   end
 
+  test "all_workspaces scope includes admin root option" do
+    user = User.find_or_create_by!(email: "root-switch-admin-root-test@example.com") do |record|
+      record.password = "Password123!"
+      record.password_confirmation = "Password123!"
+    end
+
+    sign_in user
+
+    Workspace.create!(name: "Admin Root Scope Workspace")
+    RecordingStudio.root_recording_for(AdminRoot.first_or_create!)
+
+    get "/recording_studio_root_switchable/v1/root_switch?scope=all_workspaces"
+
+    assert_response :success
+    assert_includes response.body, "Admin Root"
+  end
+
   test "switching returns to the current page when it is a valid internal route" do
     user = User.find_or_create_by!(email: "root-switch-redirect-test@example.com") do |record|
       record.password = "Password123!"

@@ -13,4 +13,12 @@ class AdminRoot < ApplicationRecord
     section :admin_activity_logs
     section :all_notifications
   end
+
+  def name
+    "Admin Root"
+  end
+
+  def to_s
+    name
+  end
 end
