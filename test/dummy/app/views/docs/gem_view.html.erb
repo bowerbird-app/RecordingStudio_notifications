@@ -1,0 +1,21 @@
+<div class="mx-auto flex w-full max-w-5xl flex-col gap-6">
+  <%# --- Minimal nav: back + root anchor --- %>
+  <div class="flex items-center gap-3">
+    <%= link_to docs_gem_views_path,
+          class: "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-[var(--interactive-content-color)] bg-[var(--interactive-surface-color)] hover:bg-[var(--interactive-surface-hover-color)] transition-colors" do %>
+      <span aria-hidden="true">←</span>
+      <span>Back to Gem Views</span>
+    <% end %>
+
+    <%= link_to main_app.root_path,
+          class: "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-[var(--interactive-content-color)] bg-[var(--interactive-surface-color)] hover:bg-[var(--interactive-surface-hover-color)] transition-colors" do %>
+      <span aria-hidden="true">⌂</span>
+      <span>Home</span>
+    <% end %>
+  </div>
+
+  <hr class="border-(--border-color)" />
+
+  <%# --- The rendered engine view --- %>
+  <%= render template: @engine_template %>
+</div>

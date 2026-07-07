@@ -29,6 +29,10 @@ Rails.application.routes.draw do
   get "docs/recordable_types", to: "docs#recordable_types", as: :docs_recordable_types
   get "docs/recordings_tree", to: "docs#recordings_tree", as: :docs_recordings_tree
   get "docs/gem_views", to: "docs#gem_views", as: :docs_gem_views
+  get "docs/gem_view", to: "docs#gem_view", as: :docs_gem_view
+  get "docs/all_notifications", to: "docs#all_notifications", as: :docs_all_notifications
+  get "docs/notification_detail", to: "docs#notification_detail", as: :docs_notification_detail
+  get "docs/notification_settings", to: "docs#notification_settings", as: :docs_notification_settings
   get "docs/methods", to: "docs#methods", as: :docs_methods
 
   mount RecordingStudioCommentable::Engine, at: "/commentable"

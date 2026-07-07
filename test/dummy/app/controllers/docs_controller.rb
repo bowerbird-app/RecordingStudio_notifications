@@ -33,6 +33,37 @@ class DocsController < ApplicationController
       .map { |path| path.delete_prefix(prefix) }
   end
 
+  def gem_view
+    view_path = params[:view]
+
+    unless valid_engine_view?(view_path)
+      redirect_to docs_gem_views_path, alert: "Invalid view path."
+      return
+    end
+
+    @view_path = view_path
+    @engine_template = view_path.sub(%r{^app/views/}, "").sub(/\.erb$/, "")
+    setup_gem_view_data(view_path)
+  end
+
+  def all_notifications
+    setup_gem_view_data("app/views/recording_studio_notifications/notifications/index.html.erb")
+    @engine_template = "recording_studio_notifications/notifications/index"
+    render :gem_view
+  end
+
+  def notification_detail
+    setup_gem_view_data("app/views/recording_studio_notifications/notifications/show.html.erb")
+    @engine_template = "recording_studio_notifications/notifications/show"
+    render :gem_view
+  end
+
+  def notification_settings
+    setup_gem_view_data("app/views/recording_studio_notifications/settings/show.html.erb")
+    @engine_template = "recording_studio_notifications/settings/show"
+    render :gem_view
+  end
+
   def methods
   end
 
@@ -98,5 +129,38 @@ class DocsController < ApplicationController
       recordable.minimum_role.present?
 
     "##{recordable.id}"
+  end
+
+  def valid_engine_view?(view_path)
+    return false if view_path.blank?
+    return false if view_path.include?("..") || view_path.start_with?("/")
+
+    allowed_views = Dir.glob(
+      RecordingStudioNotifications::Engine.root.join("app/views/recording_studio_notifications/**/*.erb").to_s
+    ).map { |p| p.delete_prefix("#{RecordingStudioNotifications::Engine.root}/") }
+
+    allowed_views.include?(view_path)
+  end
+
+  def setup_gem_view_data(view_path)
+    # Provide enough dummy data so engine views don't crash.
+    # Each view sets up what it needs; missing ivars default to nil/[].
+
+    if view_path.include?("notifications/index")
+      @notifications = RecordingStudioNotifications::Notification.none
+      @inbox_scope = "all"
+      @current_root_recording = nil
+    elsif view_path.include?("notifications/show")
+      @notification = RecordingStudioNotifications::Notification.new(
+        notification_type: "sample",
+        title: "Sample notification",
+        body: "This is a sample notification body for preview purposes.",
+        url: nil,
+        created_at: Time.current
+      )
+    elsif view_path.include?("settings/show")
+      @notification_types = RecordingStudioNotifications.notification_types.values
+      @preferences = {}
+    end
   end
 end

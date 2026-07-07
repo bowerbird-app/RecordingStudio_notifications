@@ -58,19 +58,13 @@
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Gem Views",
-        href: main_app.docs_gem_views_path,
-        icon: :eye
-      ) %>
-
-      <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Inbox",
+        label: "All Notifications",
         href: recording_studio_notifications.root_path,
         icon: :inbox
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Notification settings",
+        label: "Notification Settings",
         href: recording_studio_notifications.settings_path,
         icon: :adjustments_horizontal
       ) %>
