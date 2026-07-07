@@ -1,49 +1,43 @@
 <div class="mx-auto flex w-full max-w-3xl flex-col gap-6">
+  <%= render FlatPack::PageNav::Component.new(
+    anchor_url: main_app.root_path
+  ) %>
+
   <%= render FlatPack::PageTitle::Component.new(
     title: "Notification settings",
     subtitle: "Choose optional channels for each notification type. Required channels always stay enabled.",
     variant: :h1
   ) %>
 
-  <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
-    <% card.body do %>
-      <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-5" do %>
-        <% if @notification_types.any? %>
-          <% @notification_types.each do |type| %>
-            <section class="rounded-lg border border-[var(--border-color)] p-4">
-              <div class="mb-3">
-                <h2 class="font-medium text-[var(--surface-content-color)]"><%= type.label %></h2>
-                <% if type.description.present? %>
-                  <p class="text-sm text-[var(--surface-muted-content-color)]"><%= type.description %></p>
-                <% end %>
-              </div>
+  <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4" do %>
+    <% if @notification_types.any? %>
+      <% @notification_types.each do |type| %>
+        <% type.optional_channels.each do |channel| %>
+          <% enabled = @preferences.fetch([type.key, channel], Array(type.default_channels).include?(channel)) %>
+          <%= hidden_field_tag "preferences[#{type.key}][#{channel}]", "0" %>
 
-              <div class="flex flex-col gap-2">
-                <% type.optional_channels.each do |channel| %>
-                  <% enabled = @preferences.fetch([type.key, channel], Array(type.default_channels).include?(channel)) %>
-                  <%= hidden_field_tag "preferences[#{type.key}][#{channel}]", "0" %>
-                  <label class="flex items-center gap-2 text-sm text-[var(--surface-content-color)]">
-                    <%= check_box_tag "preferences[#{type.key}][#{channel}]", "1", enabled %>
-                    <span><%= channel.to_s.humanize %></span>
-                  </label>
-                <% end %>
-              </div>
-            </section>
-          <% end %>
+          <label class="flex gap-3 py-2">
+            <span class="pt-0.5">
+              <%= check_box_tag "preferences[#{type.key}][#{channel}]", "1", enabled %>
+            </span>
 
-          <div>
-            <%= render FlatPack::Button::Component.new(text: "Save settings", style: :primary, size: :md, type: "submit") %>
-          </div>
-        <% else %>
-          <p class="text-sm text-[var(--surface-muted-content-color)]">No optional notification channels are available.</p>
+            <span class="flex min-w-0 flex-col">
+              <span class="font-medium text-(--surface-content-color)">
+                <%= "#{type.label} (#{channel.to_s.humanize})" %>
+              </span>
+              <span class="text-sm text-(--surface-muted-content-color)">
+                <%= type.description.presence || "Optional #{channel.to_s.humanize} notifications for #{type.label}." %>
+              </span>
+            </span>
+          </label>
         <% end %>
       <% end %>
-    <% end %>
 
-    <% card.footer do %>
-      <%= link_to notifications_path do %>
-        <%= render FlatPack::Button::Component.new(text: "Back to inbox", style: :secondary, size: :sm) %>
-      <% end %>
+      <div class="pt-2">
+        <%= render FlatPack::Button::Component.new(text: "Save settings", style: :primary, size: :md, type: "submit") %>
+      </div>
+    <% else %>
+      <p class="text-sm text-(--surface-muted-content-color)">No optional notification channels are available.</p>
     <% end %>
   <% end %>
 </div>

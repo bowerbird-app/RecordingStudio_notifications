@@ -9,6 +9,7 @@ RecordingStudioNotifications::Engine.routes.draw do
       patch :mark_read
       patch :mark_unread
       patch :archive
+      patch :unarchive
     end
   end
 

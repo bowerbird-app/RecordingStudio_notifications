@@ -1,40 +1,71 @@
 <div class="mx-auto flex w-full max-w-3xl flex-col gap-6">
+  <%= render FlatPack::PageNav::Component.new(
+    anchor_url: main_app.root_path
+  ) %>
+
   <%= render FlatPack::PageTitle::Component.new(
     title: @notification.title,
     subtitle: @notification.notification_type.humanize,
     variant: :h1
   ) %>
 
-  <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
-    <% card.body do %>
-      <% if @notification.body.present? %>
-        <p class="text-sm leading-6 text-[var(--surface-content-color)]"><%= @notification.body %></p>
+  <% if @notification.body.present? %>
+    <p class="text-sm leading-6 text-(--surface-content-color)"><%= @notification.body %></p>
+  <% end %>
+
+  <% if @notification.url.present? %>
+    <div class="flex flex-wrap gap-2">
+      <%= link_to @notification.url do %>
+        <%= render FlatPack::Button::Component.new(text: "Open related item", style: :primary, size: :md) %>
       <% end %>
 
-      <% if @notification.url.present? %>
-        <div class="mt-4">
-          <%= link_to @notification.url do %>
-            <%= render FlatPack::Button::Component.new(text: "Open related item", style: :primary, size: :md) %>
-          <% end %>
-        </div>
-      <% end %>
-    <% end %>
-
-    <% card.footer do %>
-      <div class="flex flex-wrap gap-2">
-        <%= link_to notifications_path do %>
-          <%= render FlatPack::Button::Component.new(text: "Back", style: :secondary, size: :sm) %>
-        <% end %>
+      <% unless @notification.archived? %>
         <% if @notification.unread? %>
-          <%= button_to mark_read_notification_path(@notification), method: :patch do %>
-            <%= render FlatPack::Button::Component.new(text: "Mark read", style: :ghost, size: :sm) %>
+          <%= link_to mark_read_notification_path(@notification), data: { turbo_method: :patch } do %>
+            <%= render FlatPack::Button::Component.new(text: "Mark read", size: :md) %>
           <% end %>
         <% else %>
-          <%= button_to mark_unread_notification_path(@notification), method: :patch do %>
-            <%= render FlatPack::Button::Component.new(text: "Mark unread", style: :ghost, size: :sm) %>
+          <%= link_to mark_unread_notification_path(@notification), data: { turbo_method: :patch } do %>
+            <%= render FlatPack::Button::Component.new(text: "Mark unread", size: :md) %>
           <% end %>
         <% end %>
-      </div>
-    <% end %>
+      <% end %>
+
+      <% if @notification.archived? %>
+        <%= link_to unarchive_notification_path(@notification), data: { turbo_method: :patch } do %>
+          <%= render FlatPack::Button::Component.new(text: "Unarchive", size: :md) %>
+        <% end %>
+      <% else %>
+        <%= link_to archive_notification_path(@notification), data: { turbo_method: :patch } do %>
+          <%= render FlatPack::Button::Component.new(text: "Archive", size: :md) %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% unless @notification.url.present? %>
+    <div class="flex flex-wrap gap-2">
+      <% unless @notification.archived? %>
+        <% if @notification.unread? %>
+          <%= link_to mark_read_notification_path(@notification), data: { turbo_method: :patch } do %>
+            <%= render FlatPack::Button::Component.new(text: "Mark read", size: :md) %>
+          <% end %>
+        <% else %>
+          <%= link_to mark_unread_notification_path(@notification), data: { turbo_method: :patch } do %>
+            <%= render FlatPack::Button::Component.new(text: "Mark unread", size: :md) %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% if @notification.archived? %>
+        <%= link_to unarchive_notification_path(@notification), data: { turbo_method: :patch } do %>
+          <%= render FlatPack::Button::Component.new(text: "Unarchive", size: :md) %>
+        <% end %>
+      <% else %>
+        <%= link_to archive_notification_path(@notification), data: { turbo_method: :patch } do %>
+          <%= render FlatPack::Button::Component.new(text: "Archive", size: :md) %>
+        <% end %>
+      <% end %>
+    </div>
   <% end %>
 </div>

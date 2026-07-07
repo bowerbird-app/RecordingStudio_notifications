@@ -2,6 +2,8 @@
 
 module RecordingStudioNotifications
   class SettingsController < ApplicationController
+    layout "recording_studio_notifications/blank"
+
     before_action :set_recipient
     before_action :authorize_settings
 

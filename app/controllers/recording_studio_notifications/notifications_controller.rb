@@ -2,8 +2,10 @@
 
 module RecordingStudioNotifications
   class NotificationsController < ApplicationController
+    layout "recording_studio_notifications/blank", only: :index
+
     before_action :set_recipient
-    before_action :set_notification, only: %i[show open mark_read mark_unread archive]
+    before_action :set_notification, only: %i[show open mark_read mark_unread archive unarchive]
 
     def index
       return unless authorize_notifications!(recipient: @recipient)
@@ -51,7 +53,15 @@ module RecordingStudioNotifications
       return head :forbidden unless visible_notification?(@notification)
 
       @notification.archive!
-      redirect_to notifications_path, notice: "Notification archived."
+      redirect_back fallback_location: notification_path(@notification), notice: "Notification archived."
+    end
+
+    def unarchive
+      return unless authorize_notifications!(recipient: @recipient, notification: @notification)
+      return head :forbidden unless visible_notification?(@notification)
+
+      @notification.unarchive!
+      redirect_back fallback_location: notification_path(@notification), notice: "Notification unarchived."
     end
 
     private
