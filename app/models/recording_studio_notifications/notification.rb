@@ -70,6 +70,10 @@ module RecordingStudioNotifications
       update!(archived_at: archived_at || at)
     end
 
+    def unarchive!
+      update!(archived_at: nil)
+    end
+
     private
 
     def registered_notification_type
