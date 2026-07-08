@@ -25,6 +25,7 @@ module RecordingStudioNotifications
       notification_types.register(
         :generic,
         label: "Generic notification",
+        category: :system,
         description: "Default notification type for host applications.",
         default_channels: default_channels,
         available_channels: default_channels,

@@ -11,6 +11,7 @@ RecordingStudioNotifications.configure do |config|
   config.notification_types.register(
     :workspace_change,
     label: "Workspace change",
+    category: :workspace,
     description: "Root-scoped notification for workspace-level updates.",
     icon: :bell,
     default_channels: [:in_app],
@@ -21,6 +22,7 @@ RecordingStudioNotifications.configure do |config|
   config.notification_types.register(
     :system_announcement,
     label: "System announcement",
+    category: :system,
     description: "Global rootless notification sent to all recipients.",
     icon: :exclamation_triangle,
     default_channels: [],
@@ -32,6 +34,7 @@ RecordingStudioNotifications.configure do |config|
   config.notification_types.register(
     :page_comment,
     label: "Page comment",
+    category: :page,
     description: "Optional-root notification for comments on pages.",
     icon: :chat_bubble_left_ellipsis,
     default_channels: [:in_app],
@@ -42,6 +45,7 @@ RecordingStudioNotifications.configure do |config|
   config.notification_types.register(
     :page_created,
     label: "Page created",
+    category: :page,
     description: "Root-scoped notification when a new page is created.",
     icon: :document_text,
     default_channels: [:in_app],
@@ -52,6 +56,7 @@ RecordingStudioNotifications.configure do |config|
   config.notification_types.register(
     :workspace_digest,
     label: "Workspace digest",
+    category: :workspace,
     description: "Optional-root summary of workspace activity.",
     icon: :bell,
     default_channels: [:in_app],

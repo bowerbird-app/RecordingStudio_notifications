@@ -8,8 +8,7 @@ module RecordingStudioNotifications
     before_action :authorize_settings
 
     def show
-      @notification_types = configurable_notification_types
-      @preferences = preference_map
+      prepare_settings_view
     end
 
     def update
@@ -26,8 +25,7 @@ module RecordingStudioNotifications
 
       redirect_to settings_path, notice: "Notification preferences updated."
     rescue ActiveRecord::RecordInvalid, ArgumentError
-      @notification_types = configurable_notification_types
-      @preferences = preference_map
+      prepare_settings_view
       flash.now[:alert] = "Notification preferences could not be updated."
       render :show, status: :unprocessable_entity
     end
@@ -44,7 +42,65 @@ module RecordingStudioNotifications
     end
 
     def configurable_notification_types
-      RecordingStudioNotifications.notification_types.values.select { |type| type.optional_channels.any? }
+      RecordingStudioNotifications.notification_types.values.select do |type|
+        next false if type.key == :generic
+
+        type.optional_channels.any? || type.required_channels.any?
+      end
+    end
+
+    def prepare_settings_view
+      @notification_type_groups = grouped_notification_types
+      @preferences = preference_map
+      @channel_select_options = channel_select_options_map
+      @selected_channels = selected_channels_map
+    end
+
+    def grouped_notification_types
+      configurable_notification_types
+        .group_by { |type| notification_type_category(type) }
+        .sort_by { |category, _types| category.to_s }
+        .to_h
+    end
+
+    def notification_type_category(type)
+      return type.category if type.respond_to?(:category) && type.category.present?
+
+      :general
+    end
+
+    def flat_notification_types
+      @flat_notification_types ||= @notification_type_groups.values.flatten
+    end
+
+    def channel_select_options_map
+      flat_notification_types.each_with_object({}) do |type, map|
+        options = type.available_channels.map do |channel|
+          [channel_option_label(type, channel), channel.to_s, {disabled: type.required_channels.include?(channel)}]
+        end
+
+        options.unshift(["None", "__none__"]) if type.required_channels.empty?
+
+        map[type.key] = options
+      end
+    end
+
+    def selected_channels_map
+      flat_notification_types.each_with_object({}) do |type, map|
+        map[type.key] = type.optional_channels.select do |channel|
+          preference_enabled?(type, channel)
+        end.map(&:to_s)
+      end
+    end
+
+    def preference_enabled?(type, channel)
+      @preferences.fetch([type.key, channel], Array(type.default_channels).include?(channel))
+    end
+
+    def channel_option_label(type, channel)
+      return channel.to_s.humanize unless type.required_channels.include?(channel)
+
+      "#{channel.to_s.humanize} (required)"
     end
 
     def preference_map
@@ -59,13 +115,11 @@ module RecordingStudioNotifications
 
       submitted = raw_preferences.to_unsafe_h
       configurable_notification_types.each_with_object({}) do |type, allowed|
-        channels = submitted[type.key.to_s]
-        next unless channels.respond_to?(:to_h)
+        selected_channels = Array(submitted[type.key.to_s]).flatten.map(&:to_s).reject(&:blank?)
+        selected_channels = [] if selected_channels.include?("__none__")
 
         allowed_channels = type.optional_channels.each_with_object({}) do |channel, channel_values|
-          next unless channels.key?(channel.to_s)
-
-          channel_values[channel.to_s] = channels[channel.to_s]
+          channel_values[channel.to_s] = selected_channels.include?(channel.to_s) ? "1" : "0"
         end
         allowed[type.key.to_s] = allowed_channels if allowed_channels.any?
       end

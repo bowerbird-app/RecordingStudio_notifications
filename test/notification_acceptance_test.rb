@@ -20,6 +20,7 @@ class NotificationAcceptanceTest < Minitest::Test
     type = RecordingStudioNotifications.notification_types.register(
       :comment,
       label: "Comment",
+      category: :page,
       icon: :chat_bubble_left_ellipsis,
       default_channels: [:in_app],
       required_channels: [:audit],
@@ -32,6 +33,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_equal [:audit], type.required_channels
     assert_equal %i[in_app email audit], type.available_channels
     assert_equal %i[in_app email], type.optional_channels
+    assert_equal :page, type.category
     assert_equal :chat_bubble_left_ellipsis, type.icon
     assert_equal :root, type.scope
     assert_equal :create_comment_notification, type.creation_action
@@ -149,7 +151,8 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
     assert_includes application_controller, "actor || RecordingStudioNotifications.configuration.resolve_actor"
     assert_includes index_view, "icon: \"cog\""
-    assert_includes index_view, "notification_time_ago(notification.created_at)"
+    assert_includes index_view, "FlatPack::Timestamp::Component.new("
+    assert_includes index_view, "shorten_timestamp: true"
     refute_includes index_view, "inbox_scope: :all"
     refute_includes index_view, "inbox_scope: :current_root"
     refute_includes index_view, "Total:"
@@ -160,6 +163,7 @@ class NotificationAcceptanceTest < Minitest::Test
 
   def test_settings_ui_and_routes_exist_without_bell_or_custom_css
     routes = File.read(File.expand_path("../config/routes.rb", __dir__))
+    controller = File.read(File.expand_path("../app/controllers/recording_studio_notifications/settings_controller.rb", __dir__))
     settings = File.read(File.expand_path("../app/views/recording_studio_notifications/settings/show.html.erb",
                                           __dir__))
     views = Dir[File.expand_path("../app/views/recording_studio_notifications/**/*.erb", __dir__)].map do |path|
@@ -167,11 +171,34 @@ class NotificationAcceptanceTest < Minitest::Test
     end.join("
 ")
 
+    assert_includes controller, "prepare_settings_view"
+    assert_includes controller, "grouped_notification_types"
+    assert_includes controller, "notification_type_category"
+    assert_includes controller, "flat_notification_types"
+    assert_includes controller, "channel_select_options_map"
+    assert_includes controller, "selected_channels_map"
+    assert_includes controller, ".group_by { |type| notification_type_category(type) }"
+    assert_includes controller, "next false if type.key == :generic"
+    assert_includes controller, "type.optional_channels.any? || type.required_channels.any?"
+    assert_includes controller, "Array(submitted[type.key.to_s]).flatten.map(&:to_s).reject(&:blank?)"
+    assert_includes controller, "selected_channels = [] if selected_channels.include?(\"__none__\")"
+    assert_includes controller, "disabled: type.required_channels.include?(channel)"
+    assert_includes controller, "[\"None\", \"__none__\"]"
     assert_includes routes, "resource :settings"
     assert_includes settings, "Notification settings"
-    assert_includes settings, "Array(type.default_channels).include?(channel)"
+    assert_includes settings, "FlatPack::Accordion::Component.new"
+    assert_includes settings, 'accordion.item(id: "settings-category-#{category}"'
+    assert_includes settings, "FlatPack::Select::Component.new"
+    assert_includes settings, "@notification_type_groups.each do |category, types|"
+    assert_includes settings, "category.to_s.titleize"
+    assert_includes settings, "disabled: type.optional_channels.empty?"
+    assert_includes settings, "Required channels only"
+    assert_includes settings, "multiple: true"
+    assert_includes settings, "searchable: true"
     assert_includes views, "FlatPack::"
     refute_includes views, "notification_bell"
+    refute_includes settings, "check_box_tag"
+    refute_includes settings, "hidden_field_tag"
     refute_includes views, "<style"
   end
 
@@ -188,8 +215,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes helper, "see_all_href: demo_notification_path"
     assert_includes helper, "notifications = demo_notifications(limit: limit)"
     assert_includes helper, "defined?(FlatPack::Notification::Component)"
-    assert_includes helper, "def notification_time_ago(timestamp, class_name: \"text-sm text-(--surface-muted-content-color) whitespace-nowrap\")"
-    assert_includes helper, "text-sm text-(--surface-muted-content-color) whitespace-nowrap"
+    assert_includes helper, "def notification_icon_for(notification)"
     assert_includes top_nav, "recording_studio_notifications_menu"
     assert_includes tailwind, '[id^="flat-pack-notification-"][id$="-popover"] .max-h-96'
   end

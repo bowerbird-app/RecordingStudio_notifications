@@ -9,27 +9,27 @@
     variant: :h1
   ) %>
 
-  <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4" do %>
-    <% if @notification_types.any? %>
-      <% @notification_types.each do |type| %>
-        <% type.optional_channels.each do |channel| %>
-          <% enabled = @preferences.fetch([type.key, channel], Array(type.default_channels).include?(channel)) %>
-          <%= hidden_field_tag "preferences[#{type.key}][#{channel}]", "0" %>
-
-          <label class="flex gap-3 py-2">
-            <span class="pt-0.5">
-              <%= check_box_tag "preferences[#{type.key}][#{channel}]", "1", enabled %>
-            </span>
-
-            <span class="flex min-w-0 flex-col">
-              <span class="font-medium text-(--surface-content-color)">
-                <%= "#{type.label} (#{channel.to_s.humanize})" %>
-              </span>
-              <span class="text-sm text-(--surface-muted-content-color)">
-                <%= type.description.presence || "Optional #{channel.to_s.humanize} notifications for #{type.label}." %>
-              </span>
-            </span>
-          </label>
+  <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4", data: { controller: "notification-settings", action: "change->notification-settings#syncNoneSelection" } do %>
+    <% if @notification_type_groups.any? %>
+      <%= render FlatPack::Accordion::Component.new(allow_multiple: true) do |accordion| %>
+        <% @notification_type_groups.each do |category, types| %>
+          <% accordion.item(id: "settings-category-#{category}", title: category.to_s.titleize, open: true) do %>
+            <div class="flex flex-col gap-3">
+              <% types.each do |type| %>
+                <%= render FlatPack::Select::Component.new(
+                  name: "preferences[#{type.key}]",
+                  options: @channel_select_options.fetch(type.key),
+                  label: type.label,
+                  placeholder: (type.optional_channels.any? ? "Search and select channels..." : "Required channels only"),
+                  help_text: type.description.presence || (type.optional_channels.any? ? "Required channels stay enabled and optional channels can be added or removed." : "This notification type has required channels only."),
+                  disabled: type.optional_channels.empty?,
+                  searchable: true,
+                  multiple: true,
+                  value: @selected_channels.fetch(type.key)
+                ) %>
+              <% end %>
+            </div>
+          <% end %>
         <% end %>
       <% end %>
 

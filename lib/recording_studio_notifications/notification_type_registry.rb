@@ -4,6 +4,7 @@ module RecordingStudioNotifications
   NotificationType = Struct.new(
     :key,
     :label,
+    :category,
     :description,
     :icon,
     :default_channels,
@@ -27,7 +28,7 @@ module RecordingStudioNotifications
     end
 
     def register(key, label:, description: nil, icon: nil, default_channels: nil, required_channels: [],
-                 available_channels: nil, scope: :optional_root, creation_action: nil)
+                 available_channels: nil, scope: :optional_root, category: :general, creation_action: nil)
       normalized_key = normalize_key!(key)
       normalized_icon = normalize_icon(icon)
       normalized_required = normalize_channels(required_channels)
@@ -36,6 +37,7 @@ module RecordingStudioNotifications
       available_source = available_channels.nil? ? default_available_channels(normalized_default, normalized_required) : available_channels
       normalized_available = available_source.nil? ? nil : normalize_channels(available_source)
       normalized_scope = normalize_scope!(scope)
+      normalized_category = normalize_category(category)
 
       normalized_required.each do |channel|
         unless normalized_available.include?(channel)
@@ -46,6 +48,7 @@ module RecordingStudioNotifications
       metadata = NotificationType.new(
         key: normalized_key,
         label: label.to_s,
+        category: normalized_category,
         description: description&.to_s,
         icon: normalized_icon,
         default_channels: normalized_default,
@@ -99,6 +102,10 @@ module RecordingStudioNotifications
 
     def normalize_icon(icon)
       icon.to_s.strip.presence&.to_sym || :bell
+    end
+
+    def normalize_category(category)
+      normalize_key!(category || :general)
     end
 
     def normalize_scope!(scope)
