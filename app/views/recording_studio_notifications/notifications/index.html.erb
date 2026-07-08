@@ -28,7 +28,14 @@
           href: open_notification_path(notification),
           hover: true,
           active: notification.unread?,
-          trailing: notification_time_ago(notification.created_at),
+          trailing: render(
+            FlatPack::Timestamp::Component.new(
+              timestamp: notification.created_at,
+              shorten_timestamp: true,
+              fallback_text: "",
+              class_name: "text-sm text-(--surface-muted-content-color) whitespace-nowrap"
+            )
+          ),
           class: "mb-0"
         ) do %>
           <div class="space-y-0.5 text-left">
