@@ -111,6 +111,17 @@ module ApplicationHelper
 		type_definition&.icon || :bell
 	end
 
+	def notification_time_ago(timestamp, class_name: "text-sm text-(--surface-muted-content-color) whitespace-nowrap")
+		label = time_ago_in_words(timestamp)
+		label = label.sub(/^about\s+/, "")
+		label = label.sub(/^less than a minute$/, "less than a min")
+		label = label.gsub(/(\d+) minutes?/, "\\1 min")
+		label = label.gsub(/(\d+) hours?/, "\\1 hrs")
+
+		render_tag = class_name.present? ? { class: class_name } : {}
+		content_tag(:span, "#{label} ago", **render_tag)
+	end
+
 	def fallback_notifications_button(unread_count:)
 		label = unread_count.positive? ? "Notifications (#{unread_count})" : "Notifications"
 

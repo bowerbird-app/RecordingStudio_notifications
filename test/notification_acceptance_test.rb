@@ -126,7 +126,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_equal :"recording_studio_notifications.manage_preferences", calls.last.fetch(:action)
   end
 
-  def test_inbox_supports_all_and_current_root_with_rootless_notifications
+  def test_inbox_is_current_root_only_with_rootless_notifications
     controller = File.read(File.expand_path(
                              "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
                            ))
@@ -134,18 +134,26 @@ class NotificationAcceptanceTest < Minitest::Test
                                          "../app/controllers/recording_studio_notifications/application_controller.rb", __dir__
                                        ))
     model = File.read(File.expand_path("../app/models/recording_studio_notifications/notification.rb", __dir__))
+    index_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/index.html.erb",
+                                           __dir__))
     initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_notifications.rb",
                                              __dir__))
     accessible_initializer = File.read(File.expand_path(
                                          "../test/dummy/config/initializers/recording_studio_accessible.rb", __dir__
                                        ))
 
-    assert_includes controller, "params[:inbox_scope].presence_in(%w[all current_root])"
+    assert_includes controller, "@inbox_scope = \"current_root\""
     assert_includes controller, "def recording_studio_root_switchable_scope_key"
     assert_includes model, "for_current_root_inbox"
     assert_includes model, "rootless_or_global"
     assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
     assert_includes application_controller, "actor || RecordingStudioNotifications.configuration.resolve_actor"
+    assert_includes index_view, "icon: \"cog\""
+    assert_includes index_view, "notification_time_ago(notification.created_at)"
+    refute_includes index_view, "inbox_scope: :all"
+    refute_includes index_view, "inbox_scope: :current_root"
+    refute_includes index_view, "Total:"
+    refute_includes index_view, "Unread:"
     assert_includes initializer, "config.current_root_resolver"
     assert_includes accessible_initializer, "current_root.id.to_s == recording.id.to_s"
   end
@@ -178,8 +186,10 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes helper, "render FlatPack::Notification::Component.new("
     assert_includes helper, "unread_count: unread_count"
     assert_includes helper, "see_all_href: demo_notification_path"
-    assert_includes helper, "notifications: demo_notifications"
+    assert_includes helper, "notifications = demo_notifications(limit: limit)"
     assert_includes helper, "defined?(FlatPack::Notification::Component)"
+    assert_includes helper, "def notification_time_ago(timestamp, class_name: \"text-sm text-(--surface-muted-content-color) whitespace-nowrap\")"
+    assert_includes helper, "text-sm text-(--surface-muted-content-color) whitespace-nowrap"
     assert_includes top_nav, "recording_studio_notifications_menu"
     assert_includes tailwind, '[id^="flat-pack-notification-"][id$="-popover"] .max-h-96'
   end
@@ -204,7 +214,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes initializer, "RecordingStudioCommentable::Services::CreateComment"
     assert_includes initializer, "RecordingStudioNotifications.notify"
     assert_includes initializer, "notification_type: :page_comment"
-    assert_includes initializer, "recording_comments_path"
+    assert_includes initializer, "page_path(page_recordable)"
   end
 
   def test_pages_routes_and_views_use_flatpack

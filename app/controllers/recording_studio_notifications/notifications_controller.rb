@@ -10,7 +10,7 @@ module RecordingStudioNotifications
     def index
       return unless authorize_notifications!(recipient: @recipient)
 
-      @inbox_scope = notifications_inbox_scope
+      @inbox_scope = "current_root"
       @current_root_recording = current_notifications_root_recording
       @notifications = visible_notifications(scoped_notifications.limit(100))
     end
@@ -95,9 +95,7 @@ module RecordingStudioNotifications
 
     # Keep notification list filtering separate from root-switch scope selection.
     def notifications_inbox_scope
-      params[:inbox_scope].presence_in(%w[all current_root]) ||
-        params[:scope].presence_in(%w[all current_root]) ||
-        "all"
+      "current_root"
     end
 
     # Override root-switch scope extraction so `scope=current_root` in the
