@@ -105,7 +105,7 @@
 
   <%= render FlatPack::SectionTitle::Component.new(
     title: "Registering Notification Types",
-    subtitle: "Each notification type defines its label, channel availability, and root scope. Register types in your initializer.",
+    subtitle: "Each notification type defines its label, icon, channel availability, and root scope. Register types in your initializer.",
   ) %>
 
   <%= render FlatPack::CodeBlock::Component.new(
@@ -117,6 +117,7 @@
           :workspace_change,
           label: "Workspace change",
           description: "Root-scoped notification for workspace-level updates.",
+          icon: :bell,
           default_channels: [:in_app],
           available_channels: [:in_app],
           scope: :root
@@ -127,6 +128,7 @@
           :system_announcement,
           label: "System announcement",
           description: "Global rootless notification sent to all recipients.",
+          icon: :exclamation_triangle,
           default_channels: [],
           required_channels: [:in_app],
           available_channels: [:in_app],
@@ -138,6 +140,7 @@
           :page_comment,
           label: "Page comment",
           description: "Optional-root notification for comments on pages.",
+          icon: :chat_bubble_left_ellipsis,
           default_channels: [:in_app],
           available_channels: [:in_app],
           scope: :optional_root
@@ -173,6 +176,11 @@
           <td class="py-2">Optional longer description for admin/settings views.</td>
         </tr>
         <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">icon:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Heroicons v2 icon name used in the FlatPack notification menu. Defaults to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:bell</code>.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_channels:</code></td>
           <td class="py-2 pr-4">No</td>
           <td class="py-2">Channels a recipient gets by default if they have no preference. Defaults to config.default_channels.</td>
@@ -203,6 +211,8 @@
 
   <p class="text-sm"><strong>Scope rules:</strong></p>
   <ul class="list-disc pl-6 text-sm">
+    <li>Icons come from Heroicons v2 names, passed as symbols like <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:bell</code> or <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:chat_bubble_left_ellipsis</code>.</li>
+    <li>If you omit <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">icon:</code>, the registry defaults to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:bell</code>.</li>
     <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:root</code> — A <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">root_recording</code> must be provided.</li>
     <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:global</code> — Must NOT have a root recording (or notifiable/recording).</li>
     <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code> — Either is allowed. Global notifications appear alongside root-scoped ones in the inbox.</li>
@@ -494,6 +504,7 @@
           :task_assigned,
           label: "Task assigned",
           description: "A user was assigned to a task.",
+          icon: :check_circle,
           default_channels: [:in_app],
           available_channels: [:in_app],
           scope: :root

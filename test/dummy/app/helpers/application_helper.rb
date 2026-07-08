@@ -104,7 +104,11 @@ module ApplicationHelper
 	end
 
 	def notification_icon_for(notification)
-		NOTIFICATION_ICON_BY_TYPE[notification.notification_type.to_s] || :bell
+		type_key = notification.respond_to?(:notification_type) ? notification.notification_type : nil
+		return :bell if type_key.blank?
+
+		type_definition = RecordingStudioNotifications.notification_types[type_key]
+		type_definition&.icon || :bell
 	end
 
 	def fallback_notifications_button(unread_count:)

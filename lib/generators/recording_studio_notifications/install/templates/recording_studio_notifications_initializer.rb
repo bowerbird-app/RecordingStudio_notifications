@@ -13,10 +13,12 @@ RecordingStudioNotifications.configure do |config|
   # config.allowed_url_hosts = [Rails.application.routes.default_url_options[:host]].compact
 
   # Register notification types used by your app.
+  # Icons come from Heroicons v2 names. Omit icon: to default to :bell.
   config.notification_types.register(
     :generic,
     label: "Generic notification",
     description: "Default in-app notification",
+    icon: :bell,
     default_channels: [:in_app],
     available_channels: [:in_app],
     scope: :optional_root

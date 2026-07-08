@@ -104,6 +104,33 @@ config.x.recording_studio_notifications.api_key = ENV["RECORDING_STUDIO_NOTIFICA
 config.x.recording_studio_notifications.timeout = 10
 ```
 
+## Notification Type Registration
+
+Register notification types in your initializer with `config.notification_types.register(...)`. This registry controls the type label, scope, channels, and the icon shown in the FlatPack notification menu.
+
+```ruby
+RecordingStudioNotifications.configure do |config|
+  config.notification_types.register(
+    :page_comment,
+    label: "Page comment",
+    description: "Optional-root notification for comments on pages.",
+    icon: :chat_bubble_left_ellipsis,
+    default_channels: [:in_app],
+    available_channels: [:in_app],
+    scope: :optional_root
+  )
+end
+```
+
+Icon rules:
+
+- Icons come from Heroicons v2 names.
+- Use the Heroicon name as a symbol, such as `:bell`, `:document_text`, or `:chat_bubble_left_ellipsis`.
+- If you omit `icon:`, the registry defaults to `:bell`.
+- The FlatPack notification menu uses the registered type icon when rendering each notification item.
+
+If you are rendering the FlatPack notification component through the host helper, use the registered type and let the helper pass the icon through. The helper should fall back to `:bell` when the notification type is unknown.
+
 ---
 
 ## Load Order & Precedence

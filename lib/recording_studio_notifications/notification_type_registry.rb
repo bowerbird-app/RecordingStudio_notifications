@@ -5,6 +5,7 @@ module RecordingStudioNotifications
     :key,
     :label,
     :description,
+    :icon,
     :default_channels,
     :required_channels,
     :available_channels,
@@ -25,9 +26,10 @@ module RecordingStudioNotifications
       @mutex = Mutex.new
     end
 
-    def register(key, label:, description: nil, default_channels: nil, required_channels: [],
+    def register(key, label:, description: nil, icon: nil, default_channels: nil, required_channels: [],
                  available_channels: nil, scope: :optional_root, creation_action: nil)
       normalized_key = normalize_key!(key)
+      normalized_icon = normalize_icon(icon)
       normalized_required = normalize_channels(required_channels)
       default_channels_provided = !default_channels.nil?
       normalized_default = default_channels_provided ? normalize_channels(default_channels) : nil
@@ -45,6 +47,7 @@ module RecordingStudioNotifications
         key: normalized_key,
         label: label.to_s,
         description: description&.to_s,
+        icon: normalized_icon,
         default_channels: normalized_default,
         required_channels: normalized_required,
         available_channels: normalized_available,
@@ -92,6 +95,10 @@ module RecordingStudioNotifications
 
     def normalize_channels(channels)
       Array(channels).map { |channel| normalize_key!(channel) }.uniq
+    end
+
+    def normalize_icon(icon)
+      icon.to_s.strip.presence&.to_sym || :bell
     end
 
     def normalize_scope!(scope)

@@ -20,6 +20,7 @@ class NotificationAcceptanceTest < Minitest::Test
     type = RecordingStudioNotifications.notification_types.register(
       :comment,
       label: "Comment",
+      icon: :chat_bubble_left_ellipsis,
       default_channels: [:in_app],
       required_channels: [:audit],
       available_channels: %i[in_app email audit],
@@ -31,6 +32,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_equal [:audit], type.required_channels
     assert_equal %i[in_app email audit], type.available_channels
     assert_equal %i[in_app email], type.optional_channels
+    assert_equal :chat_bubble_left_ellipsis, type.icon
     assert_equal :root, type.scope
     assert_equal :create_comment_notification, type.creation_action
   end
@@ -60,6 +62,12 @@ class NotificationAcceptanceTest < Minitest::Test
 
     assert_nil type.default_channels
     assert_nil type.available_channels
+  end
+
+  def test_omitted_icon_defaults_to_bell
+    type = RecordingStudioNotifications.notification_types.register(:fallback_icon, label: "Fallback icon")
+
+    assert_equal :bell, type.icon
   end
 
   def test_preferences_model_limits_settings_to_optional_channels

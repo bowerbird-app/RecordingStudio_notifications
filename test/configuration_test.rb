@@ -11,6 +11,7 @@ class ConfigurationTest < Minitest::Test
     assert_equal [:in_app], @configuration.default_channels
     assert @configuration.channels.registered?(:in_app)
     assert @configuration.notification_types.registered?(:generic)
+    assert_equal :bell, @configuration.notification_types.fetch(:generic).icon
     assert_equal true, @configuration.deliver_later
   end
 
