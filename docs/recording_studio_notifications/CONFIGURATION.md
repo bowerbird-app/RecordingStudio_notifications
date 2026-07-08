@@ -113,6 +113,7 @@ RecordingStudioNotifications.configure do |config|
   config.notification_types.register(
     :page_comment,
     label: "Page comment",
+    category: :page,
     description: "Optional-root notification for comments on pages.",
     icon: :chat_bubble_left_ellipsis,
     default_channels: [:in_app],
@@ -130,6 +131,12 @@ Icon rules:
 - The FlatPack notification menu uses the registered type icon when rendering each notification item.
 
 If you are rendering the FlatPack notification component through the host helper, use the registered type and let the helper pass the icon through. The helper should fall back to `:bell` when the notification type is unknown.
+
+Category rules:
+
+- Use `category:` to group notification preferences in the settings page (for example, `:page`, `:workspace`, `:system`).
+- If you omit `category:`, the registry defaults to `:general`.
+- Settings UI groups notification types by category heading.
 
 ---
 

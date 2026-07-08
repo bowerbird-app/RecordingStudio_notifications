@@ -116,6 +116,7 @@
         config.notification_types.register(
           :workspace_change,
           label: "Workspace change",
+          category: :workspace,
           description: "Root-scoped notification for workspace-level updates.",
           icon: :bell,
           default_channels: [:in_app],
@@ -127,6 +128,7 @@
         config.notification_types.register(
           :system_announcement,
           label: "System announcement",
+          category: :system,
           description: "Global rootless notification sent to all recipients.",
           icon: :exclamation_triangle,
           default_channels: [],
@@ -139,6 +141,7 @@
         config.notification_types.register(
           :page_comment,
           label: "Page comment",
+          category: :page,
           description: "Optional-root notification for comments on pages.",
           icon: :chat_bubble_left_ellipsis,
           default_channels: [:in_app],
@@ -174,6 +177,11 @@
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">description:</code></td>
           <td class="py-2 pr-4">No</td>
           <td class="py-2">Optional longer description for admin/settings views.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">category:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Preference grouping key used in settings sections (for example <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:page</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:workspace</code>). Defaults to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:general</code>.</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">icon:</code></td>
