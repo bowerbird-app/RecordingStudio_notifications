@@ -12,6 +12,10 @@ RecordingStudioNotifications.configure do |config|
   # Relative paths are always allowed. Add trusted hosts for absolute http(s) URLs.
   # config.allowed_url_hosts = [Rails.application.routes.default_url_options[:host]].compact
 
+  # Notification menu polling interval in seconds.
+  # Default: 60 (1 minute)
+  # config.polling_interval_seconds = 60
+
   # Register notification types used by your app.
   # Icons come from Heroicons v2 names. Omit icon: to default to :bell.
   config.notification_types.register(

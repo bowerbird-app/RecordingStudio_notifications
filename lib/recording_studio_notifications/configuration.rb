@@ -7,7 +7,7 @@ require_relative "channel_registry"
 module RecordingStudioNotifications
   class Configuration
     attr_accessor :actor_resolver, :current_root_resolver, :allowed_url_hosts, :default_channels,
-                  :deliver_later, :queue_name, :raise_on_delivery_error
+                  :deliver_later, :queue_name, :raise_on_delivery_error, :polling_interval_seconds
     attr_reader :hooks, :notification_types, :channels
 
     def initialize
@@ -18,6 +18,7 @@ module RecordingStudioNotifications
       @deliver_later = true
       @queue_name = :default
       @raise_on_delivery_error = false
+      @polling_interval_seconds = 60
       @hooks = Hooks.new
       @notification_types = NotificationTypeRegistry.new
       @channels = ChannelRegistry.new
@@ -39,6 +40,7 @@ module RecordingStudioNotifications
         default_channels: default_channels,
         deliver_later: deliver_later,
         queue_name: queue_name,
+        polling_interval_seconds: polling_interval_seconds,
         raise_on_delivery_error: raise_on_delivery_error,
         notification_types: notification_types.keys,
         channels: channels.keys,

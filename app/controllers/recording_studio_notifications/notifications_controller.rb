@@ -10,9 +10,39 @@ module RecordingStudioNotifications
     def index
       return unless authorize_notifications!(recipient: @recipient)
 
-      @inbox_scope = "current_root"
+      @inbox_scope = notifications_inbox_scope
       @current_root_recording = current_notifications_root_recording
       @notifications = visible_notifications(scoped_notifications.limit(100))
+    end
+
+    def menu
+      return unless authorize_notifications!(recipient: @recipient)
+
+      # Menu polling should not depend on current-root query params from the host page.
+      # Show a recent feed across all accessible notifications for the actor.
+      @inbox_scope = "all"
+      @current_root_recording = current_notifications_root_recording
+
+      visible = visible_notifications(scoped_notifications)
+      limit = normalized_menu_limit
+      recent_notifications = visible.first(limit)
+      payload = recent_notifications.map { |notification| menu_notification_payload(notification) }
+      unread_count = visible.count(&:unread?)
+
+      render json: {
+        unread_count: unread_count,
+        notifications: payload,
+        polling_interval_seconds: RecordingStudioNotifications.configuration.polling_interval_seconds,
+        menu_html: render_to_string(
+          partial: "recording_studio_notifications/notifications/menu_component",
+          formats: [:html],
+          locals: {
+            unread_count: unread_count,
+            notifications: payload,
+            see_all_href: notifications_path
+          }
+        )
+      }
     end
 
     def show
@@ -96,6 +126,20 @@ module RecordingStudioNotifications
     # Keep notification list filtering separate from root-switch scope selection.
     def notifications_inbox_scope
       "current_root"
+    end
+
+    def normalized_menu_limit
+      requested_limit = params[:limit].to_i
+      return 5 if requested_limit <= 0
+
+      [requested_limit, 25].min
+    end
+
+    def menu_notification_payload(notification)
+      MenuPayload.serialize(
+        notification: notification,
+        href: open_notification_path(notification)
+      )
     end
 
     # Override root-switch scope extraction so `scope=current_root` in the

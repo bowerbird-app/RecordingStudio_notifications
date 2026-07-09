@@ -1,5 +1,6 @@
 module ApplicationHelper
 	include RecordingStudioAccessible::AccessManagementHelper if defined?(RecordingStudioAccessible::AccessManagementHelper)
+  include RecordingStudioNotifications::MenuHelper if defined?(RecordingStudioNotifications::MenuHelper)
 
 	NOTIFICATION_ICON_BY_TYPE = {
 		"page_comment" => :chat_bubble_left_ellipsis,
@@ -39,9 +40,9 @@ module ApplicationHelper
 
 	def demo_notifications(limit: 5)
 		return [] unless user_signed_in?
-		return [] unless defined?(RecordingStudioNotifications::Notification)
+		return [] unless limit.to_i.positive?
 
-		recent_visible_notifications(limit: limit).map { |notification| notification_payload(notification) }
+		[]
 	rescue StandardError
 		[]
 	end
@@ -49,77 +50,10 @@ module ApplicationHelper
 	# Renders the FlatPack notification menu introduced in flat_pack v0.1.112.
 	def recording_studio_notifications_menu(limit: 5)
 		return unless user_signed_in?
-		return unless defined?(RecordingStudioNotifications::Notification)
+		return unless respond_to?(:recording_studio_notifications_async_menu)
 
-		notifications = demo_notifications(limit: limit)
-		unread_count = unread_visible_notifications_count
-
-		return fallback_notifications_button(unread_count: unread_count) unless defined?(FlatPack::Notification::Component)
-
-		render FlatPack::Notification::Component.new(
-			unread_count: unread_count,
-			see_all_href: demo_notification_path,
-			notifications: notifications
-		)
+		recording_studio_notifications_async_menu(recipient: current_user, limit: limit)
 	rescue StandardError
 		nil
-	end
-
-	private
-
-	def recent_visible_notifications(limit:)
-		all_visible_notifications.first(limit)
-	end
-
-	def unread_visible_notifications_count
-		all_visible_notifications.count(&:unread?)
-	end
-
-	def all_visible_notifications
-		@all_visible_notifications ||= begin
-			notifications = RecordingStudioNotifications::Notification
-				.for_recipient(current_user)
-				.active
-				.newest_first
-
-			notifications.select do |notification|
-				RecordingStudioNotifications::Services::NotificationAuthorization.visible_notification?(
-					actor: current_user,
-					notification: notification,
-					controller: controller
-				)
-			end
-		end
-	end
-
-	def notification_payload(notification)
-		{
-			title: notification.title,
-			body: notification.body,
-			href: recording_studio_notifications.open_notification_path(notification),
-			unread: notification.unread?,
-			time: notification.created_at,
-			icon: notification_icon_for(notification)
-		}
-	end
-
-	def notification_icon_for(notification)
-		type_key = notification.respond_to?(:notification_type) ? notification.notification_type : nil
-		return :bell if type_key.blank?
-
-		type_definition = RecordingStudioNotifications.notification_types[type_key]
-		type_definition&.icon || :bell
-	end
-
-	def fallback_notifications_button(unread_count:)
-		label = unread_count.positive? ? "Notifications (#{unread_count})" : "Notifications"
-
-		render FlatPack::Button::Component.new(
-			text: label,
-			url: demo_notification_path,
-			style: :ghost,
-			size: :md,
-			icon: :bell
-		)
 	end
 end

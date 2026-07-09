@@ -70,7 +70,7 @@ RecordingStudioCommentable.configuration.hooks.after_service(priority: 10) do |s
       # Human-readable title displayed in the UI.
       title: "New comment on #{page_recordable.title}",
       # Message body, truncated for compact notification display.
-      body: comment.body.to_s.truncate(200),
+      body: comment.body.to_s,
       # URL opened when the recipient clicks the notification.
       url: url,
       # Idempotency key prevents duplicate notifications per comment+recipient.
