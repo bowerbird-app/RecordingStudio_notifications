@@ -132,6 +132,7 @@ class NotificationAcceptanceTest < Minitest::Test
     controller = File.read(File.expand_path(
                              "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
                            ))
+    routes = File.read(File.expand_path("../config/routes.rb", __dir__))
     application_controller = File.read(File.expand_path(
                                          "../app/controllers/recording_studio_notifications/application_controller.rb", __dir__
                                        ))
@@ -144,7 +145,11 @@ class NotificationAcceptanceTest < Minitest::Test
                                          "../test/dummy/config/initializers/recording_studio_accessible.rb", __dir__
                                        ))
 
-    assert_includes controller, "@inbox_scope = \"current_root\""
+    assert_includes controller, "@inbox_scope = notifications_inbox_scope"
+    assert_includes controller, "def menu"
+    assert_includes controller, "@inbox_scope = \"all\""
+    assert_includes controller, "polling_interval_seconds"
+    assert_includes routes, "get :menu"
     assert_includes controller, "def recording_studio_root_switchable_scope_key"
     assert_includes model, "for_current_root_inbox"
     assert_includes model, "rootless_or_global"
@@ -206,16 +211,24 @@ class NotificationAcceptanceTest < Minitest::Test
     helper = File.read(File.expand_path("../test/dummy/app/helpers/application_helper.rb", __dir__))
     top_nav = File.read(File.expand_path("../test/dummy/app/views/layouts/flat_pack/_top_nav.html.erb", __dir__))
     tailwind = File.read(File.expand_path("../test/dummy/app/assets/tailwind/application.css", __dir__))
+    menu_helper = File.read(File.expand_path("../app/helpers/recording_studio_notifications/menu_helper.rb", __dir__))
+    menu_partial = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_menu_component.html.erb",
+                                              __dir__))
+    polling_controller = File.read(File.expand_path(
+      "../test/dummy/app/javascript/controllers/notification_polling_controller.js", __dir__
+    ))
 
-    assert_includes helper, "FlatPack::Notification::Component"
+    assert_includes helper, "include RecordingStudioNotifications::MenuHelper"
     assert_includes helper, "def demo_notification_path"
     assert_includes helper, "def demo_notifications"
-    assert_includes helper, "render FlatPack::Notification::Component.new("
-    assert_includes helper, "unread_count: unread_count"
-    assert_includes helper, "see_all_href: demo_notification_path"
-    assert_includes helper, "notifications = demo_notifications(limit: limit)"
-    assert_includes helper, "defined?(FlatPack::Notification::Component)"
-    assert_includes helper, "def notification_icon_for(notification)"
+    assert_includes helper, "recording_studio_notifications_async_menu(recipient: current_user, limit: limit)"
+    assert_includes menu_helper, "notification_polling_url_value"
+    assert_includes menu_helper, "notification_polling_interval_value"
+    assert_includes menu_helper, "notification_polling_limit_value"
+    assert_includes menu_partial, "FlatPack::Notification::Component"
+    assert_includes polling_controller, "this.refresh()"
+    assert_includes polling_controller, "setInterval"
+    assert_includes polling_controller, "polling_interval_seconds"
     assert_includes top_nav, "recording_studio_notifications_menu"
     assert_includes tailwind, '[id^="flat-pack-notification-"][id$="-popover"] .max-h-96'
   end

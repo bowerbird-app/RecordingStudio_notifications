@@ -13,13 +13,20 @@ class ConfigurationTest < Minitest::Test
     assert @configuration.notification_types.registered?(:generic)
     assert_equal :bell, @configuration.notification_types.fetch(:generic).icon
     assert_equal true, @configuration.deliver_later
+    assert_equal 60, @configuration.polling_interval_seconds
   end
 
   def test_merge_updates_known_attributes_and_ignores_unknown_keys
-    @configuration.merge!("allowed_url_hosts" => ["example.com"], queue_name: :notifications, unknown: true)
+    @configuration.merge!(
+      "allowed_url_hosts" => ["example.com"],
+      queue_name: :notifications,
+      polling_interval_seconds: 30,
+      unknown: true
+    )
 
     assert_equal ["example.com"], @configuration.allowed_url_hosts
     assert_equal :notifications, @configuration.queue_name
+    assert_equal 30, @configuration.polling_interval_seconds
     refute_respond_to @configuration, :unknown
   end
 

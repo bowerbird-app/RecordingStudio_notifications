@@ -33,11 +33,10 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
   test "config page renders successfully" do
     get docs_config_path
     assert_response :success
-    assert_select "h1", text: "Config"
-    expected_placeholder = "Replace this placeholder with the configuration settings your generated gem exposes."
-
-    assert_includes response.body, expected_placeholder
-    assert_includes response.body, "# Add the config settings for the gem here."
+    assert_select "h1", text: "Configuration & Usage"
+    assert_includes response.body, "config.polling_interval_seconds = 60"
+    assert_includes response.body, "polling_interval_seconds"
+    assert_includes response.body, "Polling cadence in seconds for async notification menu refresh"
   end
 
   test "recordable types page renders configured recordables dynamically" do

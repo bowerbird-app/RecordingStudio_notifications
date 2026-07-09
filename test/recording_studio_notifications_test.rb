@@ -27,6 +27,7 @@ class RecordingStudioNotificationsTest < Minitest::Test
     routes = File.read(File.expand_path("../config/routes.rb", __dir__))
 
     assert_includes routes, "resources :notifications"
+    assert_includes routes, "get :menu"
     assert_includes routes, "resource :settings"
     assert_includes routes, 'root "notifications#index"'
   end
@@ -47,21 +48,24 @@ class RecordingStudioNotificationsTest < Minitest::Test
     routes = File.read(File.expand_path("dummy/config/routes.rb", __dir__))
     initializer = File.read(File.expand_path("dummy/config/initializers/recording_studio_notifications.rb", __dir__))
     controllers_index = File.read(File.expand_path("dummy/app/javascript/controllers/index.js", __dir__))
+    polling_controller = File.read(File.expand_path("dummy/app/javascript/controllers/notification_polling_controller.js", __dir__))
 
     assert_includes routes, "mount RecordingStudioNotifications::Engine"
     assert_includes initializer, "config.notification_types.register"
     assert_includes initializer, ":page_comment"
     assert_includes initializer, ":page_created"
     assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/flat_pack", application)'
+    assert_includes polling_controller, "class extends Controller"
+    assert_includes polling_controller, "this.refresh()"
   end
 
-  def test_engine_views_use_flatpack_without_custom_css_or_bell
+  def test_engine_views_use_flatpack_menu_component_without_custom_css
     views = Dir[File.expand_path("../app/views/recording_studio_notifications/**/*.erb", __dir__)].map do |path|
       File.read(path)
     end.join("\n")
 
     assert_includes views, "FlatPack::"
-    refute_includes views, "notification_bell"
+    assert_includes views, "FlatPack::Notification::Component"
     refute_includes views, "<style"
   end
 end
