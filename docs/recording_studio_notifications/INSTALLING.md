@@ -74,9 +74,20 @@ Creates `config/initializers/recording_studio_notifications.rb`:
 
 ```ruby
 RecordingStudioNotifications.configure do |config|
-  # config.api_key = ENV["RECORDING_STUDIO_NOTIFICATIONS_API_KEY"]
-  # config.enable_feature_x = false
-  # config.timeout = 5
+  # config.actor_resolver = -> { Current.actor }
+  # config.current_root_resolver = ->(controller:) { controller.send(:current_root_recording) if controller.respond_to?(:current_root_recording, true) }
+  # config.allowed_url_hosts = [Rails.application.routes.default_url_options[:host]].compact
+  # config.polling_interval_seconds = 60
+
+  config.notification_types.register(
+    :generic,
+    label: "Generic notification",
+    description: "Default in-app notification",
+    icon: :bell,
+    default_channels: [:in_app],
+    available_channels: [:in_app],
+    scope: :optional_root
+  )
 end
 ```
 
@@ -116,9 +127,11 @@ Create `config/initializers/recording_studio_notifications.rb`:
 
 ```ruby
 RecordingStudioNotifications.configure do |config|
-  config.api_key = ENV["RECORDING_STUDIO_NOTIFICATIONS_API_KEY"]
-  config.enable_feature_x = true
-  config.timeout = 10
+  config.actor_resolver = -> { Current.actor }
+  config.current_root_resolver = ->(controller:) { controller.send(:current_root_recording) }
+  config.allowed_url_hosts = [Rails.application.routes.default_url_options[:host]].compact
+  config.default_channels = [:in_app]
+  config.polling_interval_seconds = 60
 end
 ```
 

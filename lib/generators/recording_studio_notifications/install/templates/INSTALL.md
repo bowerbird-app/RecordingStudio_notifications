@@ -2,7 +2,7 @@ RecordingStudioNotifications install complete.
 
 Next steps:
 
-1. Review config/initializers/recording_studio_notifications.rb and register the notification types your app emits.
+1. Review config/initializers/recording_studio_notifications.rb, register the notification types your app emits, and set `config.polling_interval_seconds` if you want a polling cadence other than the default 60 seconds.
 2. If you use environment-specific settings, create config/recording_studio_notifications.yml.
 3. Install the engine migrations with `bin/rails generate recording_studio_notifications:migrations`.
 4. Apply the migrations with `bin/rails db:migrate`.

@@ -9,14 +9,15 @@ RecordingStudioNotifications is a Recording Studio addon Rails engine for root-a
 - Pluggable channel registry with bundled `:in_app` adapter
 - UUID notifications, deliveries, and preferences tables
 - Nullable `root_recording_id` for global/rootless notifications
-- Root-aware inbox scopes: `:all` and `:current_root`; current-root results include global/rootless notifications
+- Current-root inbox behavior that includes global/rootless notifications
 - Per-recipient settings for optional channels; required channels ignore preferences
 - Accessible integration for root visibility, preference management, and optional creation authorization
 - ActiveSupport instrumentation for notification creation and delivery
 - FlatPack/Tailwind inbox and settings UI
+- FlatPack notification menu integration with async hydration and configurable polling
 - Install and migrations generators
 
-No notification bell component/helper and no custom CSS are included. Notifications are stored in their own engine tables and are not RecordingStudio recordings or recordables; Recording Studio events remain separate.
+Notifications are stored in their own engine tables and are not RecordingStudio recordings or recordables; Recording Studio events remain separate.
 
 ## Installation
 
@@ -46,6 +47,7 @@ RecordingStudioNotifications.configure do |config|
   config.current_root_resolver = ->(controller:) { controller.send(:current_root_recording) }
   config.allowed_url_hosts = ["example.com"]
   config.default_channels = [:in_app]
+  config.polling_interval_seconds = 60
 
   config.notification_types.register(
     :page_comment,
@@ -65,6 +67,8 @@ Notification type scopes are:
 - `:global` - always rootless.
 - `:root` - requires a root recording.
 - `:optional_root` - may be root-scoped or rootless/global.
+
+The top-nav notification menu loads asynchronously after page render and then polls for updates on `config.polling_interval_seconds` (default: 60 seconds).
 
 ## Usage
 
@@ -119,7 +123,8 @@ The engine registers Accessible actions for viewing notifications and managing p
 
 The engine provides:
 
-- `/notifications` inbox (`inbox_scope=all` or `inbox_scope=current_root`)
+- `/notifications` inbox (current-root view, including global/rootless notifications)
+- `/notifications/menu.json` async top-nav menu payload (unread count + recent notifications)
 - `/settings` notification channel preferences
 
 Both views use FlatPack components and Tailwind utility classes only.

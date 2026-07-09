@@ -16,6 +16,7 @@ When someone posts a comment on a Page:
 5. Notification deliveries are queued via ActiveJob.
 6. For in-app channel, delivery marks as delivered.
 7. User clicks a notification, it is marked as read, then user is redirected to the target URL.
+8. Top-nav notification menu hydrates asynchronously and polls `GET /notifications/menu.json`.
 
 ## 2) Where notification types are registered
 
@@ -95,7 +96,7 @@ RecordingStudioCommentable.configuration.hooks.after_service(priority: 10) do |s
       recording: comment_recording,
       root_recording: root_recording,
       title: "New comment on #{page_recordable.title}",
-      body: comment.body.to_s.truncate(200),
+      body: comment.body.to_s,
       url: url,
       idempotency_key: "comment-#{comment.id}-#{viewer.id}"
     )

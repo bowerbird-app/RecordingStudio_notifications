@@ -22,7 +22,8 @@ Important design points:
 
 - Notifications are stored in the engine tables, not as Recording Studio recordings.
 - You can still attach a notification to Recording Studio context using `recording` and `root_recording`.
-- Root-aware inbox filtering supports both all notifications and current-root view.
+- Inbox view is current-root focused and still includes global/rootless notifications.
+- Top-nav menu refresh is async and polls a JSON endpoint.
 - Notification creation is idempotent via `idempotency_key`.
 - Delivery is channel-based, with built-in `:in_app` and support for custom channels.
 
@@ -57,11 +58,13 @@ end
 Once mounted, engine-internal routes include:
 
 - `GET /notifications` (index)
+- `GET /notifications/menu` (async menu JSON payload)
 - `GET /notifications/:id` (show)
 - `GET /notifications/:id/open` (mark read + redirect)
 - `PATCH /notifications/:id/mark_read`
 - `PATCH /notifications/:id/mark_unread`
 - `PATCH /notifications/:id/archive`
+- `PATCH /notifications/:id/unarchive`
 - `GET /settings`
 - `PATCH /settings`
 
@@ -90,6 +93,9 @@ RecordingStudioNotifications.configure do |config|
   config.deliver_later = true
   config.queue_name = :default
   config.raise_on_delivery_error = false
+
+  # Async notification menu polling interval (seconds).
+  config.polling_interval_seconds = 60
 end
 ```
 
@@ -184,7 +190,7 @@ notification = RecordingStudioNotifications.notify(
   recording: page_recording,
   root_recording: page_recording.root_recording,
   title: "New comment on #{page.title}",
-  body: comment.body.to_s.truncate(200),
+  body: comment.body.to_s,
   url: Rails.application.routes.url_helpers.page_path(page),
   metadata: {
     comment_id: comment.id,
@@ -226,7 +232,7 @@ notifications = RecordingStudioNotifications.notify_each(
   recording: page_recording,
   root_recording: page_recording.root_recording,
   title: "New comment on #{page.title}",
-  body: comment.body.to_s.truncate(200),
+  body: comment.body.to_s,
   url: Rails.application.routes.url_helpers.page_path(page)
 )
 ```
@@ -247,7 +253,7 @@ workspace_viewers.each do |viewer|
     recording: comment_recording,
     root_recording: comment_recording.root_recording,
     title: "New comment on #{page.title}",
-    body: comment.body.to_s.truncate(200),
+    body: comment.body.to_s,
     url: Rails.application.routes.url_helpers.page_path(page),
     idempotency_key: "comment-#{comment.id}-viewer-#{viewer.id}"
   )
@@ -304,24 +310,18 @@ RecordingStudioNotifications::Notification.for_recipient(user).active
 RecordingStudioNotifications::Notification.for_recipient(user).archived
 ```
 
-## 10. Current-Root Inbox Filtering
+## 10. Inbox And Menu Scoping
 
-The index supports two inbox scopes:
+Inbox behavior:
 
-- `all`
-- `current_root`
+- The inbox index is current-root focused.
+- Rootless/global notifications are included alongside the current root.
 
-Example links:
+Menu behavior:
 
-```erb
-<%= link_to "All", notifications_path(inbox_scope: "all") %>
-<%= link_to "Current root", notifications_path(inbox_scope: "current_root") %>
-```
-
-When `current_root` is active:
-
-- notifications for current root are included
-- rootless/global notifications are also included
+- The top-nav polling endpoint returns recent notifications across accessible scope.
+- Endpoint (under mount path): `GET /notifications/menu.json?limit=5`
+- Response includes unread count, recent items, and rendered menu HTML.
 
 ## 11. Channel Preferences
 
@@ -494,7 +494,7 @@ class Comments::CreateAndNotify
         recording: page_recording,
         root_recording: root,
         title: "New comment on #{page.title}",
-        body: body.to_s.truncate(200),
+        body: body.to_s,
         url: Rails.application.routes.url_helpers.page_path(page),
         idempotency_key: "comment-#{comment.id}-recipient-#{recipient.id}"
       )
@@ -511,6 +511,7 @@ end
 <%= button_to "Mark read", mark_read_notification_path(notification), method: :patch %>
 <%= button_to "Mark unread", mark_unread_notification_path(notification), method: :patch %>
 <%= button_to "Archive", archive_notification_path(notification), method: :patch %>
+<%= button_to "Unarchive", unarchive_notification_path(notification), method: :patch %>
 ```
 
 This pattern gives you:

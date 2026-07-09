@@ -1,112 +1,104 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** May 5, 2026
+> *   **Last Updated:** July 9, 2026
 >
-> *Maintainers: Please update the date above when modifying this file.*
+> *Maintainers: Update the date above when modifying this file.*
 
 ---
 
 # RecordingStudioNotifications Configuration
 
-This document explains how to configure **RecordingStudioNotifications** in your host Rails application.
+This document describes the real, current configuration surface for RecordingStudioNotifications.
 
 ---
 
 ## Quick Start
 
-After installing the gem, run the install generator:
+Run the install generator:
 
 ```bash
 rails generate recording_studio_notifications:install
 ```
 
-This will:
+This does the following:
 
-1. Mount the engine in your routes (`/recording_studio_notifications` by default).
-2. Create `config/initializers/recording_studio_notifications.rb` with example settings.
-3. Optionally create `config/recording_studio_notifications.yml` for environment-specific configuration.
+1. Mounts the engine in routes (`/recording_studio_notifications` by default).
+2. Creates `config/initializers/recording_studio_notifications.rb`.
+3. Optionally creates `config/recording_studio_notifications.yml` for environment overrides.
 
 ---
 
 ## Configuration Options
 
-| Option              | Type    | Default                          | Description                                 |
-|---------------------|---------|----------------------------------|---------------------------------------------|
-| `api_key`           | String  | `ENV["RECORDING_STUDIO_NOTIFICATIONS_API_KEY"]`    | API key for external service integration.  |
-| `enable_feature_x`  | Boolean | `false`                          | Toggle optional feature X.                 |
-| `timeout`           | Integer | `5`                              | Timeout (seconds) for external calls.      |
-
-### RecordingStudio v3 Host-App Declarations
-
-The dummy host app pins RecordingStudio to `recording_studio/v3.0.0` and keeps strict recordable declarations enabled:
-
-```ruby
-RecordingStudio.configure do |config|
-  config.recordable_types = ["Workspace", "Folder", "Page"]
-  config.require_recordable_declarations = true
-end
-
-class Workspace < ApplicationRecord
-  recording_studio_recordable label: "Workspace", root: true
-end
-
-class Folder < ApplicationRecord
-  recording_studio_recordable label: "Folder", root: false, allowed_parent_types: ["Workspace", "Folder"]
-end
-```
-
-Use `RecordingStudio.validate_recordable_declarations!`, `RecordingStudio.root_recordable_types`, and
-`RecordingStudio.allowed_parent_types_for("Page")` to verify the host app wiring.
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `actor_resolver` | Proc | resolves `Current.actor` when available | Resolves the acting user when `actor:` is omitted from `notify`. |
+| `current_root_resolver` | Proc | controller-based root resolver | Resolves the active root recording used by inbox visibility/scoping logic. |
+| `allowed_url_hosts` | Array | `[]` | Allowlist for absolute notification URLs. Relative paths are always allowed. |
+| `default_channels` | Array | `[:in_app]` | Default channels for type registration and delivery fallback. |
+| `deliver_later` | Boolean | `true` | Whether deliveries enqueue via ActiveJob by default. |
+| `queue_name` | Symbol/String | `:default` | Queue used by notification delivery jobs. |
+| `raise_on_delivery_error` | Boolean | `false` | If true, delivery exceptions bubble; if false, errors are captured/logged. |
+| `polling_interval_seconds` | Integer | `60` | Polling cadence for async notification menu refresh. |
 
 ---
 
-## Configuration Methods
-
-### 1. Ruby Initializer (Recommended)
-
-Edit `config/initializers/recording_studio_notifications.rb`:
+## Ruby Initializer (Recommended)
 
 ```ruby
 RecordingStudioNotifications.configure do |config|
-  config.api_key          = ENV["RECORDING_STUDIO_NOTIFICATIONS_API_KEY"]
-  config.enable_feature_x = true
-  config.timeout          = 10
+  config.actor_resolver = -> { Current.actor }
+  config.current_root_resolver = ->(controller:) do
+    controller.send(:current_root_recording) if controller.respond_to?(:current_root_recording, true)
+  end
+
+  config.allowed_url_hosts = [Rails.application.routes.default_url_options[:host]].compact
+  config.default_channels = [:in_app]
+  config.deliver_later = true
+  config.queue_name = :default
+  config.raise_on_delivery_error = false
+
+  # Top-nav menu polling interval (seconds)
+  config.polling_interval_seconds = 60
 end
 ```
 
-This approach is flexible and allows dynamic values, environment variables, and Rails credentials.
+---
 
-### 2. YAML Configuration
+## YAML and config.x Overrides
 
-If you prefer environment-specific static settings, create `config/recording_studio_notifications.yml`:
+The engine supports the same keys from:
+
+1. `config/recording_studio_notifications.yml` via `config_for`
+2. `config.x.recording_studio_notifications`
+3. Initializer block overrides
+
+Example YAML:
 
 ```yaml
 development:
-  api_key: "dev-key"
-  enable_feature_x: true
-  timeout: 5
+  polling_interval_seconds: 30
+  deliver_later: true
+  queue_name: default
 
 production:
-  api_key: <%= ENV["RECORDING_STUDIO_NOTIFICATIONS_API_KEY"] %>
-  enable_feature_x: false
-  timeout: 5
+  polling_interval_seconds: 60
+  deliver_later: true
+  queue_name: notifications
 ```
 
-The engine loads this file automatically via `Rails.application.config_for(:recording_studio_notifications)`.
-
-### 3. `config.x` Namespace
-
-You can also set values in `config/application.rb` or environment files:
+Example `config.x`:
 
 ```ruby
-# config/environments/production.rb
-config.x.recording_studio_notifications.api_key = ENV["RECORDING_STUDIO_NOTIFICATIONS_API_KEY"]
-config.x.recording_studio_notifications.timeout = 10
+config.x.recording_studio_notifications.polling_interval_seconds = 45
+config.x.recording_studio_notifications.deliver_later = true
 ```
+
+---
 
 ## Notification Type Registration
 
-Register notification types in your initializer with `config.notification_types.register(...)`. This registry controls the type label, scope, channels, and the icon shown in the FlatPack notification menu.
+Register types in the initializer with `config.notification_types.register(...)`.
 
 ```ruby
 RecordingStudioNotifications.configure do |config|
@@ -123,94 +115,68 @@ RecordingStudioNotifications.configure do |config|
 end
 ```
 
-Icon rules:
+### Scope Rules
 
-- Icons come from Heroicons v2 names.
-- Use the Heroicon name as a symbol, such as `:bell`, `:document_text`, or `:chat_bubble_left_ellipsis`.
-- If you omit `icon:`, the registry defaults to `:bell`.
-- The FlatPack notification menu uses the registered type icon when rendering each notification item.
+- `:global` must be rootless.
+- `:root` requires `root_recording`.
+- `:optional_root` supports both root-scoped and rootless notifications.
 
-If you are rendering the FlatPack notification component through the host helper, use the registered type and let the helper pass the icon through. The helper should fall back to `:bell` when the notification type is unknown.
+### Icon Rules
 
-Category rules:
-
-- Use `category:` to group notification preferences in the settings page (for example, `:page`, `:workspace`, `:system`).
-- If you omit `category:`, the registry defaults to `:general`.
-- Settings UI groups notification types by category heading.
+- Icons use Heroicons v2 symbol names.
+- Omitted `icon:` defaults to `:bell`.
+- Menu/inbox UI uses the registered icon per notification type.
 
 ---
 
-## Load Order & Precedence
+## Notification Menu Polling
 
-Configuration is merged in the following order (later sources override earlier ones):
+The top-nav notification menu is hydrated asynchronously after page load and then polled.
 
-1. **Defaults** – defined in `RecordingStudioNotifications::Configuration#initialize`.
-2. **YAML** – `config/recording_studio_notifications.yml` loaded via `config_for`.
-3. **`config.x.recording_studio_notifications`** – values set in Rails config files.
-4. **Initializer** – `RecordingStudioNotifications.configure` block in `config/initializers/recording_studio_notifications.rb`.
-
-> **Tip:** For most use cases, stick with the Ruby initializer and use environment variables for secrets.
+- Endpoint: `/notifications/menu.json` (under your mount path)
+- Payload includes unread count, recent items, and rendered menu HTML.
+- Poll interval is controlled by `polling_interval_seconds`.
+- Non-positive values are normalized to `60` seconds.
 
 ---
 
-## Accessing Configuration at Runtime
+## Load Order and Precedence
+
+Configuration merge order (later wins):
+
+1. Defaults in `RecordingStudioNotifications::Configuration`
+2. `config/recording_studio_notifications.yml`
+3. `config.x.recording_studio_notifications`
+4. Initializer (`RecordingStudioNotifications.configure`)
+
+---
+
+## Runtime Access
 
 ```ruby
-RecordingStudioNotifications.configuration.api_key
-# => "your-api-key"
-
-RecordingStudioNotifications.configuration.enable_feature_x
-# => true
-
+RecordingStudioNotifications.configuration.polling_interval_seconds
+RecordingStudioNotifications.configuration.deliver_later
 RecordingStudioNotifications.configuration.to_h
-# => { api_key: "...", enable_feature_x: true, timeout: 5 }
 ```
-
-You can access these values from anywhere in your application or from within the engine's controllers, models, and jobs.
-
----
-
-## Secret Management
-
-For sensitive values like `api_key`, we recommend:
-
-- **Environment variables** – `ENV["RECORDING_STUDIO_NOTIFICATIONS_API_KEY"]`
-- **Rails credentials** – `Rails.application.credentials.recording_studio_notifications[:api_key]`
-
-Avoid committing secrets to version control. The generator templates use `ENV` by default to encourage this practice.
-
----
-
-## Extending Configuration
-
-To add new options:
-
-1. Add `attr_accessor` in `lib/recording_studio_notifications/configuration.rb`.
-2. Set a sensible default in `#initialize`.
-3. Update `#to_h` if you want the option included in hash export.
-4. Document the new option in this file and in the initializer template.
 
 ---
 
 ## Troubleshooting
 
-| Issue                                  | Solution                                                                 |
-|----------------------------------------|--------------------------------------------------------------------------|
-| YAML not loading                       | Ensure `config/recording_studio_notifications.yml` exists and has valid YAML syntax.       |
-| Initializer values not applied         | Make sure the initializer runs after the engine initializer (default).   |
-| `config.x` values ignored              | Verify you're setting them in the correct environment file.             |
+| Issue | Solution |
+|---|---|
+| YAML values not applying | Ensure `config/recording_studio_notifications.yml` has valid YAML and environment keys. |
+| `config.x` ignored | Verify keys are set in the active environment file. |
+| Polling too frequent/slow | Set `polling_interval_seconds` to a suitable positive integer in initializer/YAML/config.x. |
 
 ---
 
-## Files Reference
+## File Reference
 
-| File                                                        | Purpose                                      |
-|-------------------------------------------------------------|----------------------------------------------|
-| `lib/recording_studio_notifications/configuration.rb`                         | Configuration class with defaults.           |
-| `lib/recording_studio_notifications/engine.rb`                                | Engine initializer that loads host config.   |
-| `lib/generators/recording_studio_notifications/install/install_generator.rb`  | Install generator that creates config files. |
-| `lib/generators/recording_studio_notifications/install/templates/`            | Templates for initializer and YAML files.    |
+- `lib/recording_studio_notifications/configuration.rb`
+- `lib/recording_studio_notifications/engine.rb`
+- `lib/generators/recording_studio_notifications/install/templates/recording_studio_notifications_initializer.rb`
 
 ---
 
-Happy configuring!
+Happy configuring.

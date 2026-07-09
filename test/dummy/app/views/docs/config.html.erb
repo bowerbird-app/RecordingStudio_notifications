@@ -37,6 +37,9 @@
 
         # Raise on delivery errors (false logs and swallows)
         config.raise_on_delivery_error = false
+
+        # Notification menu polling interval in seconds
+        config.polling_interval_seconds = 60
       end
     CODE
   ) %>
@@ -98,6 +101,12 @@
           <td class="py-2 pr-4"><code class="text-xs">Boolean</code></td>
           <td class="py-2 pr-4"><code class="text-xs">false</code></td>
           <td class="py-2">Raise exceptions on delivery failures (true) or log and swallow (false).</td>
+        </tr>
+        <tr>
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">polling_interval_seconds</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">Integer</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">60</code></td>
+          <td class="py-2">Polling cadence in seconds for async notification menu refresh after page load/reload.</td>
         </tr>
       </tbody>
     </table>
