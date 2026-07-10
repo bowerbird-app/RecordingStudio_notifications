@@ -537,8 +537,8 @@
           count = digest.items.count
 
           {
-            title: "#{count} comments need your review",
-            body: "Activity from #{digest.period_starts_at.to_date}",
+            title: "\#{count} comments need your review",
+            body: "Activity from \#{digest.period_starts_at.to_date}",
             icon: :chat_bubble_left_ellipsis,
             destination: nil
           }
@@ -561,7 +561,7 @@
     subtitle: "Use the dummy app to inspect a delivered summary and its source-event detail page.",
   ) %>
 
-  <p class="text-sm">The dummy seed creates three workspace-change events, delivers their daily digest, and leaves the normal summary notification in the inbox. To process all pending digests during development, run the task below. It is intentionally unavailable outside the development environment.</p>
+  <p class="text-sm">The dummy seed creates five page-comment events in Studio Workspace, delivers their daily digest, and leaves the normal summary notification in the inbox. To process all pending digests during development, run the task below. It is intentionally unavailable outside the development environment.</p>
 
   <%= render FlatPack::CodeBlock::Component.new(
     language: :sh,

@@ -54,6 +54,14 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_includes initializer, "config.notification_types.register"
     assert_includes initializer, ":page_comment"
     assert_includes initializer, ":page_created"
+    assert_match(
+      /:workspace_change,.*allowed_cadences: %i\[every_notification daily monthly\]/m,
+      initializer
+    )
+    assert_match(
+      /:workspace_digest,.*allowed_cadences: %i\[every_notification monthly\],.*default_cadence: :monthly/m,
+      initializer
+    )
     assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/flat_pack", application)'
     assert_includes polling_controller, "class extends Controller"
     assert_includes polling_controller, "this.refresh()"

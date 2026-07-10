@@ -13,6 +13,10 @@ module RecordingStudioNotifications
       return unless authorize_notifications!(recipient: @recipient, recording: @digest.root_recording)
       return head :forbidden unless digest_visible?
 
+      @summary_notification = Notification.find_by(
+        recipient: @recipient,
+        idempotency_key: "digest-summary-#{@digest.id}"
+      )
       @page = current_page
       @notifications, @has_next_page = visible_notifications_page(source_notifications)
 

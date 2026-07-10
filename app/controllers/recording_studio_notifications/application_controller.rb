@@ -8,6 +8,7 @@ module RecordingStudioNotifications
 
     protect_from_forgery with: :exception
 
+    helper NotificationsHelper
     helper_method :current_notifications_actor, :current_notifications_root_recording
 
     private

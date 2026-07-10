@@ -60,19 +60,25 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     Current.actor = nil
   end
 
-  test "dummy seeds provide an idempotent delivered digest demo" do
+  test "dummy seeds provide an idempotent delivered Studio page-comment digest demo" do
     load Rails.root.join("db/seeds.rb").to_s
 
     events = RecordingStudioNotifications::Notification.where(
-      notification_type: "workspace_digest",
-      idempotency_key: %w[seed-digest-demo-1 seed-digest-demo-2 seed-digest-demo-3]
+      notification_type: "page_comment",
+      idempotency_key: %w[
+        seed-page-comment-digest-1
+        seed-page-comment-digest-2
+        seed-page-comment-digest-3
+        seed-page-comment-digest-4
+        seed-page-comment-digest-5
+      ]
     ).order(:id)
     digest = events.filter_map(&:digest).find(&:delivered?)
     summary = RecordingStudioNotifications::Notification.find_by!(idempotency_key: "digest-summary-#{digest.id}")
 
-    assert_operator events.count, :>=, 3
+    assert_equal 5, events.count
     assert digest.delivered?
-    assert_equal 3, digest.items.count
+    assert_equal 5, digest.items.count
     assert_equal digest.id, summary.metadata.fetch("digest_id")
     assert summary.metadata.fetch("digest_summary")
 
@@ -82,6 +88,25 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
         at: digest.period_ends_at
       )
     end
+  ensure
+    Current.actor = nil
+  end
+
+  test "dummy seeds provide a delivered monthly workspace digest with 100 events" do
+    load Rails.root.join("db/seeds.rb").to_s
+
+    events = RecordingStudioNotifications::Notification.where(
+      notification_type: "workspace_change",
+      idempotency_key: (1..100).map { |index| "seed-monthly-workspace-digest-#{index}" }
+    ).order(:id)
+    digest = events.filter_map(&:digest).find(&:delivered?)
+    summary = RecordingStudioNotifications::Notification.find_by!(idempotency_key: "digest-summary-#{digest.id}")
+
+    assert_equal 100, events.count
+    assert_equal "monthly", digest.cadence
+    assert digest.delivered?
+    assert_equal 100, digest.items.count
+    assert_equal digest.id, summary.metadata.fetch("digest_id")
   ensure
     Current.actor = nil
   end

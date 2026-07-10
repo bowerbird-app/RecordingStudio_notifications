@@ -37,6 +37,9 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "config.polling_interval_seconds = 60"
     assert_includes response.body, "polling_interval_seconds"
     assert_includes response.body, "Polling cadence in seconds for async notification menu refresh"
+    assert_includes response.body, "Digest Summary Presentation"
+    assert_includes response.body, '#{count} comments need your review'
+    assert_includes response.body, "five page-comment events in Studio Workspace"
   end
 
   test "recordable types page renders configured recordables dynamically" do

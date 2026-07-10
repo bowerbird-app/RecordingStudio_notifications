@@ -1,36 +1,20 @@
 <div class="mx-auto flex w-full max-w-5xl flex-col gap-6">
+  <% starts_on = @digest.period_starts_at.strftime("%b %-d, %Y") %>
+  <% digest_subtitle = if @digest.cadence == "daily"
+    "Daily · #{starts_on}"
+  else
+    "#{@digest.cadence.humanize} · #{starts_on} to #{(@digest.period_ends_at.to_date - 1).strftime("%b %-d, %Y")}"
+  end %>
+
   <%= render FlatPack::PageNav::Component.new(
     anchor_url: notifications_path
   ) %>
 
   <%= render FlatPack::PageTitle::Component.new(
-    title: "#{@digest.notification_type.humanize} digest",
-    subtitle: "#{@digest.cadence.humanize} · #{@digest.period_starts_at.to_date} to #{(@digest.period_ends_at.to_date - 1)}",
+    title: @summary_notification&.title || "#{@digest.notification_type.humanize} digest",
+    subtitle: digest_subtitle,
     variant: :h1
   ) %>
-
-  <div class="grid gap-3 sm:grid-cols-3">
-    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
-      <% card.body do %>
-        <p class="text-xs text-(--surface-muted-content-color)">Events</p>
-        <p class="mt-1 text-lg font-semibold"><%= @digest.items.count %></p>
-      <% end %>
-    <% end %>
-
-    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
-      <% card.body do %>
-        <p class="text-xs text-(--surface-muted-content-color)">Status</p>
-        <p class="mt-1 text-lg font-semibold"><%= @digest.status.humanize %></p>
-      <% end %>
-    <% end %>
-
-    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
-      <% card.body do %>
-        <p class="text-xs text-(--surface-muted-content-color)">Scope</p>
-        <p class="mt-1 truncate text-lg font-semibold"><%= @digest.root_recording ? "Current workspace" : "All workspaces" %></p>
-      <% end %>
-    <% end %>
-  </div>
 
   <% if @notifications.any? %>
     <%= render FlatPack::List::Component.new(spacing: :comfortable, divider: true) do %>

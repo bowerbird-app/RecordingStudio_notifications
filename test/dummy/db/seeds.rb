@@ -187,28 +187,51 @@ begin
     end
   end
 
-  # Seed one delivered digest so the inbox summary and detail page can be demonstrated immediately.
+  # Seed one delivered page-comment digest so the inbox summary and detail page can be demonstrated immediately.
   RecordingStudioNotifications::CadencePreference.set!(
     recipient: user,
-    notification_type: :workspace_digest,
+    notification_type: :page_comment,
     cadence: :daily
   )
 
-  demo_events = 3.times.map do |index|
+  demo_events = 5.times.map do |index|
     RecordingStudioNotifications::Services::Notify.call(
-      notification_type: :workspace_digest,
+      notification_type: :page_comment,
       recipient: user,
       actor: user,
       root_recording: root_recording,
-      recording: root_recording,
-      title: "Digest demo update #{index + 1}",
-      body: "Seeded digest event #{index + 1} of 3.",
-      idempotency_key: "seed-digest-demo-#{index + 1}"
+      recording: page_recording,
+      title: "New comment on Getting Started #{index + 1}",
+      body: "Seeded page comment #{index + 1} of 5 for the Studio Workspace digest.",
+      idempotency_key: "seed-page-comment-digest-#{index + 1}"
     )
   end
 
   demo_digest = demo_events.first.digest
   RecordingStudioNotifications::DigestSchedulerJob.perform_now(at: demo_digest.period_ends_at) if demo_digest&.pending?
+
+  # Seed a delivered monthly workspace-change digest with enough events to exercise digest pagination.
+  RecordingStudioNotifications::CadencePreference.set!(
+    recipient: user,
+    notification_type: :workspace_change,
+    cadence: :monthly
+  )
+
+  monthly_workspace_events = 100.times.map do |index|
+    RecordingStudioNotifications::Services::Notify.call(
+      notification_type: :workspace_change,
+      recipient: user,
+      actor: user,
+      root_recording: root_recording,
+      recording: root_recording,
+      title: "Monthly workspace update #{index + 1}",
+      body: "Seeded monthly workspace digest event #{index + 1} of 100.",
+      idempotency_key: "seed-monthly-workspace-digest-#{index + 1}"
+    )
+  end
+
+  monthly_workspace_digest = monthly_workspace_events.first.digest
+  RecordingStudioNotifications::DigestSchedulerJob.perform_now(at: monthly_workspace_digest.period_ends_at) if monthly_workspace_digest&.pending?
 ensure
   Current.actor = previous_actor
 end
@@ -221,4 +244,5 @@ puts "Seeded: Workspace '#{accessible_workspace.name}' with root recording ##{ac
 puts "Seeded: Workspace '#{private_workspace.name}' with root recording ##{private_root_recording.id}"
 puts "Seeded: Folder '#{folder.name}' and page '#{page.title}'"
 puts "Seeded: Sample notifications (root, global, optional-root)"
-puts "Seeded: Delivered workspace digest demo"
+puts "Seeded: Delivered five-comment Studio Workspace digest demo"
+puts "Seeded: Delivered 100-event monthly Studio Workspace digest demo"

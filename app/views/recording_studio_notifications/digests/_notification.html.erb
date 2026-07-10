@@ -2,6 +2,7 @@
   icon: notification_icon_for(notification),
   href: notification.url.presence || notification_path(notification),
   hover: true,
+  active: notification.unread?,
   trailing: render(
     FlatPack::Timestamp::Component.new(
       timestamp: notification.created_at,

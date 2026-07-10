@@ -312,8 +312,14 @@ class NotificationAcceptanceTest < Minitest::Test
     digest_controller = File.read(File.expand_path(
       "../app/controllers/recording_studio_notifications/digests_controller.rb", __dir__
     ))
+    application_controller = File.read(File.expand_path(
+      "../app/controllers/recording_studio_notifications/application_controller.rb", __dir__
+    ))
     digest_view = File.read(File.expand_path(
       "../app/views/recording_studio_notifications/digests/show.html.erb", __dir__
+    ))
+    digest_notification_view = File.read(File.expand_path(
+      "../app/views/recording_studio_notifications/digests/_notification.html.erb", __dir__
     ))
     digest_task = File.read(File.expand_path(
       "../lib/tasks/recording_studio_notifications.rake", __dir__
@@ -347,7 +353,16 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes digest_controller, "PER_PAGE = 25"
     assert_includes digest_controller, "digest_visible?"
     assert_includes digest_controller, "visible_notification?(notification)"
+    assert_includes digest_controller, 'idempotency_key: "digest-summary-#{@digest.id}"'
+    assert_includes application_controller, "helper NotificationsHelper"
     assert_includes digest_view, "No accessible events remain in this digest."
+    assert_includes digest_view, "@summary_notification&.title"
+    assert_includes digest_view, 'strftime("%b %-d, %Y")'
+    assert_includes digest_view, '@digest.cadence == "daily"'
+    assert_includes digest_view, '"Daily · #{starts_on}"'
+    assert_includes digest_view, '"#{@digest.cadence.humanize} · #{starts_on} to'
+    refute_includes digest_view, "Current workspace"
+    assert_includes digest_notification_view, "active: notification.unread?"
     assert_includes digest_task, "FORCE=1"
     assert_includes digest_task, "available only in development"
     assert_includes config_docs, "Local Digest Demo"
