@@ -45,6 +45,21 @@
   ) %>
 
   <%= render FlatPack::SectionTitle::Component.new(
+    title: "Upgrade Compatibility",
+    subtitle: "Existing notification behavior remains immediate until you explicitly enable a consolidated cadence.",
+  ) %>
+
+  <p class="text-sm">Run the engine migration generator and migrate the host database after upgrading. Existing notifications, deliveries, and channel preferences are not rewritten. Every type defaults to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:every_notification</code>; application code also keeps that behavior during a rolling deploy until the cadence-preference table exists.</p>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :sh,
+    code: <<~CODE
+      bin/rails generate recording_studio_notifications:migrations
+      bin/rails db:migrate
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
     title: "Configuration Options",
     subtitle: "Every configurable setting on the Configuration object.",
   ) %>

@@ -15,6 +15,8 @@ module RecordingStudioNotifications
 
     class << self
       def cadence_for(recipient:, notification_type:, default: nil)
+        return default unless table_exists?
+
         preference = find_by(recipient: recipient, notification_type: notification_type.to_s)
         preference&.cadence&.to_sym || default
       end

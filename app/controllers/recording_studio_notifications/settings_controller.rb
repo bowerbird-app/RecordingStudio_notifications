@@ -64,6 +64,9 @@ module RecordingStudioNotifications
       @preferences = preference_map
       @channel_select_options = channel_select_options_map
       @selected_channels = selected_channels_map
+      @cadence_preferences_available = CadencePreference.table_exists?
+      return unless @cadence_preferences_available
+
       @cadence_select_options = cadence_select_options_map
       @selected_cadences = selected_cadences_map
     end
@@ -165,6 +168,8 @@ module RecordingStudioNotifications
     end
 
     def cadence_params
+      return {} unless CadencePreference.table_exists?
+
       raw_cadences = params.fetch(:cadences, {})
       return {} unless raw_cadences.respond_to?(:to_unsafe_h)
 

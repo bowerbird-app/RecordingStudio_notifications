@@ -213,6 +213,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, "cadence_select_options_map"
     assert_includes controller, "selected_cadences_map"
     assert_includes controller, "CadencePreference.set!"
+    assert_includes controller, "@cadence_preferences_available = CadencePreference.table_exists?"
     assert_includes controller, "type.allowed_cadences"
     assert_includes controller, ".group_by { |type| notification_type_category(type) }"
     assert_includes controller, "next false if type.key == :generic"
@@ -351,6 +352,9 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes digest_task, "available only in development"
     assert_includes config_docs, "Local Digest Demo"
     assert_includes config_docs, "recording_studio_notifications:deliver_due_digests"
+    assert_includes config_docs, "Upgrade Compatibility"
+    assert_includes File.read(File.expand_path("../README.md", __dir__)), "Existing notification types continue to deliver immediately"
+    assert_includes File.read(File.expand_path("../CHANGELOG.md", __dir__)), "default `:every_notification` cadence"
     assert_includes File.read(File.expand_path("../config/routes.rb", __dir__)), "resources :digests, only: :show"
     assert_includes File.read(File.expand_path(
       "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
