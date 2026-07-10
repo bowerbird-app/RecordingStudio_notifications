@@ -130,6 +130,8 @@
           icon: :bell,
           default_channels: [:in_app],
           available_channels: [:in_app],
+          allowed_cadences: %i[every_notification daily],
+          default_cadence: :every_notification,
           scope: :root
         )
 
@@ -155,6 +157,8 @@
           icon: :chat_bubble_left_ellipsis,
           default_channels: [:in_app],
           available_channels: [:in_app],
+          allowed_cadences: %i[every_notification daily every_other_day weekly biweekly monthly],
+          default_cadence: :every_notification,
           scope: :optional_root
         )
       end
@@ -213,6 +217,16 @@
           <td class="py-2">All channels this type can use. Defaults to default_channels + required_channels.</td>
         </tr>
         <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">allowed_cadences:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Delivery cadence choices shown to recipients. Valid values are <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:every_notification</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:daily</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:every_other_day</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:weekly</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:biweekly</code>, and <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:monthly</code>. Defaults to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">[:every_notification]</code>.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_cadence:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Recipient delivery cadence when no preference is saved. It must be included in <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">allowed_cadences:</code> and defaults to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:every_notification</code>.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">scope:</code></td>
           <td class="py-2 pr-4">No</td>
           <td class="py-2">One of <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:root</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:global</code>, or <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code>. Default: <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code>.</td>
@@ -234,6 +248,8 @@
     <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:global</code> — Must NOT have a root recording (or notifiable/recording).</li>
     <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code> — Either is allowed. Global notifications appear alongside root-scoped ones in the inbox.</li>
   </ul>
+
+  <p class="text-sm">Cadence preferences are validated on the server against each type's <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">allowed_cadences:</code>. Phase 1 stores the preference and presents valid choices in settings; consolidated delivery behavior is introduced separately.</p>
 
   <%= render FlatPack::SectionTitle::Component.new(
     title: "Sending Notifications",
@@ -442,6 +458,20 @@
   </ol>
 
   <p class="text-sm">Users manage their per-type preferences from the settings page at <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">/notifications/settings</code>.</p>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Consolidated Notification Data Model",
+    subtitle: "Digest buckets collect source notification events before a later delivery phase creates a summary notification.",
+  ) %>
+
+  <p class="text-sm"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">RecordingStudioNotifications::NotificationDigest</code> persists one pending or delivered bucket per recipient, notification type, root scope, cadence, and delivery period. <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">RecordingStudioNotifications::NotificationDigestItem</code> links each source notification to exactly one digest.</p>
+
+  <ul class="list-disc pl-6 text-sm">
+    <li>Digest buckets retain their period boundaries, cadence, root scope, and lifecycle status.</li>
+    <li>Pending buckets are unique for a recipient/type/root/cadence/period combination, including global notifications without a root recording.</li>
+    <li>Source notifications must match the digest recipient, notification type, and root scope.</li>
+    <li>Phase 2 only creates the data model. Collection, scheduling, summary notifications, and digest detail pages are introduced in later phases.</li>
+  </ul>
 
   <%= render FlatPack::SectionTitle::Component.new(
     title: "Using Hooks to Trigger Notifications",

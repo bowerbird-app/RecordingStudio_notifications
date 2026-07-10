@@ -59,13 +59,14 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_includes polling_controller, "this.refresh()"
   end
 
-  def test_engine_views_use_flatpack_menu_component_without_custom_css
+  def test_engine_views_use_flatpack_menu_component_and_scoped_settings_layering
     views = Dir[File.expand_path("../app/views/recording_studio_notifications/**/*.erb", __dir__)].map do |path|
       File.read(path)
     end.join("\n")
 
     assert_includes views, "FlatPack::"
     assert_includes views, "FlatPack::Notification::Component"
-    refute_includes views, "<style"
+    assert_includes views, ".rsn-settings-accordion"
+    assert_includes views, "overflow: visible"
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_10_001000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -69,6 +69,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
     t.index ["recording_id"], name: "index_recording_studio_events_on_recording_id"
   end
 
+  create_table "recording_studio_notifications_cadence_preferences", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "cadence", default: "every_notification", null: false
+    t.datetime "created_at", null: false
+    t.string "notification_type", null: false
+    t.uuid "recipient_id", null: false
+    t.string "recipient_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["recipient_type", "recipient_id", "notification_type"], name: "idx_dummy_rsn_cadence_preferences_recipient_type", unique: true
+  end
+
   create_table "recording_studio_notifications_deliveries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "channel", null: false
     t.datetime "created_at", null: false
@@ -80,6 +90,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
     t.datetime "updated_at", null: false
     t.index ["channel", "status"], name: "idx_dummy_rsn_deliveries_channel_status"
     t.index ["notification_id", "channel"], name: "idx_dummy_rsn_deliveries_notification_channel", unique: true
+  end
+
+  create_table "recording_studio_notifications_digest_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.uuid "digest_id", null: false
+    t.uuid "notification_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["digest_id", "notification_id"], name: "idx_dummy_rsn_digest_items_digest_notification", unique: true
+    t.index ["notification_id"], name: "idx_dummy_rsn_digest_items_notification", unique: true
+  end
+
+  create_table "recording_studio_notifications_digests", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "cadence", null: false
+    t.datetime "created_at", null: false
+    t.datetime "delivered_at"
+    t.string "notification_type", null: false
+    t.datetime "period_ends_at", null: false
+    t.datetime "period_starts_at", null: false
+    t.uuid "recipient_id", null: false
+    t.string "recipient_type", null: false
+    t.uuid "root_recording_id"
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index "recipient_type, recipient_id, notification_type, COALESCE(root_recording_id, '00000000-0000-0000-0000-000000000000'::uuid), cadence, period_starts_at", name: "idx_dummy_rsn_pending_digest_bucket", unique: true, where: "((status)::text = 'pending'::text)"
+    t.index ["status", "period_ends_at"], name: "idx_dummy_rsn_digests_status_period_end"
   end
 
   create_table "recording_studio_notifications_notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -182,6 +217,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
 
   add_foreign_key "recording_studio_events", "recording_studio_recordings", column: "recording_id"
   add_foreign_key "recording_studio_notifications_deliveries", "recording_studio_notifications_notifications", column: "notification_id"
+  add_foreign_key "recording_studio_notifications_digest_items", "recording_studio_notifications_digests", column: "digest_id"
+  add_foreign_key "recording_studio_notifications_digest_items", "recording_studio_notifications_notifications", column: "notification_id"
   add_foreign_key "recording_studio_recordings", "recording_studio_recordings", column: "parent_recording_id"
   add_foreign_key "recording_studio_recordings", "recording_studio_recordings", column: "root_recording_id"
   add_foreign_key "system_notifications", "users", column: "creator_id"
