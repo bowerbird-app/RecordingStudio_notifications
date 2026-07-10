@@ -1,4 +1,23 @@
 <div class="mx-auto flex w-full max-w-3xl flex-col gap-6">
+  <style>
+    .rsn-settings-accordion [data-controller="flat-pack--accordion"] {
+      overflow: visible;
+    }
+
+    .rsn-settings-accordion [id^="settings-category-"][id$="-content"][aria-expanded="true"] {
+      overflow: visible;
+    }
+
+    .rsn-settings-accordion .flat-pack-select-wrapper {
+      position: relative;
+      z-index: 0;
+    }
+
+    .rsn-settings-accordion .flat-pack-select-wrapper:focus-within {
+      z-index: 40;
+    }
+  </style>
+
   <%= render FlatPack::PageNav::Component.new(
     anchor_url: main_app.root_path
   ) %>
@@ -9,7 +28,7 @@
     variant: :h1
   ) %>
 
-  <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4", data: { controller: "notification-settings", action: "change->notification-settings#syncNoneSelection" } do %>
+  <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4 rsn-settings-accordion", data: { controller: "notification-settings", action: "change->notification-settings#syncNoneSelection" } do %>
     <% if @notification_type_groups.any? %>
       <%= render FlatPack::Accordion::Component.new(allow_multiple: true) do |accordion| %>
         <% @notification_type_groups.each do |category, types| %>
