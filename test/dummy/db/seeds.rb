@@ -98,6 +98,19 @@ begin
     idempotency_key: "seed-system-announcement"
   )
 
+  100.times do |index|
+    RecordingStudioNotifications::Services::Notify.call(
+      notification_type: :workspace_change,
+      recipient: user,
+      actor: user,
+      root_recording: root_recording,
+      recording: root_recording,
+      title: "Studio Workspace update #{index + 1}",
+      body: "Seeded notification #{index + 1} of 100 for inbox pagination and layout testing.",
+      idempotency_key: "seed-studio-workspace-update-#{index + 1}"
+    )
+  end
+
   if defined?(RecordingStudioAccessible) && RecordingStudioAccessible.respond_to?(:grant_access)
     ensure_access_for = lambda do |parent_recording, role|
       root_for_parent = RecordingStudio.root_recording_or_self(parent_recording)
