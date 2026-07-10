@@ -13,7 +13,7 @@
       <img src="./assets/0.13.2/loading.gif" alt="loading"/>
     </div>
     <div id="wrapper" class="hide">
-      <div class="timestamp">Generated <abbr class="timeago" title="2026-07-10T09:00:04+00:00">2026-07-10T09:00:04+00:00</abbr></div>
+      <div class="timestamp">Generated <abbr class="timeago" title="2026-07-10T09:05:27+00:00">2026-07-10T09:05:27+00:00</abbr></div>
       <ul class="group_tabs"></ul>
 
       <div id="content">
@@ -22,14 +22,14 @@
     <span class="group_name">All Files</span>
     (<span class="covered_percent">
       <span class="red">
-  69.43%
+  69.05%
 </span>
 
      </span>
      covered at
      <span class="covered_strength">
        <span class="green">
-         5.9
+         5.67
        </span>
     </span> hits/line
     )
@@ -38,26 +38,26 @@
   <a name="AllFiles"></a>
 
   <div>
-    <b>15</b> files in total.
+    <b>17</b> files in total.
   </div>
 
   <div class="t-line-summary">
-    <b>723</b> relevant lines,
-    <span class="green"><b>502</b> lines covered</span> and
-    <span class="red"><b>221</b> lines missed. </span>
+    <b>756</b> relevant lines,
+    <span class="green"><b>522</b> lines covered</span> and
+    <span class="red"><b>234</b> lines missed. </span>
     (<span class="red">
-  69.43%
+  69.05%
 </span>
 )
   </div>
 
   
     <div class="t-branch-summary">
-      <span><b>250</b> total branches, </span>
-      <span class="green"><b>92</b> branches covered</span> and
-      <span class="red"><b>158</b> branches missed.</span>
+      <span><b>264</b> total branches, </span>
+      <span class="green"><b>93</b> branches covered</span> and
+      <span class="red"><b>171</b> branches missed.</span>
       (<span class="red">
-  36.8%
+  35.23%
 </span>
 )
     </div>
@@ -83,6 +83,38 @@
         </tr>
       </thead>
       <tbody>
+        
+          <tr class="t-file">
+            <td class="strong t-file__name"><a href="#f0a4a8a906256a4b1f23e28f77137bdc6bd5fd7e" class="src_link" title="app/models/recording_studio_notifications/application_record.rb">app/models/recording_studio_notifications/application_record.rb</a></td>
+            <td class="green strong cell--number t-file__coverage">100.00 %</td>
+            <td class="cell--number">7</td>
+            <td class="cell--number">3</td>
+            <td class="cell--number">3</td>
+            <td class="cell--number">0</td>
+            <td class="cell--number">1.00</td>
+            
+              <td class="green strong cell--number t-file__branch-coverage">100.00 %</td>
+              <td class="cell--number">0</td>
+              <td class="cell--number">0</td>
+              <td class="cell--number">0</td>
+            
+          </tr>
+        
+          <tr class="t-file">
+            <td class="strong t-file__name"><a href="#10854e3ac0b167e63c15187a699d04af18e97119" class="src_link" title="app/models/recording_studio_notifications/cadence_preference.rb">app/models/recording_studio_notifications/cadence_preference.rb</a></td>
+            <td class="red strong cell--number t-file__coverage">56.67 %</td>
+            <td class="cell--number">55</td>
+            <td class="cell--number">30</td>
+            <td class="cell--number">17</td>
+            <td class="cell--number">13</td>
+            <td class="cell--number">0.57</td>
+            
+              <td class="red strong cell--number t-file__branch-coverage">7.14 %</td>
+              <td class="cell--number">14</td>
+              <td class="cell--number">1</td>
+              <td class="cell--number">13</td>
+            
+          </tr>
         
           <tr class="t-file">
             <td class="strong t-file__name"><a href="#1036b1a5cde40ed17ed8d2c59200097717c72b42" class="src_link" title="lib/generators/recording_studio_notifications/install/install_generator.rb">lib/generators/recording_studio_notifications/install/install_generator.rb</a></td>
@@ -340,6 +372,936 @@
       </div>
 
       <div class="source_files">
+      
+        <div class="source_table" id="f0a4a8a906256a4b1f23e28f77137bdc6bd5fd7e">
+  <div class="header">
+    <h3>app/models/recording_studio_notifications/application_record.rb</h3>
+    <h4>
+      <span class="green">
+  100.0%
+</span>
+
+      lines covered
+    </h4>
+
+    
+      <h4>
+        <span class="green">
+  100.0%
+</span>
+
+        branches covered
+      </h4>
+    
+
+    <div class="t-line-summary">
+      <b>3</b> relevant lines.
+      <span class="green"><b>3</b> lines covered</span> and
+      <span class="red"><b>0</b> lines missed.</span>
+    </div>
+
+    
+      <div class="t-branch-summary">
+          <span><b>0</b> total branches, </span>
+          <span class="green"><b>0</b> branches covered</span> and
+          <span class="red"><b>0</b> branches missed.</span>
+      </div>
+    
+
+  </div>
+
+  <pre>
+    <ol>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="1">
+            
+
+            
+              
+            
+
+            <code class="ruby"># frozen_string_literal: true</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="2">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="3">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">module RecordingStudioNotifications</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="4">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">  class ApplicationRecord &lt; ActiveRecord::Base</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="5">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    self.abstract_class = true</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="6">
+            
+
+            
+              
+            
+
+            <code class="ruby">  end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="7">
+            
+
+            
+              
+            
+
+            <code class="ruby">end</code>
+          </li>
+        </div>
+      
+    </ol>
+  </pre>
+</div>
+
+      
+        <div class="source_table" id="10854e3ac0b167e63c15187a699d04af18e97119">
+  <div class="header">
+    <h3>app/models/recording_studio_notifications/cadence_preference.rb</h3>
+    <h4>
+      <span class="red">
+  56.67%
+</span>
+
+      lines covered
+    </h4>
+
+    
+      <h4>
+        <span class="red">
+  7.14%
+</span>
+
+        branches covered
+      </h4>
+    
+
+    <div class="t-line-summary">
+      <b>30</b> relevant lines.
+      <span class="green"><b>17</b> lines covered</span> and
+      <span class="red"><b>13</b> lines missed.</span>
+    </div>
+
+    
+      <div class="t-branch-summary">
+          <span><b>14</b> total branches, </span>
+          <span class="green"><b>1</b> branches covered</span> and
+          <span class="red"><b>13</b> branches missed.</span>
+      </div>
+    
+
+  </div>
+
+  <pre>
+    <ol>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="1">
+            
+
+            
+              
+            
+
+            <code class="ruby"># frozen_string_literal: true</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="2">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="3">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">module RecordingStudioNotifications</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="4">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">  class CadencePreference &lt; ApplicationRecord</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="5">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    self.table_name = &quot;recording_studio_notifications_cadence_preferences&quot;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="6">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="7">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    belongs_to :recipient, polymorphic: true</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="8">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="9">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    validates :recipient, :notification_type, :cadence, presence: true</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="10">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    validates :notification_type, uniqueness: { scope: %i[recipient_type recipient_id] }</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="11">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    validate :registered_notification_type</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="12">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    validate :allowed_cadence</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="13">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="14">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    scope :for_recipient, -&gt;(recipient) { where(recipient: recipient) }</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="15">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="16">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    class &lt;&lt; self</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="17">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def cadence_for(recipient:, notification_type:, default: nil)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="1" data-linenumber="18">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+                <span class="hits" title="then branch hit 1 times">
+                  then: 1
+                </span>
+              
+            
+
+            <code class="ruby">        return default unless table_exists?</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="19">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="20">
+            
+
+            
+              
+            
+
+            <code class="ruby">        preference = find_by(recipient: recipient, notification_type: notification_type.to_s)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="21">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">        preference&amp;.cadence&amp;.to_sym || default</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="22">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="23">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="24">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def set!(recipient:, notification_type:, cadence:)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="25">
+            
+
+            
+              
+            
+
+            <code class="ruby">        preference = find_or_initialize_by(</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="26">
+            
+
+            
+              
+            
+
+            <code class="ruby">          recipient: recipient,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="27">
+            
+
+            
+              
+            
+
+            <code class="ruby">          notification_type: notification_type.to_s</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="28">
+            
+
+            
+              
+            
+
+            <code class="ruby">        )</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="29">
+            
+
+            
+              
+            
+
+            <code class="ruby">        preference.cadence = cadence.to_s</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="30">
+            
+
+            
+              
+            
+
+            <code class="ruby">        preference.save!</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="31">
+            
+
+            
+              
+            
+
+            <code class="ruby">        preference</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="32">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="33">
+            
+
+            
+              
+            
+
+            <code class="ruby">    end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="34">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="35">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    private</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="36">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="37">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    def type_definition</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="38">
+            
+
+            
+              
+            
+
+            <code class="ruby">      @type_definition ||= RecordingStudioNotifications.notification_types[notification_type]</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="39">
+            
+
+            
+              
+            
+
+            <code class="ruby">    end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="40">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="41">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    def registered_notification_type</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="42">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">      return if notification_type.blank?</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="43">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">      return if type_definition</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="44">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="45">
+            
+
+            
+              
+            
+
+            <code class="ruby">      errors.add(:notification_type, &quot;is not registered&quot;)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="46">
+            
+
+            
+              
+            
+
+            <code class="ruby">    end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="47">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="48">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    def allowed_cadence</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="49">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">      return if cadence.blank? || !type_definition</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="50">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">      return if type_definition.allowed_cadences.include?(cadence.to_sym)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="51">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="52">
+            
+
+            
+              
+            
+
+            <code class="ruby">      errors.add(:cadence, &quot;is not allowed for this notification type&quot;)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="53">
+            
+
+            
+              
+            
+
+            <code class="ruby">    end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="54">
+            
+
+            
+              
+            
+
+            <code class="ruby">  end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="55">
+            
+
+            
+              
+            
+
+            <code class="ruby">end</code>
+          </li>
+        </div>
+      
+    </ol>
+  </pre>
+</div>
+
       
         <div class="source_table" id="1036b1a5cde40ed17ed8d2c59200097717c72b42">
   <div class="header">
@@ -9568,12 +10530,12 @@
 
             
               
-                <span class="hits" title="then branch hit 0 times">
-                  then: 0
+                <span class="hits" title="then branch hit 33 times">
+                  then: 33
                 </span>
               
-                <span class="hits" title="else branch hit 33 times">
-                  else: 33
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
                 </span>
               
             

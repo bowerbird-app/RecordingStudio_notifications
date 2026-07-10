@@ -732,8 +732,8 @@
             "[:then, 11, 208, 6, 208, 12]": 1
           },
           "[:if, 12, 214, 25, 214, 77]": {
-            "[:then, 13, 214, 54, 214, 66]": 0,
-            "[:else, 14, 214, 69, 214, 77]": 33
+            "[:then, 13, 214, 54, 214, 66]": 33,
+            "[:else, 14, 214, 69, 214, 77]": 0
           },
           "[:if, 15, 224, 6, 228, 9]": {
             "[:then, 16, 225, 8, 225, 23]": 27,
@@ -2076,6 +2076,107 @@
           }
         }
       },
+      "/workspace/app/models/recording_studio_notifications/application_record.rb": {
+        "lines": [
+          null,
+          null,
+          1,
+          1,
+          1,
+          null,
+          null
+        ],
+        "branches": {}
+      },
+      "/workspace/app/models/recording_studio_notifications/cadence_preference.rb": {
+        "lines": [
+          null,
+          null,
+          1,
+          1,
+          1,
+          null,
+          1,
+          null,
+          1,
+          1,
+          1,
+          1,
+          null,
+          1,
+          null,
+          1,
+          1,
+          1,
+          null,
+          0,
+          0,
+          null,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          1,
+          null,
+          1,
+          0,
+          null,
+          null,
+          1,
+          0,
+          0,
+          null,
+          0,
+          null,
+          null,
+          1,
+          0,
+          0,
+          null,
+          0,
+          null,
+          null,
+          null
+        ],
+        "branches": {
+          "[:unless, 0, 18, 8, 18, 43]": {
+            "[:else, 1, 18, 8, 18, 43]": 0,
+            "[:then, 2, 18, 8, 18, 22]": 1
+          },
+          "[:\"&.\", 3, 21, 8, 21, 27]": {
+            "[:then, 4, 21, 8, 21, 27]": 0,
+            "[:else, 5, 21, 8, 21, 27]": 0
+          },
+          "[:\"&.\", 6, 21, 8, 21, 35]": {
+            "[:then, 7, 21, 8, 21, 35]": 0,
+            "[:else, 8, 21, 8, 21, 35]": 0
+          },
+          "[:if, 9, 42, 6, 42, 40]": {
+            "[:then, 10, 42, 6, 42, 12]": 0,
+            "[:else, 11, 42, 6, 42, 40]": 0
+          },
+          "[:if, 12, 43, 6, 43, 31]": {
+            "[:then, 13, 43, 6, 43, 12]": 0,
+            "[:else, 14, 43, 6, 43, 31]": 0
+          },
+          "[:if, 15, 49, 6, 49, 50]": {
+            "[:then, 16, 49, 6, 49, 12]": 0,
+            "[:else, 17, 49, 6, 49, 50]": 0
+          },
+          "[:if, 18, 50, 6, 50, 73]": {
+            "[:then, 19, 50, 6, 50, 12]": 0,
+            "[:else, 20, 50, 6, 50, 73]": 0
+          }
+        }
+      },
       "/workspace/lib/generators/recording_studio_notifications/install/install_generator.rb": {
         "lines": [
           null,
@@ -2209,6 +2310,6 @@
         }
       }
     },
-    "timestamp": 1783674004
+    "timestamp": 1783674327
   }
 }
