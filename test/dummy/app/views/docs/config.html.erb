@@ -249,7 +249,7 @@
     <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code> — Either is allowed. Global notifications appear alongside root-scoped ones in the inbox.</li>
   </ul>
 
-  <p class="text-sm">Cadence preferences are validated on the server against each type's <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">allowed_cadences:</code>. Phase 1 stores the preference and presents valid choices in settings; consolidated delivery behavior is introduced separately.</p>
+  <p class="text-sm">Cadence preferences are validated on the server against each type's <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">allowed_cadences:</code>. New events use the recipient's current cadence. Changing a preference never moves events already collected in an open digest.</p>
 
   <%= render FlatPack::SectionTitle::Component.new(
     title: "Sending Notifications",
@@ -470,8 +470,42 @@
     <li>Digest buckets retain their period boundaries, cadence, root scope, and lifecycle status.</li>
     <li>Pending buckets are unique for a recipient/type/root/cadence/period combination, including global notifications without a root recording.</li>
     <li>Source notifications must match the digest recipient, notification type, and root scope.</li>
-    <li>Phase 2 only creates the data model. Collection, scheduling, summary notifications, and digest detail pages are introduced in later phases.</li>
+    <li>Collected source notifications stay out of the normal inbox until a later phase creates their summary notification and detail page.</li>
   </ul>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Collection And Scheduling",
+    subtitle: "Consolidated events are grouped by the recipient's active preference; immediate and bypassed events keep the existing delivery path.",
+  ) %>
+
+  <p class="text-sm">The engine uses <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">Time.zone</code> for digest periods. Daily periods run midnight-to-midnight; alternate-day periods use stable two-day windows; weekly and biweekly periods begin on Monday; monthly periods follow calendar months. A preference change affects only events created after the change.</p>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~CODE
+      # Use the recipient's configured cadence and collect this event.
+      RecordingStudioNotifications.notify(
+        notification_type: :page_comment,
+        recipient: member,
+        title: "New comment",
+        root_recording: workspace_recording
+      )
+
+      # Bypass consolidation for an urgent event.
+      RecordingStudioNotifications.notify(
+        notification_type: :page_comment,
+        recipient: member,
+        title: "Comment requires attention",
+        root_recording: workspace_recording,
+        bypass_digest: true
+      )
+
+      # Enqueue from the host application's recurring job scheduler.
+      RecordingStudioNotifications::DigestSchedulerJob.perform_later
+    CODE
+  ) %>
+
+  <p class="text-sm">The scheduler emits <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">digest_due.recording_studio_notifications</code> for every pending digest whose period has ended. It intentionally does not mark a digest delivered: the next phase creates the inbox summary, detail page, and final delivery transition.</p>
 
   <%= render FlatPack::SectionTitle::Component.new(
     title: "Using Hooks to Trigger Notifications",

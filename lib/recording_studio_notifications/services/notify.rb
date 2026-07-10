@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "digest_collector"
+
 module RecordingStudioNotifications
   module Services
     class Notify
@@ -9,7 +11,7 @@ module RecordingStudioNotifications
 
       def initialize(notification_type:, recipient:, title:, body: nil, url: nil, metadata: {}, actor: nil,
                      notifiable: nil, recording: nil, root_recording: nil, channels: nil, idempotency_key: nil,
-                     deliver_later: nil)
+                     deliver_later: nil, bypass_digest: false)
         @notification_type = notification_type.to_s
         @recipient = recipient
         @title = title
@@ -23,6 +25,7 @@ module RecordingStudioNotifications
         @requested_channels = channels
         @idempotency_key = idempotency_key.presence
         @deliver_later = deliver_later
+        @bypass_digest = bypass_digest
       end
 
       def call
@@ -40,18 +43,27 @@ module RecordingStudioNotifications
       def create_and_deliver!
         notification = nil
         should_deliver = false
+        cadence = delivery_cadence
 
         ActiveSupport::Notifications.instrument(
           "notify.recording_studio_notifications",
           notification_type: @notification_type,
           recipient: @recipient,
           channels: channel_keys,
-          root_recording_id: resolved_root_recording&.id
+          root_recording_id: resolved_root_recording&.id,
+          cadence: cadence,
+          bypass_digest: bypass_digest?
         ) do
           Notification.transaction do
             notification = find_idempotent_notification || create_notification!
-            create_deliveries!(notification)
-            should_deliver = notification.previously_new_record? || notification.deliveries.pending.exists?
+
+            if collect_into_digest?(notification, cadence)
+              DigestCollector.call(notification: notification, cadence: cadence)
+            elsif !notification.digest_item
+              create_deliveries!(notification)
+              should_deliver = notification.previously_new_record? || notification.deliveries.pending.exists?
+            end
+
             notification
           end
         end
@@ -116,7 +128,8 @@ module RecordingStudioNotifications
           notifiable: @notifiable,
           recording: @recording,
           root_recording: resolved_root_recording,
-          channels: channel_keys
+          channels: channel_keys,
+          bypass_digest: bypass_digest?
         }
       end
 
@@ -201,6 +214,24 @@ module RecordingStudioNotifications
           channel: channel,
           default: default
         )
+      end
+
+      def delivery_cadence
+        return :every_notification if bypass_digest?
+
+        CadencePreference.cadence_for(
+          recipient: @recipient,
+          notification_type: @notification_type,
+          default: type_definition.default_cadence
+        ).to_sym
+      end
+
+      def collect_into_digest?(notification, cadence)
+        notification.previously_new_record? && cadence != :every_notification
+      end
+
+      def bypass_digest?
+        @bypass_digest == true
       end
 
       def consistent_root_scope?

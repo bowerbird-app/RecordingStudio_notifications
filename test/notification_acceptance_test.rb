@@ -319,6 +319,11 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes migration, "idx_rsn_digest_items_notification"
     assert_includes config_docs, "Consolidated Notification Data Model"
     assert_includes config_docs, "NotificationDigestItem"
+    assert_includes config_docs, "bypass_digest: true"
+    assert_includes config_docs, "DigestSchedulerJob.perform_later"
+    assert_includes File.read(File.expand_path(
+      "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
+    )), "where.missing(:digest_item)"
   end
 
   def test_commentable_hook_wires_notification

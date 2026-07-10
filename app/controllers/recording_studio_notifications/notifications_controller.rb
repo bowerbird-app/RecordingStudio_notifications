@@ -114,7 +114,7 @@ module RecordingStudioNotifications
     end
 
     def scoped_notifications
-      notifications = Notification.for_recipient(@recipient).active
+      notifications = Notification.for_recipient(@recipient).active.where.missing(:digest_item)
       notifications = notifications.for_current_root_inbox(@current_root_recording) if @inbox_scope == "current_root"
       notifications.newest_first
     end
