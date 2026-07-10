@@ -2,6 +2,8 @@
 
 module RecordingStudioNotifications
   class NotificationsController < ApplicationController
+    PER_PAGE = 25
+
     layout "recording_studio_notifications/blank", only: :index
 
     before_action :set_recipient
@@ -12,7 +14,13 @@ module RecordingStudioNotifications
 
       @inbox_scope = notifications_inbox_scope
       @current_root_recording = current_notifications_root_recording
-      @notifications = visible_notifications(scoped_notifications.limit(100))
+      @page = current_page
+      @notifications, @has_next_page = visible_notifications_page(scoped_notifications)
+
+      respond_to do |format|
+        format.html
+        format.turbo_stream
+      end
     end
 
     def menu
@@ -115,6 +123,37 @@ module RecordingStudioNotifications
       notifications.select { |notification| visible_notification?(notification) }
     end
 
+    def visible_notifications_page(notifications_scope)
+      visible_offset = (@page - 1) * PER_PAGE
+      loaded_visible_count = 0
+      collected = []
+      database_offset = 0
+      batch_size = PER_PAGE * 4
+
+      loop do
+        batch = notifications_scope.offset(database_offset).limit(batch_size).to_a
+        break if batch.empty?
+
+        batch.each do |notification|
+          next unless visible_notification?(notification)
+
+          if loaded_visible_count < visible_offset
+            loaded_visible_count += 1
+            next
+          end
+
+          collected << notification
+          break if collected.size > PER_PAGE
+        end
+
+        break if collected.size > PER_PAGE
+
+        database_offset += batch.size
+      end
+
+      [collected.first(PER_PAGE), collected.size > PER_PAGE]
+    end
+
     def visible_notification?(notification)
       Services::NotificationAuthorization.visible_notification?(
         actor: current_notifications_actor,
@@ -133,6 +172,11 @@ module RecordingStudioNotifications
       return 5 if requested_limit <= 0
 
       [requested_limit, 25].min
+    end
+
+    def current_page
+      page = params[:page].to_i
+      page.positive? ? page : 1
     end
 
     def menu_notification_payload(notification)

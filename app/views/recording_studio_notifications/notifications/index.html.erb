@@ -22,31 +22,14 @@
 
   <% if @notifications.any? %>
     <%= render FlatPack::List::Component.new(spacing: :comfortable, divider: true) do %>
-      <% @notifications.each do |notification| %>
-        <%= render FlatPack::List::Item.new(
-          icon: notification_icon_for(notification),
-          href: open_notification_path(notification),
-          hover: true,
-          active: notification.unread?,
-          trailing: render(
-            FlatPack::Timestamp::Component.new(
-              timestamp: notification.created_at,
-              shorten_timestamp: true,
-              fallback_text: "",
-              class_name: "text-sm text-(--surface-muted-content-color) whitespace-nowrap"
-            )
-          ),
-          class: "mb-0"
-        ) do %>
-          <div class="space-y-0.5 text-left">
-            <div class="truncate text-sm font-medium text-(--surface-content-color)"><%= notification.title %></div>
-            <% if notification.body.present? %>
-              <div class="line-clamp-2 text-xs text-(--surface-muted-content-color)"><%= notification.body %></div>
-            <% end %>
-          </div>
-        <% end %>
-      <% end %>
+      <div id="notifications-list">
+        <%= render partial: "recording_studio_notifications/notifications/page", locals: { notifications: @notifications } %>
+      </div>
     <% end %>
+
+    <div class="pt-2">
+      <%= render partial: "recording_studio_notifications/notifications/next_page", locals: { page: @page, has_next_page: @has_next_page } %>
+    </div>
   <% else %>
     <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
       <% card.body do %>
