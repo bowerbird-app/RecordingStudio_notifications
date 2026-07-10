@@ -308,6 +308,12 @@ class NotificationAcceptanceTest < Minitest::Test
     digest_scheduler = File.read(File.expand_path(
       "../app/jobs/recording_studio_notifications/digest_scheduler_job.rb", __dir__
     ))
+    digest_controller = File.read(File.expand_path(
+      "../app/controllers/recording_studio_notifications/digests_controller.rb", __dir__
+    ))
+    digest_view = File.read(File.expand_path(
+      "../app/views/recording_studio_notifications/digests/show.html.erb", __dir__
+    ))
     migration = File.read(File.expand_path(
       "../db/migrate/20260710001000_create_recording_studio_notification_digests.rb", __dir__
     ))
@@ -332,7 +338,13 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes digest_delivery, "digest-summary-\#{@digest.id}"
     assert_includes digest_delivery, "bypass_digest: true"
     assert_includes digest_delivery, "status: \"delivered\""
+    assert_includes digest_delivery, "RecordingStudioAccessible.authorized?"
     assert_includes digest_scheduler, "Services::DigestDelivery.call"
+    assert_includes digest_controller, "PER_PAGE = 25"
+    assert_includes digest_controller, "digest_visible?"
+    assert_includes digest_controller, "visible_notification?(notification)"
+    assert_includes digest_view, "No accessible events remain in this digest."
+    assert_includes File.read(File.expand_path("../config/routes.rb", __dir__)), "resources :digests, only: :show"
     assert_includes File.read(File.expand_path(
       "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
     )), "where.missing(:digest_item)"

@@ -41,11 +41,29 @@ module RecordingStudioNotifications
       end
 
       def recipient_eligible?
+        return false unless @digest.source_notifications.active.exists?
+        return recipient_authorized? unless @digest.root_recording
+        return recipient_authorized? unless accessible_recording_authorization_available?
+
+        RecordingStudioAccessible.authorized?(
+          actor: @digest.recipient,
+          recording: @digest.root_recording,
+          role: :view
+        )
+      rescue StandardError
+        false
+      end
+
+      def recipient_authorized?
         NotificationAuthorization.allowed?(
           actor: @digest.recipient,
           recipient: @digest.recipient,
           recording: @digest.root_recording
         )
+      end
+
+      def accessible_recording_authorization_available?
+        defined?(RecordingStudioAccessible) && RecordingStudioAccessible.respond_to?(:authorized?)
       end
 
       def create_summary!

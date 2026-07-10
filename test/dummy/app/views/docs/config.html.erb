@@ -532,7 +532,14 @@
     CODE
   ) %>
 
-  <p class="text-sm">A destination may be supplied now; the digest detail experience and its event list are introduced separately.</p>
+  <p class="text-sm">By default, opening a digest summary takes the recipient to the built-in digest detail page. A custom destination still overrides that default.</p>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Digest Detail Experience",
+    subtitle: "Delivered summaries open a visibility-aware event list for their digest period.",
+  ) %>
+
+  <p class="text-sm">The digest page shows its cadence, period, scope, status, and event count. Source events are loaded 25 at a time with Turbo. Every event is authorized again as it is rendered, so revoked workspace access removes inaccessible events from the detail view. Events with a destination open their original resource directly.</p>
 
   <%= render FlatPack::SectionTitle::Component.new(
     title: "Using Hooks to Trigger Notifications",

@@ -1,0 +1,7 @@
+<%= turbo_stream.append "digest-notifications-list" do %>
+  <%= render partial: "recording_studio_notifications/digests/page", locals: { notifications: @notifications } %>
+<% end %>
+
+<%= turbo_stream.replace "digest_notifications_next_page" do %>
+  <%= render partial: "recording_studio_notifications/digests/next_page", locals: { page: @page, has_next_page: @has_next_page } %>
+<% end %>

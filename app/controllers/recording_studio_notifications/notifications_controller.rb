@@ -66,7 +66,7 @@ module RecordingStudioNotifications
 
       @notification.mark_read! if @notification.unread?
 
-      destination = @notification.url.presence || notification_path(@notification)
+      destination = @notification.url.presence || digest_destination || notification_path(@notification)
       redirect_to destination, allow_other_host: true
     end
 
@@ -184,6 +184,13 @@ module RecordingStudioNotifications
         notification: notification,
         href: open_notification_path(notification)
       )
+    end
+
+    def digest_destination
+      digest_id = @notification.metadata["digest_id"]
+      return if digest_id.blank? || !@notification.metadata["digest_summary"]
+
+      digest_path(digest_id)
     end
 
     # Override root-switch scope extraction so `scope=current_root` in the
