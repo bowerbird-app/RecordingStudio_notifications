@@ -13,7 +13,7 @@
       <img src="./assets/0.13.2/loading.gif" alt="loading"/>
     </div>
     <div id="wrapper" class="hide">
-      <div class="timestamp">Generated <abbr class="timeago" title="2026-07-10T08:08:24+00:00">2026-07-10T08:08:24+00:00</abbr></div>
+      <div class="timestamp">Generated <abbr class="timeago" title="2026-07-10T08:16:22+00:00">2026-07-10T08:16:22+00:00</abbr></div>
       <ul class="group_tabs"></ul>
 
       <div id="content">
@@ -22,14 +22,14 @@
     <span class="group_name">All Files</span>
     (<span class="covered_percent">
       <span class="red">
-  70.94%
+  70.45%
 </span>
 
      </span>
      covered at
      <span class="covered_strength">
        <span class="green">
-         7.01
+         6.4
        </span>
     </span> hits/line
     )
@@ -38,26 +38,26 @@
   <a name="AllFiles"></a>
 
   <div>
-    <b>12</b> files in total.
+    <b>13</b> files in total.
   </div>
 
   <div class="t-line-summary">
-    <b>585</b> relevant lines,
-    <span class="green"><b>415</b> lines covered</span> and
-    <span class="red"><b>170</b> lines missed. </span>
+    <b>660</b> relevant lines,
+    <span class="green"><b>465</b> lines covered</span> and
+    <span class="red"><b>195</b> lines missed. </span>
     (<span class="red">
-  70.94%
+  70.45%
 </span>
 )
   </div>
 
   
     <div class="t-branch-summary">
-      <span><b>214</b> total branches, </span>
-      <span class="green"><b>82</b> branches covered</span> and
-      <span class="red"><b>132</b> branches missed.</span>
+      <span><b>234</b> total branches, </span>
+      <span class="green"><b>89</b> branches covered</span> and
+      <span class="red"><b>145</b> branches missed.</span>
       (<span class="red">
-  38.32%
+  38.03%
 </span>
 )
     </div>
@@ -213,6 +213,22 @@
           </tr>
         
           <tr class="t-file">
+            <td class="strong t-file__name"><a href="#45eb6b2b225f43ba49593b53e9aaa4f45a13a1f8" class="src_link" title="lib/recording_studio_notifications/services/digest_collector.rb">lib/recording_studio_notifications/services/digest_collector.rb</a></td>
+            <td class="red strong cell--number t-file__coverage">74.19 %</td>
+            <td class="cell--number">121</td>
+            <td class="cell--number">62</td>
+            <td class="cell--number">46</td>
+            <td class="cell--number">16</td>
+            <td class="cell--number">1.84</td>
+            
+              <td class="red strong cell--number t-file__branch-coverage">50.00 %</td>
+              <td class="cell--number">14</td>
+              <td class="cell--number">7</td>
+              <td class="cell--number">7</td>
+            
+          </tr>
+        
+          <tr class="t-file">
             <td class="strong t-file__name"><a href="#157c42dbd6309a0a1829f841cca979ec3c53f0b4" class="src_link" title="lib/recording_studio_notifications/services/notification_authorization.rb">lib/recording_studio_notifications/services/notification_authorization.rb</a></td>
             <td class="green strong cell--number t-file__coverage">94.74 %</td>
             <td class="cell--number">81</td>
@@ -230,17 +246,17 @@
         
           <tr class="t-file">
             <td class="strong t-file__name"><a href="#84d9fd042df6472c9dce9dc1946110c735782b6e" class="src_link" title="lib/recording_studio_notifications/services/notify.rb">lib/recording_studio_notifications/services/notify.rb</a></td>
-            <td class="red strong cell--number t-file__coverage">23.15 %</td>
-            <td class="cell--number">229</td>
-            <td class="cell--number">108</td>
-            <td class="cell--number">25</td>
-            <td class="cell--number">83</td>
-            <td class="cell--number">0.23</td>
+            <td class="red strong cell--number t-file__coverage">23.97 %</td>
+            <td class="cell--number">260</td>
+            <td class="cell--number">121</td>
+            <td class="cell--number">29</td>
+            <td class="cell--number">92</td>
+            <td class="cell--number">0.24</td>
             
               <td class="red strong cell--number t-file__branch-coverage">0.00 %</td>
-              <td class="cell--number">54</td>
+              <td class="cell--number">60</td>
               <td class="cell--number">0</td>
-              <td class="cell--number">54</td>
+              <td class="cell--number">60</td>
             
           </tr>
         
@@ -12819,6 +12835,1651 @@
 </div>
 
       
+        <div class="source_table" id="45eb6b2b225f43ba49593b53e9aaa4f45a13a1f8">
+  <div class="header">
+    <h3>lib/recording_studio_notifications/services/digest_collector.rb</h3>
+    <h4>
+      <span class="red">
+  74.19%
+</span>
+
+      lines covered
+    </h4>
+
+    
+      <h4>
+        <span class="red">
+  50.0%
+</span>
+
+        branches covered
+      </h4>
+    
+
+    <div class="t-line-summary">
+      <b>62</b> relevant lines.
+      <span class="green"><b>46</b> lines covered</span> and
+      <span class="red"><b>16</b> lines missed.</span>
+    </div>
+
+    
+      <div class="t-branch-summary">
+          <span><b>14</b> total branches, </span>
+          <span class="green"><b>7</b> branches covered</span> and
+          <span class="red"><b>7</b> branches missed.</span>
+      </div>
+    
+
+  </div>
+
+  <pre>
+    <ol>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="1">
+            
+
+            
+              
+            
+
+            <code class="ruby"># frozen_string_literal: true</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="2">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="3">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">require &quot;date&quot;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="4">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="5">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">module RecordingStudioNotifications</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="6">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">  module Services</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="7">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    class DigestCollector</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="8">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      Period = Struct.new(:starts_at, :ends_at, keyword_init: true)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="9">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="10">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def self.call(...)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="11">
+            
+
+            
+              
+            
+
+            <code class="ruby">        new(...).call</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="12">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="13">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="14">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def self.period_for(cadence:, at: Time.current)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="7" data-linenumber="15">
+            
+              <span class="hits">7</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        new(cadence: cadence, at: at).period</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="16">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="17">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="18">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def initialize(notification: nil, cadence:, at: Time.current)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="7" data-linenumber="19">
+            
+              <span class="hits">7</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        @notification = notification</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="7" data-linenumber="20">
+            
+              <span class="hits">7</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        @cadence = cadence.to_sym</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="7" data-linenumber="21">
+            
+              <span class="hits">7</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        @at = at</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="22">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="23">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="24">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def call</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="25">
+            
+
+            
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+            
+
+            <code class="ruby">        raise ArgumentError, &quot;notification is required&quot; unless @notification</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="26">
+            
+
+            
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+            
+
+            <code class="ruby">        raise ArgumentError, &quot;cadence must be consolidated&quot; unless consolidated_cadence?</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="27">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="28">
+            
+
+            
+              
+            
+
+            <code class="ruby">        NotificationDigest.transaction do</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="29">
+            
+
+            
+              
+            
+
+            <code class="ruby">          digest = find_or_create_digest!</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="30">
+            
+
+            
+              
+            
+
+            <code class="ruby">          attach_notification!(digest)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="31">
+            
+
+            
+              
+            
+
+            <code class="ruby">        end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="32">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="33">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="34">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def period</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="7" data-linenumber="35">
+            
+              <span class="hits">7</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        case @cadence</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="36">
+            
+
+            
+              
+                <span class="hits" title="when branch hit 1 times">
+                  when: 1
+                </span>
+              
+            
+
+            <code class="ruby">        when :daily</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="37">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">          period_from(day_start, midnight_for(@at.to_date + 1))</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="38">
+            
+
+            
+              
+                <span class="hits" title="when branch hit 2 times">
+                  when: 2
+                </span>
+              
+            
+
+            <code class="ruby">        when :every_other_day</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="2" data-linenumber="39">
+            
+              <span class="hits">2</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">          starts_at = midnight_for(alternate_day_start)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="2" data-linenumber="40">
+            
+              <span class="hits">2</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">          period_from(starts_at, midnight_for(alternate_day_start + 2))</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="41">
+            
+
+            
+              
+                <span class="hits" title="when branch hit 1 times">
+                  when: 1
+                </span>
+              
+            
+
+            <code class="ruby">        when :weekly</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="42">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">          week_start = monday_for(@at.to_date)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="43">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">          starts_at = midnight_for(week_start)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="44">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">          period_from(starts_at, midnight_for(week_start + 7))</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="45">
+            
+
+            
+              
+                <span class="hits" title="when branch hit 1 times">
+                  when: 1
+                </span>
+              
+            
+
+            <code class="ruby">        when :biweekly</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="46">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">          starts_at = midnight_for(biweekly_start)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="47">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">          period_from(starts_at, midnight_for(biweekly_start + 14))</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="48">
+            
+
+            
+              
+                <span class="hits" title="when branch hit 1 times">
+                  when: 1
+                </span>
+              
+            
+
+            <code class="ruby">        when :monthly</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="49">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">          month_start = Date.new(@at.year, @at.month, 1)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="50">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">          period_from(midnight_for(month_start), midnight_for(month_start &gt;&gt; 1))</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="51">
+            
+
+            
+              
+                <span class="hits" title="else branch hit 1 times">
+                  else: 1
+                </span>
+              
+            
+
+            <code class="ruby">        else</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="52">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">          raise ArgumentError, &quot;cadence must be consolidated&quot;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="53">
+            
+
+            
+              
+            
+
+            <code class="ruby">        end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="54">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="55">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="56">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      private</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="57">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="58">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def consolidated_cadence?</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="59">
+            
+
+            
+              
+            
+
+            <code class="ruby">        NotificationTypeRegistry::CADENCES.include?(@cadence) &amp;&amp; @cadence != :every_notification</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="60">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="61">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="62">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def find_or_create_digest!</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="63">
+            
+
+            
+              
+            
+
+            <code class="ruby">        digest_period = period</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="64">
+            
+
+            
+              
+            
+
+            <code class="ruby">        attributes = {</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="65">
+            
+
+            
+              
+            
+
+            <code class="ruby">          recipient: @notification.recipient,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="66">
+            
+
+            
+              
+            
+
+            <code class="ruby">          notification_type: @notification.notification_type,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="67">
+            
+
+            
+              
+            
+
+            <code class="ruby">          root_recording: @notification.root_recording,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="68">
+            
+
+            
+              
+            
+
+            <code class="ruby">          cadence: @cadence.to_s,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="69">
+            
+
+            
+              
+            
+
+            <code class="ruby">          status: &quot;pending&quot;,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="70">
+            
+
+            
+              
+            
+
+            <code class="ruby">          period_starts_at: digest_period.starts_at</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="71">
+            
+
+            
+              
+            
+
+            <code class="ruby">        }</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="72">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="73">
+            
+
+            
+              
+            
+
+            <code class="ruby">        NotificationDigest.pending.find_by(attributes) || NotificationDigest.create!(</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="74">
+            
+
+            
+              
+            
+
+            <code class="ruby">          **attributes,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="75">
+            
+
+            
+              
+            
+
+            <code class="ruby">          period_ends_at: digest_period.ends_at</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="76">
+            
+
+            
+              
+            
+
+            <code class="ruby">        )</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="77">
+            
+
+            
+              
+            
+
+            <code class="ruby">      rescue ActiveRecord::RecordNotUnique</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="78">
+            
+
+            
+              
+            
+
+            <code class="ruby">        NotificationDigest.pending.find_by!(attributes)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="79">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="80">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="81">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def attach_notification!(digest)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="82">
+            
+
+            
+              
+            
+
+            <code class="ruby">        existing_item = NotificationDigestItem.find_by(notification: @notification)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="83">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">        return existing_item.digest if existing_item</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="84">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="85">
+            
+
+            
+              
+            
+
+            <code class="ruby">        digest.items.create!(notification: @notification)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="86">
+            
+
+            
+              
+            
+
+            <code class="ruby">        digest</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="87">
+            
+
+            
+              
+            
+
+            <code class="ruby">      rescue ActiveRecord::RecordNotUnique</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="88">
+            
+
+            
+              
+            
+
+            <code class="ruby">        NotificationDigestItem.find_by!(notification: @notification).digest</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="89">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="90">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="91">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def day_start</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="92">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        midnight_for(@at.to_date)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="93">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="94">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="95">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def alternate_day_start</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="4" data-linenumber="96">
+            
+              <span class="hits">4</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        anchor = Date.new(2000, 1, 1)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="4" data-linenumber="97">
+            
+              <span class="hits">4</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        @at.to_date - ((@at.to_date - anchor) % 2)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="98">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="99">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="100">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def biweekly_start</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="2" data-linenumber="101">
+            
+              <span class="hits">2</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        anchor = Date.new(2000, 1, 3)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="2" data-linenumber="102">
+            
+              <span class="hits">2</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        weeks_since_anchor = ((@at.to_date - anchor) / 7).floor</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="2" data-linenumber="103">
+            
+              <span class="hits">2</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        anchor + ((weeks_since_anchor / 2) * 14)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="104">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="105">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="106">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def midnight_for(date)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="12" data-linenumber="107">
+            
+              <span class="hits">12</span>
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 12 times">
+                  else: 12
+                </span>
+              
+            
+
+            <code class="ruby">        return Time.zone.local(date.year, date.month, date.day) if Time.respond_to?(:zone) &amp;&amp; Time.zone</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="108">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="12" data-linenumber="109">
+            
+              <span class="hits">12</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        Time.new(date.year, date.month, date.day, 0, 0, 0, @at.utc_offset)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="110">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="111">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="112">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def monday_for(date)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="113">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        date - ((date.wday + 6) % 7)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="114">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="115">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="116">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def period_from(starts_at, ends_at)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="6" data-linenumber="117">
+            
+              <span class="hits">6</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">        Period.new(starts_at: starts_at, ends_at: ends_at)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="118">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="119">
+            
+
+            
+              
+            
+
+            <code class="ruby">    end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="120">
+            
+
+            
+              
+            
+
+            <code class="ruby">  end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="121">
+            
+
+            
+              
+            
+
+            <code class="ruby">end</code>
+          </li>
+        </div>
+      
+    </ol>
+  </pre>
+</div>
+
+      
         <div class="source_table" id="157c42dbd6309a0a1829f841cca979ec3c53f0b4">
   <div class="header">
     <h3>lib/recording_studio_notifications/services/notification_authorization.rb</h3>
@@ -13985,7 +15646,7 @@
     <h3>lib/recording_studio_notifications/services/notify.rb</h3>
     <h4>
       <span class="red">
-  23.15%
+  23.97%
 </span>
 
       lines covered
@@ -14002,16 +15663,16 @@
     
 
     <div class="t-line-summary">
-      <b>108</b> relevant lines.
-      <span class="green"><b>25</b> lines covered</span> and
-      <span class="red"><b>83</b> lines missed.</span>
+      <b>121</b> relevant lines.
+      <span class="green"><b>29</b> lines covered</span> and
+      <span class="red"><b>92</b> lines missed.</span>
     </div>
 
     
       <div class="t-branch-summary">
-          <span><b>54</b> total branches, </span>
+          <span><b>60</b> total branches, </span>
           <span class="green"><b>0</b> branches covered</span> and
-          <span class="red"><b>54</b> branches missed.</span>
+          <span class="red"><b>60</b> branches missed.</span>
       </div>
     
 
@@ -14054,21 +15715,19 @@
               
             
 
-            <code class="ruby">module RecordingStudioNotifications</code>
+            <code class="ruby">require_relative &quot;digest_collector&quot;</code>
           </li>
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="4">
-            
-              <span class="hits">1</span>
+          <li class="never" data-hits="" data-linenumber="4">
             
 
             
               
             
 
-            <code class="ruby">  module Services</code>
+            <code class="ruby"></code>
           </li>
         </div>
       
@@ -14082,7 +15741,7 @@
               
             
 
-            <code class="ruby">    class Notify</code>
+            <code class="ruby">module RecordingStudioNotifications</code>
           </li>
         </div>
       
@@ -14096,12 +15755,40 @@
               
             
 
+            <code class="ruby">  module Services</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="7">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">    class Notify</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="8">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
             <code class="ruby">      def self.call(...)</code>
           </li>
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="7">
+          <li class="missed" data-hits="0" data-linenumber="9">
             
 
             
@@ -14113,7 +15800,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="8">
+          <li class="never" data-hits="" data-linenumber="10">
             
 
             
@@ -14125,7 +15812,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="9">
+          <li class="never" data-hits="" data-linenumber="11">
             
 
             
@@ -14137,7 +15824,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="10">
+          <li class="covered" data-hits="1" data-linenumber="12">
             
               <span class="hits">1</span>
             
@@ -14151,7 +15838,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="11">
+          <li class="never" data-hits="" data-linenumber="13">
             
 
             
@@ -14163,38 +15850,14 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="12">
+          <li class="never" data-hits="" data-linenumber="14">
             
 
             
               
             
 
-            <code class="ruby">                     deliver_later: nil)</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="13">
-            
-
-            
-              
-            
-
-            <code class="ruby">        @notification_type = notification_type.to_s</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="14">
-            
-
-            
-              
-            
-
-            <code class="ruby">        @recipient = recipient</code>
+            <code class="ruby">                     deliver_later: nil, bypass_digest: false)</code>
           </li>
         </div>
       
@@ -14206,7 +15869,7 @@
               
             
 
-            <code class="ruby">        @title = title</code>
+            <code class="ruby">        @notification_type = notification_type.to_s</code>
           </li>
         </div>
       
@@ -14218,7 +15881,7 @@
               
             
 
-            <code class="ruby">        @body = body</code>
+            <code class="ruby">        @recipient = recipient</code>
           </li>
         </div>
       
@@ -14230,7 +15893,7 @@
               
             
 
-            <code class="ruby">        @url = url</code>
+            <code class="ruby">        @title = title</code>
           </li>
         </div>
       
@@ -14242,7 +15905,7 @@
               
             
 
-            <code class="ruby">        @metadata = metadata.presence || {}</code>
+            <code class="ruby">        @body = body</code>
           </li>
         </div>
       
@@ -14254,7 +15917,7 @@
               
             
 
-            <code class="ruby">        @actor = actor || RecordingStudioNotifications.configuration.resolve_actor</code>
+            <code class="ruby">        @url = url</code>
           </li>
         </div>
       
@@ -14266,7 +15929,7 @@
               
             
 
-            <code class="ruby">        @notifiable = notifiable</code>
+            <code class="ruby">        @metadata = metadata.presence || {}</code>
           </li>
         </div>
       
@@ -14278,7 +15941,7 @@
               
             
 
-            <code class="ruby">        @recording = recording</code>
+            <code class="ruby">        @actor = actor || RecordingStudioNotifications.configuration.resolve_actor</code>
           </li>
         </div>
       
@@ -14290,7 +15953,7 @@
               
             
 
-            <code class="ruby">        @root_recording = root_recording</code>
+            <code class="ruby">        @notifiable = notifiable</code>
           </li>
         </div>
       
@@ -14302,7 +15965,7 @@
               
             
 
-            <code class="ruby">        @requested_channels = channels</code>
+            <code class="ruby">        @recording = recording</code>
           </li>
         </div>
       
@@ -14314,7 +15977,7 @@
               
             
 
-            <code class="ruby">        @idempotency_key = idempotency_key.presence</code>
+            <code class="ruby">        @root_recording = root_recording</code>
           </li>
         </div>
       
@@ -14326,12 +15989,48 @@
               
             
 
+            <code class="ruby">        @requested_channels = channels</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="26">
+            
+
+            
+              
+            
+
+            <code class="ruby">        @idempotency_key = idempotency_key.presence</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="27">
+            
+
+            
+              
+            
+
             <code class="ruby">        @deliver_later = deliver_later</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="26">
+          <li class="missed" data-hits="0" data-linenumber="28">
+            
+
+            
+              
+            
+
+            <code class="ruby">        @bypass_digest = bypass_digest</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="29">
             
 
             
@@ -14343,7 +16042,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="27">
+          <li class="never" data-hits="" data-linenumber="30">
             
 
             
@@ -14355,7 +16054,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="28">
+          <li class="covered" data-hits="1" data-linenumber="31">
             
               <span class="hits">1</span>
             
@@ -14369,7 +16068,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="29">
+          <li class="missed" data-hits="0" data-linenumber="32">
             
 
             
@@ -14381,7 +16080,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="30">
+          <li class="missed" data-hits="0" data-linenumber="33">
             
 
             
@@ -14393,7 +16092,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="31">
+          <li class="never" data-hits="" data-linenumber="34">
             
 
             
@@ -14401,42 +16100,6 @@
             
 
             <code class="ruby"></code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="32">
-            
-
-            
-              
-            
-
-            <code class="ruby">        hooks.run(:before_service, self.class, service_payload)</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="33">
-            
-
-            
-              
-            
-
-            <code class="ruby">        result = hooks.run_around(:around_service, self) { create_and_deliver! }</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="34">
-            
-
-            
-              
-            
-
-            <code class="ruby">        hooks.run(:after_service, self.class, result)</code>
           </li>
         </div>
       
@@ -14448,12 +16111,48 @@
               
             
 
+            <code class="ruby">        hooks.run(:before_service, self.class, service_payload)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="36">
+            
+
+            
+              
+            
+
+            <code class="ruby">        result = hooks.run_around(:around_service, self) { create_and_deliver! }</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="37">
+            
+
+            
+              
+            
+
+            <code class="ruby">        hooks.run(:after_service, self.class, result)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="38">
+            
+
+            
+              
+            
+
             <code class="ruby">        result</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="36">
+          <li class="never" data-hits="" data-linenumber="39">
             
 
             
@@ -14465,7 +16164,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="37">
+          <li class="never" data-hits="" data-linenumber="40">
             
 
             
@@ -14477,7 +16176,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="38">
+          <li class="covered" data-hits="1" data-linenumber="41">
             
               <span class="hits">1</span>
             
@@ -14491,7 +16190,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="39">
+          <li class="never" data-hits="" data-linenumber="42">
             
 
             
@@ -14503,7 +16202,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="40">
+          <li class="covered" data-hits="1" data-linenumber="43">
             
               <span class="hits">1</span>
             
@@ -14517,7 +16216,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="41">
+          <li class="missed" data-hits="0" data-linenumber="44">
             
 
             
@@ -14529,7 +16228,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="42">
+          <li class="missed" data-hits="0" data-linenumber="45">
             
 
             
@@ -14541,50 +16240,14 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="43">
+          <li class="missed" data-hits="0" data-linenumber="46">
             
 
             
               
             
 
-            <code class="ruby"></code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="44">
-            
-
-            
-              
-            
-
-            <code class="ruby">        ActiveSupport::Notifications.instrument(</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="45">
-            
-
-            
-              
-            
-
-            <code class="ruby">          &quot;notify.recording_studio_notifications&quot;,</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="46">
-            
-
-            
-              
-            
-
-            <code class="ruby">          notification_type: @notification_type,</code>
+            <code class="ruby">        cadence = delivery_cadence</code>
           </li>
         </div>
       
@@ -14596,12 +16259,60 @@
               
             
 
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="48">
+            
+
+            
+              
+            
+
+            <code class="ruby">        ActiveSupport::Notifications.instrument(</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="49">
+            
+
+            
+              
+            
+
+            <code class="ruby">          &quot;notify.recording_studio_notifications&quot;,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="50">
+            
+
+            
+              
+            
+
+            <code class="ruby">          notification_type: @notification_type,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="51">
+            
+
+            
+              
+            
+
             <code class="ruby">          recipient: @recipient,</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="48">
+          <li class="never" data-hits="" data-linenumber="52">
             
 
             
@@ -14613,7 +16324,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="" data-linenumber="49">
+          <li class="missed-branch" data-hits="" data-linenumber="53">
             
 
             
@@ -14628,79 +16339,31 @@
               
             
 
-            <code class="ruby">          root_recording_id: resolved_root_recording&amp;.id</code>
+            <code class="ruby">          root_recording_id: resolved_root_recording&amp;.id,</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="50">
+          <li class="never" data-hits="" data-linenumber="54">
             
 
             
               
             
 
-            <code class="ruby">        ) do</code>
+            <code class="ruby">          cadence: cadence,</code>
           </li>
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="51">
+          <li class="never" data-hits="" data-linenumber="55">
             
 
             
               
             
 
-            <code class="ruby">          Notification.transaction do</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="52">
-            
-
-            
-              
-            
-
-            <code class="ruby">            notification = find_idempotent_notification || create_notification!</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="53">
-            
-
-            
-              
-            
-
-            <code class="ruby">            create_deliveries!(notification)</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="54">
-            
-
-            
-              
-            
-
-            <code class="ruby">            should_deliver = notification.previously_new_record? || notification.deliveries.pending.exists?</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="55">
-            
-
-            
-              
-            
-
-            <code class="ruby">            notification</code>
+            <code class="ruby">          bypass_digest: bypass_digest?</code>
           </li>
         </div>
       
@@ -14712,24 +16375,36 @@
               
             
 
-            <code class="ruby">          end</code>
+            <code class="ruby">        ) do</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="57">
+          <li class="missed" data-hits="0" data-linenumber="57">
             
 
             
               
             
 
-            <code class="ruby">        end</code>
+            <code class="ruby">          Notification.transaction do</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="58">
+          <li class="missed" data-hits="0" data-linenumber="58">
+            
+
+            
+              
+            
+
+            <code class="ruby">            notification = find_idempotent_notification || create_notification!</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="59">
             
 
             
@@ -14741,7 +16416,155 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="59">
+          <li class="missed-branch" data-hits="0" data-linenumber="60">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+            
+
+            <code class="ruby">            if collect_into_digest?(notification, cadence)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="61">
+            
+
+            
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">              DigestCollector.call(notification: notification, cadence: cadence)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="62">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">            elsif !notification.digest_item</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="63">
+            
+
+            
+              
+            
+
+            <code class="ruby">              create_deliveries!(notification)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="64">
+            
+
+            
+              
+            
+
+            <code class="ruby">              should_deliver = notification.previously_new_record? || notification.deliveries.pending.exists?</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="65">
+            
+
+            
+              
+            
+
+            <code class="ruby">            end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="66">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="67">
+            
+
+            
+              
+            
+
+            <code class="ruby">            notification</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="68">
+            
+
+            
+              
+            
+
+            <code class="ruby">          end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="69">
+            
+
+            
+              
+            
+
+            <code class="ruby">        end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="70">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="71">
             
 
             
@@ -14761,7 +16584,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="60">
+          <li class="missed" data-hits="0" data-linenumber="72">
             
 
             
@@ -14773,7 +16596,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="61">
+          <li class="never" data-hits="" data-linenumber="73">
             
 
             
@@ -14785,7 +16608,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="62">
+          <li class="never" data-hits="" data-linenumber="74">
             
 
             
@@ -14797,7 +16620,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="63">
+          <li class="covered" data-hits="1" data-linenumber="75">
             
               <span class="hits">1</span>
             
@@ -14811,7 +16634,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="64">
+          <li class="missed-branch" data-hits="0" data-linenumber="76">
             
 
             
@@ -14831,7 +16654,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="65">
+          <li class="missed-branch" data-hits="0" data-linenumber="77">
             
 
             
@@ -14851,7 +16674,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="66">
+          <li class="missed-branch" data-hits="0" data-linenumber="78">
             
 
             
@@ -14871,7 +16694,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="67">
+          <li class="missed-branch" data-hits="0" data-linenumber="79">
             
 
             
@@ -14891,7 +16714,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="68">
+          <li class="missed-branch" data-hits="0" data-linenumber="80">
             
 
             
@@ -14911,7 +16734,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="69">
+          <li class="missed-branch" data-hits="0" data-linenumber="81">
             
 
             
@@ -14931,7 +16754,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="70">
+          <li class="never" data-hits="" data-linenumber="82">
             
 
             
@@ -14943,7 +16766,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="71">
+          <li class="missed" data-hits="0" data-linenumber="83">
             
 
             
@@ -14951,184 +16774,6 @@
             
 
             <code class="ruby">        unregistered_channel = channel_keys.find { |channel| !RecordingStudioNotifications.channels.registered?(channel) }</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="72">
-            
-
-            
-              
-                <span class="hits" title="then branch hit 0 times">
-                  then: 0
-                </span>
-              
-                <span class="hits" title="else branch hit 0 times">
-                  else: 0
-                </span>
-              
-            
-
-            <code class="ruby">        raise ArgumentError, &quot;channel is not registered: #{unregistered_channel}&quot; if unregistered_channel</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="73">
-            
-
-            
-              
-            
-
-            <code class="ruby"></code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="74">
-            
-
-            
-              
-                <span class="hits" title="then branch hit 0 times">
-                  then: 0
-                </span>
-              
-                <span class="hits" title="else branch hit 0 times">
-                  else: 0
-                </span>
-              
-            
-
-            <code class="ruby">        if type_definition.available_channels</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="75">
-            
-
-            
-              
-            
-
-            <code class="ruby">          unavailable_channel = channel_keys.find { |channel| !type_definition.available_channels.include?(channel) }</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="76">
-            
-
-            
-              
-                <span class="hits" title="then branch hit 0 times">
-                  then: 0
-                </span>
-              
-                <span class="hits" title="else branch hit 0 times">
-                  else: 0
-                </span>
-              
-            
-
-            <code class="ruby">          raise ArgumentError, &quot;channel is not available for #{@notification_type}: #{unavailable_channel}&quot; if unavailable_channel</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="77">
-            
-
-            
-              
-            
-
-            <code class="ruby">        end</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="78">
-            
-
-            
-              
-            
-
-            <code class="ruby"></code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="79">
-            
-
-            
-              
-            
-
-            <code class="ruby">        UrlSafety.sanitize!(@url)</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="80">
-            
-
-            
-              
-            
-
-            <code class="ruby">      end</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="81">
-            
-
-            
-              
-            
-
-            <code class="ruby"></code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="covered" data-hits="1" data-linenumber="82">
-            
-              <span class="hits">1</span>
-            
-
-            
-              
-            
-
-            <code class="ruby">      def authorize_creation!</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="83">
-            
-
-            
-              
-                <span class="hits" title="else branch hit 0 times">
-                  else: 0
-                </span>
-              
-                <span class="hits" title="then branch hit 0 times">
-                  then: 0
-                </span>
-              
-            
-
-            <code class="ruby">        return unless type_definition.creation_action</code>
           </li>
         </div>
       
@@ -15148,7 +16793,7 @@
               
             
 
-            <code class="ruby">        return if accessible_action_allowed?(type_definition.creation_action)</code>
+            <code class="ruby">        raise ArgumentError, &quot;channel is not registered: #{unregistered_channel}&quot; if unregistered_channel</code>
           </li>
         </div>
       
@@ -15165,38 +16810,54 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="86">
+          <li class="missed-branch" data-hits="0" data-linenumber="86">
             
 
             
               
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
             
 
-            <code class="ruby">        raise RecordingStudioNotifications::Services::NotificationAuthorization::NotAuthorized,</code>
+            <code class="ruby">        if type_definition.available_channels</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="87">
+          <li class="missed" data-hits="0" data-linenumber="87">
             
 
             
               
             
 
-            <code class="ruby">              &quot;not authorized to create #{@notification_type} notifications&quot;</code>
+            <code class="ruby">          unavailable_channel = channel_keys.find { |channel| !type_definition.available_channels.include?(channel) }</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="88">
+          <li class="missed-branch" data-hits="0" data-linenumber="88">
             
 
             
               
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
             
 
-            <code class="ruby">      end</code>
+            <code class="ruby">          raise ArgumentError, &quot;channel is not available for #{@notification_type}: #{unavailable_channel}&quot; if unavailable_channel</code>
           </li>
         </div>
       
@@ -15208,12 +16869,174 @@
               
             
 
+            <code class="ruby">        end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="90">
+            
+
+            
+              
+            
+
             <code class="ruby"></code>
           </li>
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="90">
+          <li class="missed" data-hits="0" data-linenumber="91">
+            
+
+            
+              
+            
+
+            <code class="ruby">        UrlSafety.sanitize!(@url)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="92">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="93">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="94">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def authorize_creation!</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="95">
+            
+
+            
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+            
+
+            <code class="ruby">        return unless type_definition.creation_action</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="96">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">        return if accessible_action_allowed?(type_definition.creation_action)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="97">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="98">
+            
+
+            
+              
+            
+
+            <code class="ruby">        raise RecordingStudioNotifications::Services::NotificationAuthorization::NotAuthorized,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="99">
+            
+
+            
+              
+            
+
+            <code class="ruby">              &quot;not authorized to create #{@notification_type} notifications&quot;</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="100">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="101">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="102">
             
               <span class="hits">1</span>
             
@@ -15227,7 +17050,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="91">
+          <li class="missed-branch" data-hits="0" data-linenumber="103">
             
 
             
@@ -15247,7 +17070,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="92">
+          <li class="missed-branch" data-hits="0" data-linenumber="104">
             
 
             
@@ -15267,7 +17090,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="93">
+          <li class="never" data-hits="" data-linenumber="105">
             
 
             
@@ -15279,7 +17102,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="94">
+          <li class="missed" data-hits="0" data-linenumber="106">
             
 
             
@@ -15291,7 +17114,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="95">
+          <li class="never" data-hits="" data-linenumber="107">
             
 
             
@@ -15303,7 +17126,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="96">
+          <li class="never" data-hits="" data-linenumber="108">
             
 
             
@@ -15315,7 +17138,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="97">
+          <li class="never" data-hits="" data-linenumber="109">
             
 
             
@@ -15327,7 +17150,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="98">
+          <li class="never" data-hits="" data-linenumber="110">
             
 
             
@@ -15339,7 +17162,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="99">
+          <li class="never" data-hits="" data-linenumber="111">
             
 
             
@@ -15351,7 +17174,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="100">
+          <li class="never" data-hits="" data-linenumber="112">
             
 
             
@@ -15363,7 +17186,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="101">
+          <li class="never" data-hits="" data-linenumber="113">
             
 
             
@@ -15375,7 +17198,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="102">
+          <li class="never" data-hits="" data-linenumber="114">
             
 
             
@@ -15387,7 +17210,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="103">
+          <li class="never" data-hits="" data-linenumber="115">
             
 
             
@@ -15399,7 +17222,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="104">
+          <li class="never" data-hits="" data-linenumber="116">
             
 
             
@@ -15411,7 +17234,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="105">
+          <li class="never" data-hits="" data-linenumber="117">
             
 
             
@@ -15423,7 +17246,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="106">
+          <li class="never" data-hits="" data-linenumber="118">
             
 
             
@@ -15435,7 +17258,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="107">
+          <li class="covered" data-hits="1" data-linenumber="119">
             
               <span class="hits">1</span>
             
@@ -15449,7 +17272,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="108">
+          <li class="missed" data-hits="0" data-linenumber="120">
             
 
             
@@ -15457,152 +17280,6 @@
             
 
             <code class="ruby">        RecordingStudioNotifications.configuration.hooks</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="109">
-            
-
-            
-              
-            
-
-            <code class="ruby">      end</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="110">
-            
-
-            
-              
-            
-
-            <code class="ruby"></code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="covered" data-hits="1" data-linenumber="111">
-            
-              <span class="hits">1</span>
-            
-
-            
-              
-            
-
-            <code class="ruby">      def service_payload</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="112">
-            
-
-            
-              
-            
-
-            <code class="ruby">        {</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="missed" data-hits="0" data-linenumber="113">
-            
-
-            
-              
-            
-
-            <code class="ruby">          notification_type: @notification_type,</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="114">
-            
-
-            
-              
-            
-
-            <code class="ruby">          recipient: @recipient,</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="115">
-            
-
-            
-              
-            
-
-            <code class="ruby">          actor: @actor,</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="116">
-            
-
-            
-              
-            
-
-            <code class="ruby">          notifiable: @notifiable,</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="117">
-            
-
-            
-              
-            
-
-            <code class="ruby">          recording: @recording,</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="118">
-            
-
-            
-              
-            
-
-            <code class="ruby">          root_recording: resolved_root_recording,</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="119">
-            
-
-            
-              
-            
-
-            <code class="ruby">          channels: channel_keys</code>
-          </li>
-        </div>
-      
-        <div>
-          <li class="never" data-hits="" data-linenumber="120">
-            
-
-            
-              
-            
-
-            <code class="ruby">        }</code>
           </li>
         </div>
       
@@ -15640,31 +17317,31 @@
               
             
 
-            <code class="ruby">      def type_definition</code>
+            <code class="ruby">      def service_payload</code>
           </li>
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="124">
+          <li class="never" data-hits="" data-linenumber="124">
             
 
             
               
             
 
-            <code class="ruby">        @type_definition ||= RecordingStudioNotifications.notification_types[@notification_type]</code>
+            <code class="ruby">        {</code>
           </li>
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="125">
+          <li class="missed" data-hits="0" data-linenumber="125">
             
 
             
               
             
 
-            <code class="ruby">      end</code>
+            <code class="ruby">          notification_type: @notification_type,</code>
           </li>
         </div>
       
@@ -15676,12 +17353,170 @@
               
             
 
+            <code class="ruby">          recipient: @recipient,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="127">
+            
+
+            
+              
+            
+
+            <code class="ruby">          actor: @actor,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="128">
+            
+
+            
+              
+            
+
+            <code class="ruby">          notifiable: @notifiable,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="129">
+            
+
+            
+              
+            
+
+            <code class="ruby">          recording: @recording,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="130">
+            
+
+            
+              
+            
+
+            <code class="ruby">          root_recording: resolved_root_recording,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="131">
+            
+
+            
+              
+            
+
+            <code class="ruby">          channels: channel_keys,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="132">
+            
+
+            
+              
+            
+
+            <code class="ruby">          bypass_digest: bypass_digest?</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="133">
+            
+
+            
+              
+            
+
+            <code class="ruby">        }</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="134">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="135">
+            
+
+            
+              
+            
+
             <code class="ruby"></code>
           </li>
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="127">
+          <li class="covered" data-hits="1" data-linenumber="136">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def type_definition</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="137">
+            
+
+            
+              
+            
+
+            <code class="ruby">        @type_definition ||= RecordingStudioNotifications.notification_types[@notification_type]</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="138">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="139">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="140">
             
               <span class="hits">1</span>
             
@@ -15695,7 +17530,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="128">
+          <li class="missed-branch" data-hits="0" data-linenumber="141">
             
 
             
@@ -15715,7 +17550,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="129">
+          <li class="never" data-hits="" data-linenumber="142">
             
 
             
@@ -15727,7 +17562,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="130">
+          <li class="missed" data-hits="0" data-linenumber="143">
             
 
             
@@ -15739,7 +17574,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="131">
+          <li class="never" data-hits="" data-linenumber="144">
             
 
             
@@ -15751,7 +17586,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="132">
+          <li class="never" data-hits="" data-linenumber="145">
             
 
             
@@ -15763,7 +17598,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="133">
+          <li class="covered" data-hits="1" data-linenumber="146">
             
               <span class="hits">1</span>
             
@@ -15777,7 +17612,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="134">
+          <li class="missed" data-hits="0" data-linenumber="147">
             
 
             
@@ -15789,7 +17624,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="135">
+          <li class="never" data-hits="" data-linenumber="148">
             
 
             
@@ -15801,7 +17636,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="136">
+          <li class="never" data-hits="" data-linenumber="149">
             
 
             
@@ -15813,7 +17648,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="137">
+          <li class="never" data-hits="" data-linenumber="150">
             
 
             
@@ -15825,7 +17660,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="138">
+          <li class="never" data-hits="" data-linenumber="151">
             
 
             
@@ -15837,7 +17672,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="139">
+          <li class="missed-branch" data-hits="0" data-linenumber="152">
             
 
             
@@ -15857,7 +17692,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="140">
+          <li class="missed-branch" data-hits="0" data-linenumber="153">
             
 
             
@@ -15877,7 +17712,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="141">
+          <li class="never" data-hits="" data-linenumber="154">
             
 
             
@@ -15889,7 +17724,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="142">
+          <li class="never" data-hits="" data-linenumber="155">
             
 
             
@@ -15901,7 +17736,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="143">
+          <li class="never" data-hits="" data-linenumber="156">
             
 
             
@@ -15913,7 +17748,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="144">
+          <li class="never" data-hits="" data-linenumber="157">
             
 
             
@@ -15925,7 +17760,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="145">
+          <li class="never" data-hits="" data-linenumber="158">
             
 
             
@@ -15937,7 +17772,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="146">
+          <li class="never" data-hits="" data-linenumber="159">
             
 
             
@@ -15949,7 +17784,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="147">
+          <li class="never" data-hits="" data-linenumber="160">
             
 
             
@@ -15961,7 +17796,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="148">
+          <li class="missed-branch" data-hits="0" data-linenumber="161">
             
 
             
@@ -15981,7 +17816,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="149">
+          <li class="never" data-hits="" data-linenumber="162">
             
 
             
@@ -15993,7 +17828,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="150">
+          <li class="missed" data-hits="0" data-linenumber="163">
             
 
             
@@ -16005,7 +17840,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="151">
+          <li class="never" data-hits="" data-linenumber="164">
             
 
             
@@ -16017,7 +17852,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="152">
+          <li class="never" data-hits="" data-linenumber="165">
             
 
             
@@ -16029,7 +17864,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="153">
+          <li class="covered" data-hits="1" data-linenumber="166">
             
               <span class="hits">1</span>
             
@@ -16043,7 +17878,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="154">
+          <li class="missed-branch" data-hits="0" data-linenumber="167">
             
 
             
@@ -16071,7 +17906,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="155">
+          <li class="never" data-hits="" data-linenumber="168">
             
 
             
@@ -16083,7 +17918,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="156">
+          <li class="missed" data-hits="0" data-linenumber="169">
             
 
             
@@ -16095,7 +17930,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="157">
+          <li class="never" data-hits="" data-linenumber="170">
             
 
             
@@ -16107,7 +17942,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="158">
+          <li class="never" data-hits="" data-linenumber="171">
             
 
             
@@ -16119,7 +17954,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="159">
+          <li class="never" data-hits="" data-linenumber="172">
             
 
             
@@ -16131,7 +17966,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="160">
+          <li class="never" data-hits="" data-linenumber="173">
             
 
             
@@ -16143,7 +17978,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="161">
+          <li class="never" data-hits="" data-linenumber="174">
             
 
             
@@ -16155,7 +17990,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="162">
+          <li class="never" data-hits="" data-linenumber="175">
             
 
             
@@ -16167,7 +18002,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="163">
+          <li class="covered" data-hits="1" data-linenumber="176">
             
               <span class="hits">1</span>
             
@@ -16181,7 +18016,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="164">
+          <li class="missed" data-hits="0" data-linenumber="177">
             
 
             
@@ -16193,7 +18028,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="165">
+          <li class="missed" data-hits="0" data-linenumber="178">
             
 
             
@@ -16205,7 +18040,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="166">
+          <li class="missed" data-hits="0" data-linenumber="179">
             
 
             
@@ -16217,7 +18052,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="167">
+          <li class="never" data-hits="" data-linenumber="180">
             
 
             
@@ -16229,7 +18064,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="168">
+          <li class="never" data-hits="" data-linenumber="181">
             
 
             
@@ -16241,7 +18076,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="169">
+          <li class="never" data-hits="" data-linenumber="182">
             
 
             
@@ -16253,7 +18088,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="170">
+          <li class="never" data-hits="" data-linenumber="183">
             
 
             
@@ -16265,7 +18100,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="171">
+          <li class="covered" data-hits="1" data-linenumber="184">
             
               <span class="hits">1</span>
             
@@ -16279,7 +18114,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="172">
+          <li class="missed" data-hits="0" data-linenumber="185">
             
 
             
@@ -16291,7 +18126,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="173">
+          <li class="missed" data-hits="0" data-linenumber="186">
             
 
             
@@ -16303,7 +18138,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="174">
+          <li class="missed" data-hits="0" data-linenumber="187">
             
 
             
@@ -16315,7 +18150,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="175">
+          <li class="missed" data-hits="0" data-linenumber="188">
             
 
             
@@ -16327,7 +18162,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="176">
+          <li class="missed" data-hits="0" data-linenumber="189">
             
 
             
@@ -16339,7 +18174,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="177">
+          <li class="never" data-hits="" data-linenumber="190">
             
 
             
@@ -16351,7 +18186,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="178">
+          <li class="never" data-hits="" data-linenumber="191">
             
 
             
@@ -16363,7 +18198,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="179">
+          <li class="never" data-hits="" data-linenumber="192">
             
 
             
@@ -16375,7 +18210,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="180">
+          <li class="covered" data-hits="1" data-linenumber="193">
             
               <span class="hits">1</span>
             
@@ -16389,7 +18224,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="181">
+          <li class="missed" data-hits="0" data-linenumber="194">
             
 
             
@@ -16401,7 +18236,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="182">
+          <li class="missed" data-hits="0" data-linenumber="195">
             
 
             
@@ -16413,7 +18248,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="183">
+          <li class="never" data-hits="" data-linenumber="196">
             
 
             
@@ -16425,7 +18260,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="184">
+          <li class="never" data-hits="" data-linenumber="197">
             
 
             
@@ -16437,7 +18272,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="185">
+          <li class="covered" data-hits="1" data-linenumber="198">
             
               <span class="hits">1</span>
             
@@ -16451,7 +18286,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="186">
+          <li class="missed" data-hits="0" data-linenumber="199">
             
 
             
@@ -16463,7 +18298,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="187">
+          <li class="missed-branch" data-hits="0" data-linenumber="200">
             
 
             
@@ -16483,7 +18318,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="188">
+          <li class="never" data-hits="" data-linenumber="201">
             
 
             
@@ -16495,7 +18330,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="189">
+          <li class="missed" data-hits="0" data-linenumber="202">
             
 
             
@@ -16507,7 +18342,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="190">
+          <li class="missed" data-hits="0" data-linenumber="203">
             
 
             
@@ -16519,7 +18354,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="191">
+          <li class="never" data-hits="" data-linenumber="204">
             
 
             
@@ -16531,7 +18366,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="192">
+          <li class="never" data-hits="" data-linenumber="205">
             
 
             
@@ -16543,7 +18378,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="193">
+          <li class="never" data-hits="" data-linenumber="206">
             
 
             
@@ -16555,7 +18390,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="194">
+          <li class="covered" data-hits="1" data-linenumber="207">
             
               <span class="hits">1</span>
             
@@ -16569,7 +18404,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="195">
+          <li class="missed-branch" data-hits="0" data-linenumber="208">
             
 
             
@@ -16589,7 +18424,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="196">
+          <li class="missed-branch" data-hits="0" data-linenumber="209">
             
 
             
@@ -16609,7 +18444,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="197">
+          <li class="never" data-hits="" data-linenumber="210">
             
 
             
@@ -16621,7 +18456,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="198">
+          <li class="missed" data-hits="0" data-linenumber="211">
             
 
             
@@ -16633,7 +18468,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="199">
+          <li class="never" data-hits="" data-linenumber="212">
             
 
             
@@ -16645,7 +18480,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="200">
+          <li class="never" data-hits="" data-linenumber="213">
             
 
             
@@ -16657,7 +18492,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="201">
+          <li class="never" data-hits="" data-linenumber="214">
             
 
             
@@ -16669,7 +18504,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="202">
+          <li class="never" data-hits="" data-linenumber="215">
             
 
             
@@ -16681,7 +18516,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="203">
+          <li class="never" data-hits="" data-linenumber="216">
             
 
             
@@ -16693,7 +18528,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="204">
+          <li class="never" data-hits="" data-linenumber="217">
             
 
             
@@ -16705,7 +18540,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="205">
+          <li class="never" data-hits="" data-linenumber="218">
             
 
             
@@ -16717,7 +18552,237 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="206">
+          <li class="covered" data-hits="1" data-linenumber="219">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def delivery_cadence</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed-branch" data-hits="0" data-linenumber="220">
+            
+
+            
+              
+                <span class="hits" title="then branch hit 0 times">
+                  then: 0
+                </span>
+              
+                <span class="hits" title="else branch hit 0 times">
+                  else: 0
+                </span>
+              
+            
+
+            <code class="ruby">        return :every_notification if bypass_digest?</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="221">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="222">
+            
+
+            
+              
+            
+
+            <code class="ruby">        CadencePreference.cadence_for(</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="223">
+            
+
+            
+              
+            
+
+            <code class="ruby">          recipient: @recipient,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="224">
+            
+
+            
+              
+            
+
+            <code class="ruby">          notification_type: @notification_type,</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="225">
+            
+
+            
+              
+            
+
+            <code class="ruby">          default: type_definition.default_cadence</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="226">
+            
+
+            
+              
+            
+
+            <code class="ruby">        ).to_sym</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="227">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="228">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="229">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def collect_into_digest?(notification, cadence)</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="230">
+            
+
+            
+              
+            
+
+            <code class="ruby">        notification.previously_new_record? &amp;&amp; cadence != :every_notification</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="231">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="232">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="233">
+            
+              <span class="hits">1</span>
+            
+
+            
+              
+            
+
+            <code class="ruby">      def bypass_digest?</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="missed" data-hits="0" data-linenumber="234">
+            
+
+            
+              
+            
+
+            <code class="ruby">        @bypass_digest == true</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="235">
+            
+
+            
+              
+            
+
+            <code class="ruby">      end</code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="never" data-hits="" data-linenumber="236">
+            
+
+            
+              
+            
+
+            <code class="ruby"></code>
+          </li>
+        </div>
+      
+        <div>
+          <li class="covered" data-hits="1" data-linenumber="237">
             
               <span class="hits">1</span>
             
@@ -16731,7 +18796,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="207">
+          <li class="missed-branch" data-hits="0" data-linenumber="238">
             
 
             
@@ -16751,7 +18816,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="208">
+          <li class="never" data-hits="" data-linenumber="239">
             
 
             
@@ -16763,7 +18828,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="209">
+          <li class="missed" data-hits="0" data-linenumber="240">
             
 
             
@@ -16775,7 +18840,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="210">
+          <li class="never" data-hits="" data-linenumber="241">
             
 
             
@@ -16787,7 +18852,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="211">
+          <li class="never" data-hits="" data-linenumber="242">
             
 
             
@@ -16799,7 +18864,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="212">
+          <li class="never" data-hits="" data-linenumber="243">
             
 
             
@@ -16811,7 +18876,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="213">
+          <li class="never" data-hits="" data-linenumber="244">
             
 
             
@@ -16823,7 +18888,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="214">
+          <li class="never" data-hits="" data-linenumber="245">
             
 
             
@@ -16835,7 +18900,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="215">
+          <li class="never" data-hits="" data-linenumber="246">
             
 
             
@@ -16847,7 +18912,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="216">
+          <li class="covered" data-hits="1" data-linenumber="247">
             
               <span class="hits">1</span>
             
@@ -16861,7 +18926,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="217">
+          <li class="missed-branch" data-hits="0" data-linenumber="248">
             
 
             
@@ -16877,7 +18942,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="218">
+          <li class="missed" data-hits="0" data-linenumber="249">
             
 
             
@@ -16889,7 +18954,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="" data-linenumber="219">
+          <li class="missed-branch" data-hits="" data-linenumber="250">
             
 
             
@@ -16905,7 +18970,7 @@
         </div>
       
         <div>
-          <li class="missed" data-hits="0" data-linenumber="220">
+          <li class="missed" data-hits="0" data-linenumber="251">
             
 
             
@@ -16917,7 +18982,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="221">
+          <li class="never" data-hits="" data-linenumber="252">
             
 
             
@@ -16929,7 +18994,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="222">
+          <li class="never" data-hits="" data-linenumber="253">
             
 
             
@@ -16941,7 +19006,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="223">
+          <li class="never" data-hits="" data-linenumber="254">
             
 
             
@@ -16953,7 +19018,7 @@
         </div>
       
         <div>
-          <li class="covered" data-hits="1" data-linenumber="224">
+          <li class="covered" data-hits="1" data-linenumber="255">
             
               <span class="hits">1</span>
             
@@ -16967,7 +19032,7 @@
         </div>
       
         <div>
-          <li class="missed-branch" data-hits="0" data-linenumber="225">
+          <li class="missed-branch" data-hits="0" data-linenumber="256">
             
 
             
@@ -16987,7 +19052,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="226">
+          <li class="never" data-hits="" data-linenumber="257">
             
 
             
@@ -16999,7 +19064,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="227">
+          <li class="never" data-hits="" data-linenumber="258">
             
 
             
@@ -17011,7 +19076,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="228">
+          <li class="never" data-hits="" data-linenumber="259">
             
 
             
@@ -17023,7 +19088,7 @@
         </div>
       
         <div>
-          <li class="never" data-hits="" data-linenumber="229">
+          <li class="never" data-hits="" data-linenumber="260">
             
 
             
