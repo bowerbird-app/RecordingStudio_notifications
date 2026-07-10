@@ -186,6 +186,29 @@ begin
       end
     end
   end
+
+  # Seed one delivered digest so the inbox summary and detail page can be demonstrated immediately.
+  RecordingStudioNotifications::CadencePreference.set!(
+    recipient: user,
+    notification_type: :workspace_digest,
+    cadence: :daily
+  )
+
+  demo_events = 3.times.map do |index|
+    RecordingStudioNotifications::Services::Notify.call(
+      notification_type: :workspace_digest,
+      recipient: user,
+      actor: user,
+      root_recording: root_recording,
+      recording: root_recording,
+      title: "Digest demo update #{index + 1}",
+      body: "Seeded digest event #{index + 1} of 3.",
+      idempotency_key: "seed-digest-demo-#{index + 1}"
+    )
+  end
+
+  demo_digest = demo_events.first.digest
+  RecordingStudioNotifications::DigestSchedulerJob.perform_now(at: demo_digest.period_ends_at) if demo_digest&.pending?
 ensure
   Current.actor = previous_actor
 end
@@ -198,3 +221,4 @@ puts "Seeded: Workspace '#{accessible_workspace.name}' with root recording ##{ac
 puts "Seeded: Workspace '#{private_workspace.name}' with root recording ##{private_root_recording.id}"
 puts "Seeded: Folder '#{folder.name}' and page '#{page.title}'"
 puts "Seeded: Sample notifications (root, global, optional-root)"
+puts "Seeded: Delivered workspace digest demo"

@@ -59,4 +59,30 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
   ensure
     Current.actor = nil
   end
+
+  test "dummy seeds provide an idempotent delivered digest demo" do
+    load Rails.root.join("db/seeds.rb").to_s
+
+    events = RecordingStudioNotifications::Notification.where(
+      notification_type: "workspace_digest",
+      idempotency_key: %w[seed-digest-demo-1 seed-digest-demo-2 seed-digest-demo-3]
+    ).order(:id)
+    digest = events.filter_map(&:digest).find(&:delivered?)
+    summary = RecordingStudioNotifications::Notification.find_by!(idempotency_key: "digest-summary-#{digest.id}")
+
+    assert_operator events.count, :>=, 3
+    assert digest.delivered?
+    assert_equal 3, digest.items.count
+    assert_equal digest.id, summary.metadata.fetch("digest_id")
+    assert summary.metadata.fetch("digest_summary")
+
+    assert_no_difference -> { RecordingStudioNotifications::Notification.where(idempotency_key: summary.idempotency_key).count } do
+      RecordingStudioNotifications::Services::DigestDelivery.call(
+        digest: digest,
+        at: digest.period_ends_at
+      )
+    end
+  ensure
+    Current.actor = nil
+  end
 end

@@ -65,6 +65,8 @@ RecordingStudioNotifications.configure do |config|
     icon: :bell,
     default_channels: [:in_app],
     available_channels: [:in_app],
+    allowed_cadences: %i[every_notification daily],
+    default_cadence: :every_notification,
     scope: :optional_root
   )
 end

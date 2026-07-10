@@ -542,6 +542,21 @@
   <p class="text-sm">The digest page shows its cadence, period, scope, status, and event count. Source events are loaded 25 at a time with Turbo. Every event is authorized again as it is rendered, so revoked workspace access removes inaccessible events from the detail view. Events with a destination open their original resource directly.</p>
 
   <%= render FlatPack::SectionTitle::Component.new(
+    title: "Local Digest Demo",
+    subtitle: "Use the dummy app to inspect a delivered summary and its source-event detail page.",
+  ) %>
+
+  <p class="text-sm">The dummy seed creates three workspace-change events, delivers their daily digest, and leaves the normal summary notification in the inbox. To process all pending digests during development, run the task below. It is intentionally unavailable outside the development environment.</p>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :sh,
+    code: <<~CODE
+      bin/rails db:seed
+      FORCE=1 bin/rails recording_studio_notifications:deliver_due_digests
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
     title: "Using Hooks to Trigger Notifications",
     subtitle: "Decouple notification logic from your business code by hooking into service lifecycle events.",
   ) %>

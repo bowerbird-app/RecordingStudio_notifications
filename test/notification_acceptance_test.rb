@@ -314,6 +314,9 @@ class NotificationAcceptanceTest < Minitest::Test
     digest_view = File.read(File.expand_path(
       "../app/views/recording_studio_notifications/digests/show.html.erb", __dir__
     ))
+    digest_task = File.read(File.expand_path(
+      "../lib/tasks/recording_studio_notifications.rake", __dir__
+    ))
     migration = File.read(File.expand_path(
       "../db/migrate/20260710001000_create_recording_studio_notification_digests.rb", __dir__
     ))
@@ -344,6 +347,10 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes digest_controller, "digest_visible?"
     assert_includes digest_controller, "visible_notification?(notification)"
     assert_includes digest_view, "No accessible events remain in this digest."
+    assert_includes digest_task, "FORCE=1"
+    assert_includes digest_task, "available only in development"
+    assert_includes config_docs, "Local Digest Demo"
+    assert_includes config_docs, "recording_studio_notifications:deliver_due_digests"
     assert_includes File.read(File.expand_path("../config/routes.rb", __dir__)), "resources :digests, only: :show"
     assert_includes File.read(File.expand_path(
       "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
