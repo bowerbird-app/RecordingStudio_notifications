@@ -8,6 +8,7 @@ require "recording_studio_notifications/channel_registry"
 require "recording_studio_notifications/url_safety"
 require "recording_studio_notifications/menu_payload"
 require "recording_studio_notifications/services/notify"
+require "recording_studio_notifications/services/digest_delivery"
 require "recording_studio_notifications/services/root_resolver"
 require "recording_studio_notifications/services/notification_authorization"
 

@@ -302,6 +302,12 @@ class NotificationAcceptanceTest < Minitest::Test
     notification = File.read(File.expand_path(
       "../app/models/recording_studio_notifications/notification.rb", __dir__
     ))
+    digest_delivery = File.read(File.expand_path(
+      "../lib/recording_studio_notifications/services/digest_delivery.rb", __dir__
+    ))
+    digest_scheduler = File.read(File.expand_path(
+      "../app/jobs/recording_studio_notifications/digest_scheduler_job.rb", __dir__
+    ))
     migration = File.read(File.expand_path(
       "../db/migrate/20260710001000_create_recording_studio_notification_digests.rb", __dir__
     ))
@@ -321,6 +327,12 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes config_docs, "NotificationDigestItem"
     assert_includes config_docs, "bypass_digest: true"
     assert_includes config_docs, "DigestSchedulerJob.perform_later"
+    assert_includes config_docs, "Digest Summary Presentation"
+    assert_includes config_docs, "digest_summary_presenter"
+    assert_includes digest_delivery, "digest-summary-\#{@digest.id}"
+    assert_includes digest_delivery, "bypass_digest: true"
+    assert_includes digest_delivery, "status: \"delivered\""
+    assert_includes digest_scheduler, "Services::DigestDelivery.call"
     assert_includes File.read(File.expand_path(
       "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
     )), "where.missing(:digest_item)"

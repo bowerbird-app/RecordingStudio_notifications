@@ -505,7 +505,34 @@
     CODE
   ) %>
 
-  <p class="text-sm">The scheduler emits <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">digest_due.recording_studio_notifications</code> for every pending digest whose period has ended. It intentionally does not mark a digest delivered: the next phase creates the inbox summary, detail page, and final delivery transition.</p>
+  <p class="text-sm">The scheduler emits <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">digest_due.recording_studio_notifications</code> for every pending digest whose period has ended. It creates one normal inbox summary notification, then marks the digest delivered. If recipient authorization is no longer valid, the digest is cancelled instead.</p>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Digest Summary Presentation",
+    subtitle: "Customize the normal inbox notification created when a digest is delivered.",
+  ) %>
+
+  <p class="text-sm">The default presenter uses the digest cadence, notification type, event count, and period. Configure a callable to return a title, body, icon, and optional destination. Digest delivery uses a digest-specific idempotency key, so concurrent scheduler runs create at most one summary.</p>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~CODE
+      RecordingStudioNotifications.configure do |config|
+        config.digest_summary_presenter = lambda do |digest:|
+          count = digest.items.count
+
+          {
+            title: "#{count} comments need your review",
+            body: "Activity from #{digest.period_starts_at.to_date}",
+            icon: :chat_bubble_left_ellipsis,
+            destination: nil
+          }
+        end
+      end
+    CODE
+  ) %>
+
+  <p class="text-sm">A destination may be supplied now; the digest detail experience and its event list are introduced separately.</p>
 
   <%= render FlatPack::SectionTitle::Component.new(
     title: "Using Hooks to Trigger Notifications",

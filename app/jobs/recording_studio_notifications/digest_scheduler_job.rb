@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "recording_studio_notifications/services/digest_delivery"
+
 module RecordingStudioNotifications
   class DigestSchedulerJob < ApplicationJob
     def perform(at: Time.current)
@@ -10,7 +12,7 @@ module RecordingStudioNotifications
           recipient: digest.recipient,
           notification_type: digest.notification_type,
           cadence: digest.cadence
-        )
+        ) { Services::DigestDelivery.call(digest: digest, at: at) }
       end
     end
   end
