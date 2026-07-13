@@ -11,9 +11,15 @@ class ConfigurationTest < Minitest::Test
     assert_equal [:in_app], @configuration.default_channels
     assert @configuration.channels.registered?(:in_app)
     assert @configuration.notification_types.registered?(:generic)
-    assert_equal :bell, @configuration.notification_types.fetch(:generic).icon
+    generic_type = @configuration.notification_types.fetch(:generic)
+    assert_equal :bell, generic_type.icon
+    assert_equal [:individual], generic_type.allowed_cadences
+    assert_equal :individual, generic_type.default_cadence
+    assert_nil generic_type.required_cadence
     assert_equal true, @configuration.deliver_later
     assert_equal 60, @configuration.polling_interval_seconds
+    assert_equal 15.minutes, @configuration.rollup_reservation_timeout
+    assert_equal false, @configuration.rollup_delivery_enabled
   end
 
   def test_merge_updates_known_attributes_and_ignores_unknown_keys

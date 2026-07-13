@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_13_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -76,10 +76,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
     t.text "error_message"
     t.jsonb "metadata", default: {}, null: false
     t.uuid "notification_id", null: false
+    t.datetime "rollup_reserved_at"
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
     t.index ["channel", "status"], name: "idx_dummy_rsn_deliveries_channel_status"
     t.index ["notification_id", "channel"], name: "idx_dummy_rsn_deliveries_notification_channel", unique: true
+    t.index ["status", "rollup_reserved_at"], name: "idx_dummy_rsn_deliveries_rollup_reservation"
   end
 
   create_table "recording_studio_notifications_notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -108,15 +110,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
   end
 
   create_table "recording_studio_notifications_preferences", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "channel", null: false
+    t.string "cadence"
+    t.string "channel"
     t.datetime "created_at", null: false
-    t.boolean "enabled", default: true, null: false
+    t.boolean "enabled"
     t.string "notification_type", null: false
     t.uuid "recipient_id", null: false
     t.string "recipient_type", null: false
     t.datetime "updated_at", null: false
     t.index ["notification_type", "channel"], name: "idx_dummy_rsn_preferences_type_channel"
-    t.index ["recipient_type", "recipient_id", "notification_type", "channel"], name: "idx_dummy_rsn_preferences_recipient", unique: true
+    t.index ["recipient_type", "recipient_id", "notification_type", "channel"], name: "idx_dummy_rsn_preferences_channel", unique: true, where: "(channel IS NOT NULL)"
+    t.index ["recipient_type", "recipient_id", "notification_type"], name: "idx_dummy_rsn_preferences_cadence", unique: true, where: "(channel IS NULL)"
+    t.check_constraint "channel IS NOT NULL AND enabled IS NOT NULL AND cadence IS NULL OR channel IS NULL AND enabled IS NULL AND cadence IS NOT NULL", name: "chk_dummy_rsn_preferences_shape"
   end
 
   create_table "recording_studio_recordings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

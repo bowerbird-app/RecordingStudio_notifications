@@ -16,6 +16,8 @@ RecordingStudioNotifications.configure do |config|
     icon: :bell,
     default_channels: [:in_app],
     available_channels: [:in_app],
+    allowed_cadences: %i[individual daily weekly monthly],
+    default_cadence: :monthly,
     scope: :root
   )
 
@@ -28,6 +30,9 @@ RecordingStudioNotifications.configure do |config|
     default_channels: [],
     required_channels: [:in_app],
     available_channels: [:in_app],
+    allowed_cadences: %i[individual daily weekly],
+    default_cadence: :individual,
+    required_cadence: :individual,
     scope: :global
   )
 
@@ -39,6 +44,8 @@ RecordingStudioNotifications.configure do |config|
     icon: :chat_bubble_left_ellipsis,
     default_channels: [:in_app],
     available_channels: [:in_app],
+    allowed_cadences: %i[individual daily weekly monthly],
+    default_cadence: :weekly,
     scope: :optional_root
   )
 
@@ -50,6 +57,8 @@ RecordingStudioNotifications.configure do |config|
     icon: :document_text,
     default_channels: [:in_app],
     available_channels: [:in_app],
+    allowed_cadences: %i[individual daily weekly],
+    default_cadence: :weekly,
     scope: :root
   )
 

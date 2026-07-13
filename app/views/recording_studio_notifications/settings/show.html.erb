@@ -34,17 +34,34 @@
           <% accordion.item(id: "settings-category-#{category}", title: category.to_s.titleize, open: true) do %>
             <div class="flex flex-col gap-3">
               <% types.each do |type| %>
-                <%= render FlatPack::Select::Component.new(
-                  name: "preferences[#{type.key}]",
-                  options: @channel_select_options.fetch(type.key),
-                  label: type.label,
-                  placeholder: (type.optional_channels.any? ? "Search and select channels..." : "Required channels only"),
-                  help_text: type.description.presence || (type.optional_channels.any? ? "Required channels stay enabled and optional channels can be added or removed." : "This notification type has required channels only."),
-                  disabled: type.optional_channels.empty?,
-                  searchable: true,
-                  multiple: true,
-                  value: @selected_channels.fetch(type.key)
-                ) %>
+                <% if channel_configurable?(type) %>
+                  <%= render FlatPack::Select::Component.new(
+                    name: "preferences[#{type.key}]",
+                    options: @channel_select_options.fetch(type.key),
+                    label: type.label,
+                    placeholder: (type.optional_channels.any? ? "Search and select channels..." : "Required channels only"),
+                    help_text: type.description.presence || (type.optional_channels.any? ? "Required channels stay enabled and optional channels can be added or removed." : "This notification type has required channels only."),
+                    disabled: type.optional_channels.empty?,
+                    searchable: true,
+                    multiple: true,
+                    value: @selected_channels.fetch(type.key)
+                  ) %>
+                <% end %>
+
+                <% if cadence_selectable?(type) %>
+                  <%= render FlatPack::Select::Component.new(
+                    name: "cadences[#{type.key}]",
+                    options: @cadence_select_options.fetch(type.key),
+                    label: "Notification cadence",
+                    help_text: "Controls when this notification type is delivered and how it is grouped in your inbox.",
+                    searchable: false,
+                    value: @selected_cadences.fetch(type.key)
+                  ) %>
+                <% elsif type.required_cadence.present? %>
+                  <p class="text-sm text-(--surface-muted-content-color)">
+                    Notification cadence: <%= type.required_cadence.to_s.humanize %>. This cadence is required for <%= type.label.downcase %>.
+                  </p>
+                <% end %>
               <% end %>
             </div>
           <% end %>
