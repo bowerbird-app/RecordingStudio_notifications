@@ -1,5 +1,5 @@
 <%= render FlatPack::List::Item.new(
-  icon: notification_icon_for(notification),
+  leading: notification_leading_icon(notification),
   href: open_notification_path(notification),
   hover: true,
   active: notification.unread?,

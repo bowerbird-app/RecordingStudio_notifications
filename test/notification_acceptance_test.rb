@@ -143,6 +143,9 @@ class NotificationAcceptanceTest < Minitest::Test
     notification_partial = File.read(File.expand_path(
       "../app/views/recording_studio_notifications/notifications/_notification.html.erb", __dir__
     ))
+    notifications_helper = File.read(File.expand_path(
+      "../app/helpers/recording_studio_notifications/notifications_helper.rb", __dir__
+    ))
     initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_notifications.rb",
                                              __dir__))
     accessible_initializer = File.read(File.expand_path(
@@ -162,6 +165,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes index_view, "icon: \"cog\""
     assert_includes notification_partial, "FlatPack::Timestamp::Component.new("
     assert_includes notification_partial, "shorten_timestamp: true"
+    assert_includes notifications_helper, "fp-red-dot"
     refute_includes index_view, "inbox_scope: :all"
     refute_includes index_view, "inbox_scope: :current_root"
     refute_includes index_view, "Total:"
@@ -215,6 +219,7 @@ class NotificationAcceptanceTest < Minitest::Test
   def test_dummy_top_nav_uses_flatpack_notification_component
     helper = File.read(File.expand_path("../test/dummy/app/helpers/application_helper.rb", __dir__))
     top_nav = File.read(File.expand_path("../test/dummy/app/views/layouts/flat_pack/_top_nav.html.erb", __dir__))
+    sidebar = File.read(File.expand_path("../test/dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
     tailwind = File.read(File.expand_path("../test/dummy/app/assets/tailwind/application.css", __dir__))
     menu_helper = File.read(File.expand_path("../app/helpers/recording_studio_notifications/menu_helper.rb", __dir__))
     menu_partial = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_menu_component.html.erb",
@@ -235,6 +240,8 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes polling_controller, "setInterval"
     assert_includes polling_controller, "polling_interval_seconds"
     assert_includes top_nav, "recording_studio_notifications_menu"
+    assert_includes sidebar, "RecordingStudioNotifications::VERSION"
+    refute_includes sidebar, "FlatPack::VERSION"
     assert_includes tailwind, '[id^="flat-pack-notification-"][id$="-popover"] .max-h-96'
   end
 

@@ -9,5 +9,16 @@ module RecordingStudioNotifications
       definition = RecordingStudioNotifications.notification_types[key]
       definition&.icon || :bell
     end
+
+    def notification_leading_icon(notification)
+      icon_classes = ["text-[var(--surface-muted-content-color)]"]
+      icon_classes << "fp-red-dot" if notification.respond_to?(:unread?) && notification.unread?
+
+      render FlatPack::Shared::IconComponent.new(
+        name: notification_icon_for(notification),
+        size: :md,
+        class: icon_classes.join(" ")
+      )
+    end
   end
 end
