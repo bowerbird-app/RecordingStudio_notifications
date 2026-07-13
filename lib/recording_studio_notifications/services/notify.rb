@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "cadence_period"
+
 module RecordingStudioNotifications
   module Services
     class Notify
@@ -39,7 +41,7 @@ module RecordingStudioNotifications
 
       def create_and_deliver!
         notification = nil
-        should_deliver = false
+        should_deliver_immediately = false
 
         ActiveSupport::Notifications.instrument(
           "notify.recording_studio_notifications",
@@ -51,13 +53,13 @@ module RecordingStudioNotifications
           Notification.transaction do
             notification = find_idempotent_notification || create_notification!
             create_deliveries!(notification)
-            should_deliver = notification.previously_new_record? || notification.deliveries.pending.exists?
+            should_deliver_immediately = notification.deliveries.pending.any? { |delivery| !delivery.deferred_rollup? }
 
             notification
           end
         end
 
-        enqueue_or_deliver!(notification) if should_deliver
+        enqueue_or_deliver!(notification) if should_deliver_immediately
         notification
       end
 
@@ -75,6 +77,13 @@ module RecordingStudioNotifications
         if type_definition.available_channels
           unavailable_channel = channel_keys.find { |channel| !type_definition.available_channels.include?(channel) }
           raise ArgumentError, "channel is not available for #{@notification_type}: #{unavailable_channel}" if unavailable_channel
+        end
+
+        unsupported_rollup_channel = channel_keys.find do |channel|
+          deferred_rollup_channel?(channel) && !RecordingStudioNotifications.channels.fetch(channel).respond_to?(:deliver_rollup)
+        end
+        if unsupported_rollup_channel
+          raise ArgumentError, "channel does not support grouped delivery: #{unsupported_rollup_channel}"
         end
 
         UrlSafety.sanitize!(@url)
@@ -165,8 +174,59 @@ module RecordingStudioNotifications
         channel_keys.each do |channel|
           notification.deliveries.find_or_create_by!(channel: channel.to_s) do |delivery|
             delivery.status = "pending"
+            delivery.metadata = rollup_metadata_for(notification, channel) || {}
           end
         end
+      end
+
+      def rollup_metadata_for(notification, channel)
+        return unless deferred_rollup_channel?(channel)
+
+        period = CadencePeriod.for(
+          timestamp: notification.created_at,
+          cadence: effective_cadence,
+          time_zone: recipient_time_zone
+        )
+        starts_at = period.starts_at.utc.iso8601
+
+        {
+          "rollup" => true,
+          "rollup_key" => [
+            "#{@recipient.class.name}:#{@recipient.id}",
+            @notification_type,
+            channel,
+            effective_cadence,
+            starts_at
+          ].join("/"),
+          "cadence" => effective_cadence.to_s,
+          "period_starts_at" => starts_at,
+          "period_ends_at" => period.ends_at.utc.iso8601
+        }
+      end
+
+      def deferred_rollup_channel?(channel)
+        effective_cadence != :individual && channel.to_sym != :in_app
+      end
+
+      def effective_cadence
+        @effective_cadence ||= begin
+          return type_definition.required_cadence if type_definition.required_cadence
+          return type_definition.default_cadence unless preference_table_available?
+
+          Preference.cadence_for(
+            recipient: @recipient,
+            notification_type: @notification_type,
+            default: type_definition.default_cadence
+          )
+        end
+      end
+
+      def recipient_time_zone
+        @recipient.try(:time_zone).presence || Time.zone || "UTC"
+      end
+
+      def preference_table_available?
+        defined?(RecordingStudioNotifications::Preference) && RecordingStudioNotifications::Preference.table_exists?
       end
 
       def channel_keys
@@ -193,8 +253,7 @@ module RecordingStudioNotifications
       end
 
       def preference_enabled?(channel, default:)
-        return default unless defined?(RecordingStudioNotifications::Preference)
-        return default unless RecordingStudioNotifications::Preference.table_exists?
+        return default unless preference_table_available?
 
         RecordingStudioNotifications::Preference.enabled_for?(
           recipient: @recipient,

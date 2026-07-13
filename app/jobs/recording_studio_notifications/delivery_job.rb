@@ -6,6 +6,8 @@ module RecordingStudioNotifications
       notification = Notification.find(notification_id)
 
       notification.deliveries.pending.find_each do |delivery|
+        next if delivery.deferred_rollup?
+
         deliver_one(notification, delivery)
       end
     end
