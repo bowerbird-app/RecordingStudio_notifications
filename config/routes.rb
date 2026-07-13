@@ -6,6 +6,7 @@ RecordingStudioNotifications::Engine.routes.draw do
   resources :notifications, only: %i[index show] do
     collection do
       get :menu
+      patch :mark_group_read
     end
 
     member do

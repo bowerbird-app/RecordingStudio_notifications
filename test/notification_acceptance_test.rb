@@ -25,6 +25,9 @@ class NotificationAcceptanceTest < Minitest::Test
       default_channels: [:in_app],
       required_channels: [:audit],
       available_channels: %i[in_app email audit],
+      allowed_cadences: %i[individual daily weekly],
+      default_cadence: :weekly,
+      required_cadence: :daily,
       scope: :root,
       creation_action: :create_comment_notification
     )
@@ -35,6 +38,9 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_equal %i[in_app email], type.optional_channels
     assert_equal :page, type.category
     assert_equal :chat_bubble_left_ellipsis, type.icon
+    assert_equal %i[individual daily weekly], type.allowed_cadences
+    assert_equal :weekly, type.default_cadence
+    assert_equal :daily, type.required_cadence
     assert_equal :root, type.scope
     assert_equal :create_comment_notification, type.creation_action
   end
@@ -70,6 +76,37 @@ class NotificationAcceptanceTest < Minitest::Test
     type = RecordingStudioNotifications.notification_types.register(:fallback_icon, label: "Fallback icon")
 
     assert_equal :bell, type.icon
+  end
+
+  def test_notification_type_cadence_configuration_is_validated
+    registry = RecordingStudioNotifications.notification_types
+
+    assert_raises(ArgumentError) do
+      registry.register(:no_cadences, label: "No cadences", allowed_cadences: [])
+    end
+
+    assert_raises(ArgumentError) do
+      registry.register(
+        :invalid_default,
+        label: "Invalid default",
+        allowed_cadences: [:daily],
+        default_cadence: :weekly
+      )
+    end
+
+    assert_raises(ArgumentError) do
+      registry.register(
+        :invalid_required,
+        label: "Invalid required",
+        allowed_cadences: [:daily],
+        default_cadence: :daily,
+        required_cadence: :weekly
+      )
+    end
+
+    assert_raises(ArgumentError) do
+      registry.register(:unknown_cadence, label: "Unknown cadence", allowed_cadences: [:hourly])
+    end
   end
 
   def test_preferences_model_limits_settings_to_optional_channels
@@ -140,6 +177,8 @@ class NotificationAcceptanceTest < Minitest::Test
     model = File.read(File.expand_path("../app/models/recording_studio_notifications/notification.rb", __dir__))
     index_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/index.html.erb",
                                            __dir__))
+    page_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_page.html.erb",
+                        __dir__))
     notification_partial = File.read(File.expand_path(
       "../app/views/recording_studio_notifications/notifications/_notification.html.erb", __dir__
     ))
@@ -153,19 +192,37 @@ class NotificationAcceptanceTest < Minitest::Test
                                        ))
 
     assert_includes controller, "@inbox_scope = notifications_inbox_scope"
+    assert_includes controller, 'require "recording_studio_notifications/services/inbox_grouping"'
     assert_includes controller, "def menu"
+    assert_includes controller, "def mark_group_read"
+    assert_includes controller, "visible_notification_group(params[:group_id])"
+    assert_includes controller, "group.notifications.select(&:unread?)"
     assert_includes controller, "@inbox_scope = \"all\""
     assert_includes controller, "polling_interval_seconds"
     assert_includes routes, "get :menu"
+    assert_includes routes, "patch :mark_group_read"
     assert_includes controller, "def recording_studio_root_switchable_scope_key"
     assert_includes model, "for_current_root_inbox"
     assert_includes model, "rootless_or_global"
     assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
     assert_includes application_controller, "actor || RecordingStudioNotifications.configuration.resolve_actor"
     assert_includes index_view, "icon: \"cog\""
+    assert_includes page_view, "notification_sections.flat_map(&:groups)"
+    assert_includes page_view, "FlatPack::List::Component.new(spacing: :dense, class: \"space-y-0\")"
+    assert_includes page_view, "divide-y divide-(--surface-border-color)"
+    assert_includes page_view, "FlatPack::Accordion::Component.new"
+    assert_includes page_view, "left_slot: notification_group_leading_icon(group)"
+    assert_includes page_view, "group.notification_type_label"
+    assert_includes page_view, "group.period_label"
+    assert_includes page_view, "'unread' if unread"
+    assert_includes page_view, "[&_[data-flat-pack--accordion-target=trigger]]:bg-[var(--list-item-active-background-color)]"
+    assert_includes page_view, "[&_[data-flat-pack--accordion-target=trigger]]:min-h-[54px]"
+    assert_includes page_view, "!border-0"
+    refute_includes page_view, "<h2"
     assert_includes notification_partial, "FlatPack::Timestamp::Component.new("
     assert_includes notification_partial, "shorten_timestamp: true"
     assert_includes notifications_helper, "fp-red-dot"
+    assert_includes index_view, "notification_sections"
     refute_includes index_view, "inbox_scope: :all"
     refute_includes index_view, "inbox_scope: :current_root"
     refute_includes index_view, "Total:"
@@ -190,9 +247,13 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, "flat_notification_types"
     assert_includes controller, "channel_select_options_map"
     assert_includes controller, "selected_channels_map"
+    assert_includes controller, "cadence_select_options_map"
+    assert_includes controller, "selected_cadences_map"
+    assert_includes controller, "Preference.set_cadence!"
+    assert_includes controller, "next if preference.channel.blank?"
     assert_includes controller, ".group_by { |type| notification_type_category(type) }"
     assert_includes controller, "next false if type.key == :generic"
-    assert_includes controller, "type.optional_channels.any? || type.required_channels.any?"
+    assert_includes controller, "channel_configurable?(type) || cadence_selectable?(type) || type.required_cadence.present?"
     assert_includes controller, "Array(submitted[type.key.to_s]).flatten.map(&:to_s).reject(&:blank?)"
     assert_includes controller, "selected_channels = [] if selected_channels.include?(\"__none__\")"
     assert_includes controller, "disabled: type.required_channels.include?(channel)"
@@ -208,6 +269,9 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes settings, "Required channels only"
     assert_includes settings, "multiple: true"
     assert_includes settings, "searchable: true"
+    assert_includes settings, 'name: "cadences[#{type.key}]"'
+    assert_includes settings, "Notification cadence"
+    assert_includes settings, "This cadence is required for"
     assert_includes views, "FlatPack::"
     refute_includes views, "notification_bell"
     refute_includes settings, "check_box_tag"

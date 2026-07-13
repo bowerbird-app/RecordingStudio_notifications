@@ -14,6 +14,19 @@ module RecordingStudioNotifications
         }
       end
 
+      def serialize_group(group:, href:)
+        latest_notification = group.latest_notification
+
+        {
+          title: "#{group.notification_type_label}: #{group.period_label}",
+          body: "#{group.unread_count} unread · #{group.notifications.size} notifications",
+          href: href,
+          unread: group.unread_count.positive?,
+          time: latest_notification.created_at,
+          icon: icon_for(latest_notification)
+        }
+      end
+
       private
 
       def icon_for(notification)

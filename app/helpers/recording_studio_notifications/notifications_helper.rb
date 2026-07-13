@@ -4,6 +4,10 @@ module RecordingStudioNotifications
   module NotificationsHelper
     def notification_icon_for(notification)
       key = notification.respond_to?(:notification_type) ? notification.notification_type : nil
+      notification_type_icon_for(key)
+    end
+
+    def notification_type_icon_for(key)
       return :bell if key.blank?
 
       definition = RecordingStudioNotifications.notification_types[key]
@@ -11,11 +15,22 @@ module RecordingStudioNotifications
     end
 
     def notification_leading_icon(notification)
+      notification_type_leading_icon(
+        notification.respond_to?(:notification_type) ? notification.notification_type : nil,
+        unread: notification.respond_to?(:unread?) && notification.unread?
+      )
+    end
+
+    def notification_group_leading_icon(group)
+      notification_type_leading_icon(group.notification_type, unread: group.unread_count.positive?)
+    end
+
+    def notification_type_leading_icon(notification_type, unread: false)
       icon_classes = ["text-[var(--surface-muted-content-color)]"]
-      icon_classes << "fp-red-dot" if notification.respond_to?(:unread?) && notification.unread?
+      icon_classes << "fp-red-dot" if unread
 
       render FlatPack::Shared::IconComponent.new(
-        name: notification_icon_for(notification),
+        name: notification_type_icon_for(notification_type),
         size: :md,
         class: icon_classes.join(" ")
       )

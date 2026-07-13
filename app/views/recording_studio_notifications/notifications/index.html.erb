@@ -20,12 +20,10 @@
     variant: :h1
   ) %>
 
-  <% if @notifications.any? %>
-    <%= render FlatPack::List::Component.new(spacing: :comfortable, divider: true) do %>
-      <div id="notifications-list">
-        <%= render partial: "recording_studio_notifications/notifications/page", locals: { notifications: @notifications } %>
-      </div>
-    <% end %>
+  <% if @notification_sections.any? %>
+    <div id="notifications-list" class="flex flex-col gap-6">
+      <%= render partial: "recording_studio_notifications/notifications/page", locals: { notification_sections: @notification_sections } %>
+    </div>
 
     <div class="pt-2">
       <%= render partial: "recording_studio_notifications/notifications/next_page", locals: { page: @page, has_next_page: @has_next_page } %>
