@@ -40,6 +40,10 @@
 
         # Notification menu polling interval in seconds
         config.polling_interval_seconds = 60
+
+        # Keep scheduled rollup delivery disabled until adapters and a scheduler are configured.
+        config.rollup_delivery_enabled = false
+        config.rollup_reservation_timeout = 15.minutes
       end
     CODE
   ) %>
@@ -108,6 +112,18 @@
           <td class="py-2 pr-4"><code class="text-xs">60</code></td>
           <td class="py-2">Polling cadence in seconds for async notification menu refresh after page load/reload.</td>
         </tr>
+        <tr>
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">rollup_delivery_enabled</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">Boolean</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">false</code></td>
+          <td class="py-2">Enables scheduled delivery of completed external notification rollups after adapters and a recurring scheduler are ready.</td>
+        </tr>
+        <tr>
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">rollup_reservation_timeout</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">ActiveSupport::Duration</code></td>
+          <td class="py-2 pr-4"><code class="text-xs">15.minutes</code></td>
+          <td class="py-2">Returns interrupted rollup reservations to the pending queue for a later scheduler retry.</td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -130,6 +146,8 @@
           icon: :bell,
           default_channels: [:in_app],
           available_channels: [:in_app],
+          allowed_cadences: %i[individual daily weekly monthly],
+          default_cadence: :monthly,
           scope: :root
         )
 
@@ -143,6 +161,9 @@
           default_channels: [],
           required_channels: [:in_app],
           available_channels: [:in_app],
+          allowed_cadences: %i[individual daily weekly],
+          default_cadence: :individual,
+          required_cadence: :individual,
           scope: :global
         )
 
@@ -155,6 +176,8 @@
           icon: :chat_bubble_left_ellipsis,
           default_channels: [:in_app],
           available_channels: [:in_app],
+          allowed_cadences: %i[individual daily weekly monthly],
+          default_cadence: :weekly,
           scope: :optional_root
         )
       end
@@ -213,6 +236,21 @@
           <td class="py-2">All channels this type can use. Defaults to default_channels + required_channels.</td>
         </tr>
         <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">allowed_cadences:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Cadences a recipient may select. Supported values are <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:individual</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:daily</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:every_other_day</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:weekly</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:biweekly</code>, and <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:monthly</code>.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_cadence:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Cadence used when a recipient has no override. Defaults to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:individual</code>.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
+          <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">required_cadence:</code></td>
+          <td class="py-2 pr-4">No</td>
+          <td class="py-2">Forces one cadence for the type and takes precedence over recipient preferences.</td>
+        </tr>
+        <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">scope:</code></td>
           <td class="py-2 pr-4">No</td>
           <td class="py-2">One of <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:root</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:global</code>, or <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code>. Default: <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code>.</td>
@@ -234,6 +272,28 @@
     <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:global</code> — Must NOT have a root recording (or notifiable/recording).</li>
     <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code> — Either is allowed. Global notifications appear alongside root-scoped ones in the inbox.</li>
   </ul>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Notification Cadences & Digests",
+    subtitle: "Cadence controls both external delivery timing and how source notifications appear in the inbox.",
+  ) %>
+
+  <ul class="list-disc space-y-2 pl-6 text-sm">
+    <li><strong>Individual</strong> notifications retain immediate, per-notification delivery and display as single inbox rows.</li>
+    <li><strong>Daily, every-other-day, weekly, biweekly, and monthly</strong> cadence types retain individual source records but group them into an inbox accordion for their local period.</li>
+    <li>The effective cadence is <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">required_cadence</code>, then the recipient override, then <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_cadence</code>.</li>
+    <li>The notification settings page lets recipients choose allowed cadences. Selecting a type's default removes its override; a required cadence cannot be changed.</li>
+  </ul>
+
+  <p class="text-sm">Grouped external channels are delivered once the period closes. The in-app channel stays available immediately because the source notifications already appear in their inbox group.</p>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      # Run from the host application's recurring scheduler after configuring rollup-capable adapters.
+      bundle exec rake recording_studio_notifications:deliver_rollups
+    CODE
+  ) %>
 
   <%= render FlatPack::SectionTitle::Component.new(
     title: "Sending Notifications",
@@ -370,7 +430,7 @@
     subtitle: "Beyond the built-in :in_app adapter, register your own delivery channels (email, Slack, push, etc.).",
   ) %>
 
-  <p class="text-sm">A channel adapter must implement a single method: <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">deliver(notification:, delivery:)</code>. The delivery object tracks per-channel state (pending/delivered/failed) and can be marked via <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">delivery.mark_delivered!</code> or <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">delivery.mark_failed!</code>.</p>
+  <p class="text-sm">A channel adapter must implement <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">deliver(notification:, delivery:)</code>. Channels used by grouped cadence types must also implement <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">deliver_rollup</code>. The delivery object tracks per-channel state (pending/delivered/failed) and can be marked via <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">delivery.mark_delivered!</code> or <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">delivery.mark_failed!</code>.</p>
 
   <%= render FlatPack::CodeBlock::Component.new(
     language: :ruby,
@@ -388,6 +448,20 @@
             notification
           rescue StandardError => e
             delivery.mark_failed!
+            raise
+          end
+
+          def deliver_rollup(notifications:, deliveries:, rollup_key:, cadence:, period_starts_at:, period_ends_at:, idempotency_key:)
+            NotificationMailer.with(
+              notifications: notifications,
+              cadence: cadence,
+              period_starts_at: period_starts_at,
+              period_ends_at: period_ends_at
+            ).notification_rollup.deliver_now
+
+            deliveries.each(&:mark_delivered!)
+          rescue StandardError
+            deliveries.each(&:mark_failed!)
             raise
           end
         end
