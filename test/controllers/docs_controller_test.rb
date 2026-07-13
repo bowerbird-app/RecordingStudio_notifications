@@ -38,6 +38,10 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "polling_interval_seconds"
     assert_includes response.body, "Polling cadence in seconds for async notification menu refresh"
     assert_includes response.body, "Per-Recipient Channel Preferences"
+    assert_includes response.body, "Notification Cadences &amp; Digests"
+    assert_includes response.body, "allowed_cadences:"
+    assert_includes response.body, "recording_studio_notifications:deliver_rollups"
+    assert_includes response.body, "deliver_rollup"
   end
 
   test "recordable types page renders configured recordables dynamically" do
