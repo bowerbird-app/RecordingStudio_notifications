@@ -46,17 +46,6 @@
                   multiple: true,
                   value: @selected_channels.fetch(type.key)
                 ) %>
-
-                <% if @cadence_preferences_available %>
-                  <%= render FlatPack::Select::Component.new(
-                    name: "cadences[#{type.key}]",
-                    options: @cadence_select_options.fetch(type.key),
-                    label: "Delivery cadence",
-                    help_text: "How often this notification type is delivered.",
-                    disabled: type.allowed_cadences.one?,
-                    value: @selected_cadences.fetch(type.key)
-                  ) %>
-                <% end %>
               <% end %>
             </div>
           <% end %>

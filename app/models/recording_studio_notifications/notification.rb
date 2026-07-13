@@ -10,8 +10,6 @@ module RecordingStudioNotifications
     belongs_to :recording, class_name: "RecordingStudio::Recording", optional: true
     belongs_to :root_recording, class_name: "RecordingStudio::Recording", optional: true
     has_many :deliveries, class_name: "RecordingStudioNotifications::Delivery", dependent: :destroy
-    has_one :digest_item, class_name: "RecordingStudioNotifications::NotificationDigestItem", dependent: :destroy
-    has_one :digest, through: :digest_item, source: :digest
 
     validates :notification_type, :title, :recipient, presence: true
     validates :url, length: { maximum: 2048 }, allow_blank: true

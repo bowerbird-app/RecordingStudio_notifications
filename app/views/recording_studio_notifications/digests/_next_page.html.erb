@@ -1,7 +1,0 @@
-<% next_page_params = request.query_parameters.merge(page: page + 1, format: :turbo_stream) %>
-
-<%= turbo_frame_tag "digest_notifications_next_page", src: (has_next_page ? digest_path(@digest, next_page_params) : nil), loading: (has_next_page ? :lazy : nil) do %>
-  <% if has_next_page %>
-    <div class="py-3 text-center text-xs text-(--surface-muted-content-color)">Loading more events...</div>
-  <% end %>
-<% end %>

@@ -7,13 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Configurable per-notification-type delivery cadences, durable digest collection, scheduled summary delivery, and digest detail pages.
-- A development-only task and dummy seed data for exercising digest delivery locally.
-
-### Changed
-- Existing notification types retain immediate delivery through the default `:every_notification` cadence.
-- Upgrades without the cadence-preference table temporarily retain immediate delivery and hide cadence controls until engine migrations run.
+### Removed
+- The abandoned notification cadence and digest implementation, including its database tables, scheduler, settings, seed data, and documentation. Notifications now use the standard immediate delivery path.
 
 ## [0.1.1] - 2026-04-28
 

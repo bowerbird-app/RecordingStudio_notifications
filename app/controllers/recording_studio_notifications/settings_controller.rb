@@ -24,13 +24,6 @@ module RecordingStudioNotifications
           end
         end
 
-        cadence_params.each do |type_key, cadence|
-          CadencePreference.set!(
-            recipient: @recipient,
-            notification_type: type_key,
-            cadence: cadence
-          )
-        end
       end
 
       redirect_to settings_path, notice: "Notification preferences updated."
@@ -64,11 +57,6 @@ module RecordingStudioNotifications
       @preferences = preference_map
       @channel_select_options = channel_select_options_map
       @selected_channels = selected_channels_map
-      @cadence_preferences_available = CadencePreference.table_exists?
-      return unless @cadence_preferences_available
-
-      @cadence_select_options = cadence_select_options_map
-      @selected_cadences = selected_cadences_map
     end
 
     def grouped_notification_types
@@ -108,22 +96,6 @@ module RecordingStudioNotifications
       end
     end
 
-    def cadence_select_options_map
-      flat_notification_types.each_with_object({}) do |type, map|
-        map[type.key] = type.allowed_cadences.map { |cadence| [cadence_label(cadence), cadence.to_s] }
-      end
-    end
-
-    def selected_cadences_map
-      cadence_preferences = CadencePreference.for_recipient(@recipient).index_by do |preference|
-        preference.notification_type.to_sym
-      end
-
-      flat_notification_types.each_with_object({}) do |type, map|
-        map[type.key] = cadence_preferences.fetch(type.key, nil)&.cadence || type.default_cadence.to_s
-      end
-    end
-
     def preference_enabled?(type, channel)
       @preferences.fetch([type.key, channel], Array(type.default_channels).include?(channel))
     end
@@ -132,17 +104,6 @@ module RecordingStudioNotifications
       return channel.to_s.humanize unless type.required_channels.include?(channel)
 
       "#{channel.to_s.humanize} (required)"
-    end
-
-    def cadence_label(cadence)
-      {
-        every_notification: "Every notification",
-        daily: "Once a day",
-        every_other_day: "Every other day",
-        weekly: "Once a week",
-        biweekly: "Once every two weeks",
-        monthly: "Once a month"
-      }.fetch(cadence)
     end
 
     def preference_map
@@ -167,17 +128,5 @@ module RecordingStudioNotifications
       end
     end
 
-    def cadence_params
-      return {} unless CadencePreference.table_exists?
-
-      raw_cadences = params.fetch(:cadences, {})
-      return {} unless raw_cadences.respond_to?(:to_unsafe_h)
-
-      submitted = raw_cadences.to_unsafe_h
-      configurable_notification_types.each_with_object({}) do |type, allowed|
-        cadence = submitted[type.key.to_s].to_s
-        allowed[type.key.to_s] = cadence if cadence.present?
-      end
-    end
   end
 end

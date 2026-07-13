@@ -16,7 +16,7 @@ class NotificationAcceptanceTest < Minitest::Test
     RecordingStudioNotifications.instance_variable_set(:@configuration, @original_configuration)
   end
 
-  def test_notification_types_support_channels_scope_cadence_and_creation_action
+  def test_notification_types_support_channels_scope_and_creation_action
     type = RecordingStudioNotifications.notification_types.register(
       :comment,
       label: "Comment",
@@ -25,8 +25,6 @@ class NotificationAcceptanceTest < Minitest::Test
       default_channels: [:in_app],
       required_channels: [:audit],
       available_channels: %i[in_app email audit],
-      allowed_cadences: %i[every_notification daily weekly],
-      default_cadence: :daily,
       scope: :root,
       creation_action: :create_comment_notification
     )
@@ -35,8 +33,6 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_equal [:audit], type.required_channels
     assert_equal %i[in_app email audit], type.available_channels
     assert_equal %i[in_app email], type.optional_channels
-    assert_equal %i[every_notification daily weekly], type.allowed_cadences
-    assert_equal :daily, type.default_cadence
     assert_equal :page, type.category
     assert_equal :chat_bubble_left_ellipsis, type.icon
     assert_equal :root, type.scope
@@ -46,25 +42,6 @@ class NotificationAcceptanceTest < Minitest::Test
   def test_notification_type_scope_is_validated
     assert_raises(ArgumentError) do
       RecordingStudioNotifications.notification_types.register(:bad, label: "Bad", scope: :workspace)
-    end
-  end
-
-  def test_notification_type_cadences_are_validated
-    assert_raises(ArgumentError) do
-      RecordingStudioNotifications.notification_types.register(
-        :bad_cadence,
-        label: "Bad cadence",
-        allowed_cadences: [:hourly]
-      )
-    end
-
-    assert_raises(ArgumentError) do
-      RecordingStudioNotifications.notification_types.register(
-        :missing_default_cadence,
-        label: "Missing default cadence",
-        allowed_cadences: [:daily],
-        default_cadence: :weekly
-      )
     end
   end
 
@@ -93,8 +70,6 @@ class NotificationAcceptanceTest < Minitest::Test
     type = RecordingStudioNotifications.notification_types.register(:fallback_icon, label: "Fallback icon")
 
     assert_equal :bell, type.icon
-    assert_equal [:every_notification], type.allowed_cadences
-    assert_equal :every_notification, type.default_cadence
   end
 
   def test_preferences_model_limits_settings_to_optional_channels
@@ -115,6 +90,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes source, "RootResolver.consistent?"
     assert_includes source, "default: requested.include?(channel)"
     assert_includes source, "enqueue_or_deliver!(notification) if should_deliver"
+    assert_includes source, "create_deliveries!(notification)"
   end
 
   def test_delivery_uses_channel_architecture_and_instrumentation
@@ -210,11 +186,6 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, "flat_notification_types"
     assert_includes controller, "channel_select_options_map"
     assert_includes controller, "selected_channels_map"
-    assert_includes controller, "cadence_select_options_map"
-    assert_includes controller, "selected_cadences_map"
-    assert_includes controller, "CadencePreference.set!"
-    assert_includes controller, "@cadence_preferences_available = CadencePreference.table_exists?"
-    assert_includes controller, "type.allowed_cadences"
     assert_includes controller, ".group_by { |type| notification_type_category(type) }"
     assert_includes controller, "next false if type.key == :generic"
     assert_includes controller, "type.optional_channels.any? || type.required_channels.any?"
@@ -233,9 +204,6 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes settings, "Required channels only"
     assert_includes settings, "multiple: true"
     assert_includes settings, "searchable: true"
-    assert_includes settings, 'name: "cadences[#{type.key}]"'
-    assert_includes settings, "Delivery cadence"
-    assert_includes settings, "@cadence_select_options"
     assert_includes views, "FlatPack::"
     refute_includes views, "notification_bell"
     refute_includes settings, "check_box_tag"
@@ -278,102 +246,6 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes readme, "Current-root inbox behavior"
     assert_includes readme, "CaptainHook"
     assert_includes readme, "not RecordingStudio recordings or recordables"
-  end
-
-  def test_configuration_docs_explain_cadence_options
-    config_docs = File.read(File.expand_path("../test/dummy/app/views/docs/config.html.erb", __dir__))
-    cadence_preference = File.read(File.expand_path(
-      "../app/models/recording_studio_notifications/cadence_preference.rb", __dir__
-    ))
-
-    assert_includes config_docs, "allowed_cadences:"
-    assert_includes config_docs, "default_cadence:"
-    assert_includes config_docs, ":biweekly"
-    assert_includes cadence_preference, "is not allowed for this notification type"
-    assert_includes cadence_preference, "cadence_for"
-  end
-
-  def test_digest_schema_and_models_preserve_source_notification_boundaries
-    digest = File.read(File.expand_path(
-      "../app/models/recording_studio_notifications/notification_digest.rb", __dir__
-    ))
-    digest_item = File.read(File.expand_path(
-      "../app/models/recording_studio_notifications/notification_digest_item.rb", __dir__
-    ))
-    notification = File.read(File.expand_path(
-      "../app/models/recording_studio_notifications/notification.rb", __dir__
-    ))
-    digest_delivery = File.read(File.expand_path(
-      "../lib/recording_studio_notifications/services/digest_delivery.rb", __dir__
-    ))
-    digest_scheduler = File.read(File.expand_path(
-      "../app/jobs/recording_studio_notifications/digest_scheduler_job.rb", __dir__
-    ))
-    digest_controller = File.read(File.expand_path(
-      "../app/controllers/recording_studio_notifications/digests_controller.rb", __dir__
-    ))
-    application_controller = File.read(File.expand_path(
-      "../app/controllers/recording_studio_notifications/application_controller.rb", __dir__
-    ))
-    digest_view = File.read(File.expand_path(
-      "../app/views/recording_studio_notifications/digests/show.html.erb", __dir__
-    ))
-    digest_notification_view = File.read(File.expand_path(
-      "../app/views/recording_studio_notifications/digests/_notification.html.erb", __dir__
-    ))
-    digest_task = File.read(File.expand_path(
-      "../lib/tasks/recording_studio_notifications.rake", __dir__
-    ))
-    migration = File.read(File.expand_path(
-      "../db/migrate/20260710001000_create_recording_studio_notification_digests.rb", __dir__
-    ))
-    config_docs = File.read(File.expand_path("../test/dummy/app/views/docs/config.html.erb", __dir__))
-
-    assert_includes digest, "STATUSES = %w[pending delivered cancelled]"
-    assert_includes digest, "foreign_key: :digest_id"
-    assert_includes digest, "has_many :source_notifications"
-    assert_includes digest, "period_ends_after_start"
-    assert_includes digest_item, "notification_matches_digest"
-    assert_includes digest_item, "must match the digest root recording"
-    assert_includes notification, "has_one :digest_item"
-    assert_includes migration, "COALESCE(root_recording_id"
-    assert_includes migration, "idx_rsn_pending_digest_bucket"
-    assert_includes migration, "idx_rsn_digest_items_notification"
-    assert_includes config_docs, "Consolidated Notification Data Model"
-    assert_includes config_docs, "NotificationDigestItem"
-    assert_includes config_docs, "bypass_digest: true"
-    assert_includes config_docs, "DigestSchedulerJob.perform_later"
-    assert_includes config_docs, "Digest Summary Presentation"
-    assert_includes config_docs, "digest_summary_presenter"
-    assert_includes digest_delivery, "digest-summary-\#{@digest.id}"
-    assert_includes digest_delivery, "bypass_digest: true"
-    assert_includes digest_delivery, "status: \"delivered\""
-    assert_includes digest_delivery, "RecordingStudioAccessible.authorized?"
-    assert_includes digest_scheduler, "Services::DigestDelivery.call"
-    assert_includes digest_controller, "PER_PAGE = 25"
-    assert_includes digest_controller, "digest_visible?"
-    assert_includes digest_controller, "visible_notification?(notification)"
-    assert_includes digest_controller, 'idempotency_key: "digest-summary-#{@digest.id}"'
-    assert_includes application_controller, "helper NotificationsHelper"
-    assert_includes digest_view, "No accessible events remain in this digest."
-    assert_includes digest_view, "@summary_notification&.title"
-    assert_includes digest_view, 'strftime("%b %-d, %Y")'
-    assert_includes digest_view, '@digest.cadence == "daily"'
-    assert_includes digest_view, '"Daily · #{starts_on}"'
-    assert_includes digest_view, '"#{@digest.cadence.humanize} · #{starts_on} to'
-    refute_includes digest_view, "Current workspace"
-    assert_includes digest_notification_view, "active: notification.unread?"
-    assert_includes digest_task, "FORCE=1"
-    assert_includes digest_task, "available only in development"
-    assert_includes config_docs, "Local Digest Demo"
-    assert_includes config_docs, "recording_studio_notifications:deliver_due_digests"
-    assert_includes config_docs, "Upgrade Compatibility"
-    assert_includes File.read(File.expand_path("../README.md", __dir__)), "Existing notification types continue to deliver immediately"
-    assert_includes File.read(File.expand_path("../CHANGELOG.md", __dir__)), "default `:every_notification` cadence"
-    assert_includes File.read(File.expand_path("../config/routes.rb", __dir__)), "resources :digests, only: :show"
-    assert_includes File.read(File.expand_path(
-      "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
-    )), "where.missing(:digest_item)"
   end
 
   def test_commentable_hook_wires_notification

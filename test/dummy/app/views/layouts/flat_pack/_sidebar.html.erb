@@ -40,6 +40,12 @@
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Gem Views",
+        href: main_app.docs_gem_views_path,
+        icon: :document_magnifying_glass
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Methods",
         href: main_app.docs_methods_path,
         icon: :code_bracket

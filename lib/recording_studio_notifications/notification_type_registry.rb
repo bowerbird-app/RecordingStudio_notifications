@@ -10,8 +10,6 @@ module RecordingStudioNotifications
     :default_channels,
     :required_channels,
     :available_channels,
-    :allowed_cadences,
-    :default_cadence,
     :scope,
     :creation_action,
     keyword_init: true
@@ -23,7 +21,6 @@ module RecordingStudioNotifications
 
   class NotificationTypeRegistry
     SCOPES = %i[global root optional_root].freeze
-    CADENCES = %i[every_notification daily every_other_day weekly biweekly monthly].freeze
 
     def initialize
       @types = {}
@@ -31,8 +28,7 @@ module RecordingStudioNotifications
     end
 
     def register(key, label:, description: nil, icon: nil, default_channels: nil, required_channels: [],
-                 available_channels: nil, allowed_cadences: [:every_notification],
-                 default_cadence: :every_notification, scope: :optional_root, category: :general,
+                 available_channels: nil, scope: :optional_root, category: :general,
                  creation_action: nil)
       normalized_key = normalize_key!(key)
       normalized_icon = normalize_icon(icon)
@@ -43,12 +39,6 @@ module RecordingStudioNotifications
       normalized_available = available_source.nil? ? nil : normalize_channels(available_source)
       normalized_scope = normalize_scope!(scope)
       normalized_category = normalize_category(category)
-      normalized_allowed_cadences = normalize_cadences!(allowed_cadences)
-      normalized_default_cadence = normalize_cadence!(default_cadence)
-
-      unless normalized_allowed_cadences.include?(normalized_default_cadence)
-        raise ArgumentError, "default cadence must be included in allowed cadences"
-      end
 
       normalized_required.each do |channel|
         unless normalized_available.include?(channel)
@@ -65,8 +55,6 @@ module RecordingStudioNotifications
         default_channels: normalized_default,
         required_channels: normalized_required,
         available_channels: normalized_available,
-        allowed_cadences: normalized_allowed_cadences,
-        default_cadence: normalized_default_cadence,
         scope: normalized_scope,
         creation_action: creation_action&.to_sym
       ).freeze
@@ -126,20 +114,6 @@ module RecordingStudioNotifications
       return normalized if SCOPES.include?(normalized)
 
       raise ArgumentError, "scope must be one of: #{SCOPES.join(', ')}"
-    end
-
-    def normalize_cadences!(cadences)
-      normalized = Array(cadences).map { |cadence| normalize_cadence!(cadence) }.uniq
-      raise ArgumentError, "allowed cadences must not be empty" if normalized.empty?
-
-      normalized
-    end
-
-    def normalize_cadence!(cadence)
-      normalized = normalize_key!(cadence)
-      return normalized if CADENCES.include?(normalized)
-
-      raise ArgumentError, "cadence must be one of: #{CADENCES.join(', ')}"
     end
 
     def normalize_key!(key)

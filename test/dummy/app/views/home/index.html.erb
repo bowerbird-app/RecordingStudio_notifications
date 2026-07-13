@@ -40,7 +40,7 @@
         <ol class="space-y-3 text-sm leading-6 list-decimal pl-5">
           <li>Open <code>bin/rails console</code>.</li>
           <li>Set <code>Current.actor = User.first</code>.</li>
-          <li>Call <code>RecordingStudioNotifications.notify(notification_type: :workspace_digest, recipient: User.first, title: "Digest ready", url: "/")</code>.</li>
+          <li>Call <code>RecordingStudioNotifications.notify(notification_type: :workspace_change, recipient: User.first, title: "Workspace updated", url: "/")</code>.</li>
           <li>Visit <code>/notifications</code> to view the in-app notification.</li>
         </ol>
       <% end %>

@@ -11,7 +11,6 @@ RecordingStudioNotifications is a Recording Studio addon Rails engine for root-a
 - Nullable `root_recording_id` for global/rootless notifications
 - Current-root inbox behavior that includes global/rootless notifications
 - Per-recipient settings for optional channels; required channels ignore preferences
-- Per-type delivery cadences with consolidated digest summaries and visibility-aware digest details
 - Accessible integration for root visibility, preference management, and optional creation authorization
 - ActiveSupport instrumentation for notification creation and delivery
 - FlatPack/Tailwind inbox and settings UI
@@ -71,37 +70,6 @@ Notification type scopes are:
 
 The top-nav notification menu loads asynchronously after page render and then polls for updates on `config.polling_interval_seconds` (default: 60 seconds).
 
-### Consolidated delivery
-
-Notification types default to `:every_notification`, preserving the established immediate-delivery behavior. Types may opt into a constrained set of recipient-selectable cadences:
-
-```ruby
-config.notification_types.register(
-  :page_comment,
-  label: "Page comment",
-  default_channels: [:in_app],
-  available_channels: [:in_app],
-  allowed_cadences: %i[every_notification daily weekly monthly],
-  default_cadence: :every_notification,
-  scope: :root
-)
-```
-
-For a consolidated cadence, new source events are collected into a digest. When it becomes due, the engine creates one ordinary inbox summary that opens the digest detail page. Pass `bypass_digest: true` to send an urgent event immediately.
-
-See the dummy app's `/docs/config` page for cadence windows, summary presentation, detail-page behavior, and local demo commands.
-
-## Upgrading
-
-After updating the gem, install and run the engine migrations before enabling a consolidated cadence:
-
-```bash
-bin/rails generate recording_studio_notifications:migrations
-bin/rails db:migrate
-```
-
-No existing notifications, deliveries, or channel preferences are rewritten. Existing notification types continue to deliver immediately because `:every_notification` is the default. During a rolling deploy, application code also falls back to that immediate behavior until the cadence-preference table is present; cadence controls appear after migrations have run.
-
 ## Usage
 
 ```ruby
@@ -123,8 +91,8 @@ Send the same notification to many recipients:
 ```ruby
 RecordingStudioNotifications.notify_each(
   recipients: users,
-  notification_type: :workspace_digest,
-  title: "Digest ready",
+  notification_type: :page_comment,
+  title: "New page comment",
   url: "/"
 )
 ```
@@ -158,7 +126,6 @@ The engine provides:
 - `/notifications` inbox (current-root view, including global/rootless notifications)
 - `/notifications/menu.json` async top-nav menu payload (unread count + recent notifications)
 - `/settings` notification channel preferences
-- `/digests/:id` delivered digest detail page
 
 Both views use FlatPack components and Tailwind utility classes only.
 

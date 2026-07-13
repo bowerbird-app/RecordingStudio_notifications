@@ -25,9 +25,9 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     get docs_install_path
     assert_response :success
     assert_select "h1", text: "Install"
-    assert_includes response.body, "Step 1"
-    assert_includes response.body, "Provide one section title for each step"
-    assert_includes response.body, "# Put the step instruction here."
+    assert_includes response.body, "1. Add the gem"
+    assert_includes response.body, "recording_studio_notifications"
+    assert_includes response.body, "bin/rails generate recording_studio_notifications:install"
   end
 
   test "config page renders successfully" do
@@ -37,9 +37,7 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "config.polling_interval_seconds = 60"
     assert_includes response.body, "polling_interval_seconds"
     assert_includes response.body, "Polling cadence in seconds for async notification menu refresh"
-    assert_includes response.body, "Digest Summary Presentation"
-    assert_includes response.body, '#{count} comments need your review'
-    assert_includes response.body, "five page-comment events in Studio Workspace"
+    assert_includes response.body, "Per-Recipient Channel Preferences"
   end
 
   test "recordable types page renders configured recordables dynamically" do
@@ -100,7 +98,7 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     get docs_gem_views_path
     assert_response :success
     assert_select "h1", text: "Gem Views"
-    assert_select "table", minimum: 1
+    assert_select "a[href*='/docs/gem_view?view=']", minimum: 1
     refute_includes response.body, "app/views/recording_studio_notifications/home/index.html.erb"
   end
 
@@ -109,10 +107,9 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", text: "Methods"
     assert_includes response.body, "Document the public methods your addon exposes."
-    assert_includes response.body, "Example method"
-    assert_includes response.body, "recordingstudio_addon.example_method"
-    assert_includes response.body, "# Explain what this method does before the example."
-    assert_includes response.body, "Provide one section title and codeblock for each method"
+    assert_includes response.body, ".for_recipient(recipient)"
+    assert_includes response.body, "RecordingStudioNotifications::Notification.for_recipient(user).newest_first"
+    assert_includes response.body, "#mark_read!"
   end
 
   test "sidebar includes documentation links" do

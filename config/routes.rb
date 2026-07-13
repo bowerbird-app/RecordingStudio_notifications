@@ -17,7 +17,5 @@ RecordingStudioNotifications::Engine.routes.draw do
     end
   end
 
-  resources :digests, only: :show
-
   root "notifications#index"
 end
