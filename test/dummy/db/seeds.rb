@@ -98,6 +98,17 @@ begin
     idempotency_key: "seed-system-announcement"
   )
 
+  50.times do |index|
+    RecordingStudioNotifications::Services::Notify.call(
+      notification_type: :system_announcement,
+      recipient: user,
+      actor: user,
+      title: "System announcement #{index + 1}",
+      body: "Seeded global system notification #{index + 1} of 50 for inbox pagination and layout testing.",
+      idempotency_key: "seed-system-announcement-#{index + 1}"
+    )
+  end
+
   100.times do |index|
     RecordingStudioNotifications::Services::Notify.call(
       notification_type: :workspace_change,

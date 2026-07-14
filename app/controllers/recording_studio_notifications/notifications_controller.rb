@@ -5,6 +5,7 @@ require "recording_studio_notifications/services/inbox_grouping"
 module RecordingStudioNotifications
   class NotificationsController < ApplicationController
     PER_PAGE = 25
+    GROUP_NOTIFICATIONS_PER_PAGE = 20
 
     layout "recording_studio_notifications/blank", only: :index
 
@@ -58,6 +59,25 @@ module RecordingStudioNotifications
       }
     end
 
+    def group_page
+      return unless authorize_notifications!(recipient: @recipient)
+
+      @inbox_scope = notifications_inbox_scope
+      @current_root_recording = current_notifications_root_recording
+      @group = visible_notification_group(params[:group_id])
+      return head :not_found unless @group
+
+      @group_page = current_group_page
+      offset = (@group_page - 1) * GROUP_NOTIFICATIONS_PER_PAGE
+      @group_notifications = @group.notifications.slice(offset, GROUP_NOTIFICATIONS_PER_PAGE) || []
+      @has_next_group_page = @group.notifications.size > offset + @group_notifications.size
+
+      respond_to do |format|
+        format.html
+        format.turbo_stream { head :not_acceptable }
+      end
+    end
+
     def show
       return unless authorize_notifications!(recipient: @recipient, notification: @notification)
       return if visible_notification?(@notification)
@@ -103,7 +123,20 @@ module RecordingStudioNotifications
         group.notifications.select(&:unread?).each { |notification| notification.mark_read! }
       end
 
-      redirect_back fallback_location: notifications_path, notice: "Notification group marked read."
+      respond_to do |format|
+        format.html do
+          redirect_back fallback_location: notifications_path, notice: "Notification group marked read."
+        end
+        format.turbo_stream do
+          updated_group = visible_notification_group(params[:group_id])
+
+          render turbo_stream: turbo_stream.replace(
+            notification_group_dom_id(updated_group),
+            partial: "recording_studio_notifications/notifications/group",
+            locals: { group: updated_group, index: 0 }
+          )
+        end
+      end
     end
 
     def archive
@@ -184,6 +217,11 @@ module RecordingStudioNotifications
       page.positive? ? page : 1
     end
 
+    def current_group_page
+      page = params[:page].to_i
+      page.positive? ? page : 1
+    end
+
     def menu_notification_payload(notification)
       MenuPayload.serialize(
         notification: notification,
@@ -206,6 +244,10 @@ module RecordingStudioNotifications
 
       visible = visible_notifications(scoped_notifications)
       grouped_notification_sections(visible).flat_map(&:groups).find { |group| group.id == group_id }
+    end
+
+    def notification_group_dom_id(group)
+      "#{group.id}-container"
     end
 
     # Override root-switch scope extraction so `scope=current_root` in the

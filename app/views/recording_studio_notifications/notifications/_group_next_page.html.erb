@@ -1,0 +1,7 @@
+<% next_page_params = request.query_parameters.except("format", "page").merge(page: page + 1) %>
+
+<%= turbo_frame_tag notification_group_next_page_dom_id(group, page + 1), src: (has_next_page ? group_page_notifications_path(group_id: group.id, **next_page_params) : nil), loading: (has_next_page ? :lazy : nil) do %>
+  <% if has_next_page %>
+    <div class="py-3 text-center text-xs text-(--surface-muted-content-color)">Loading more notifications...</div>
+  <% end %>
+<% end %>

@@ -6,6 +6,7 @@ RecordingStudioNotifications::Engine.routes.draw do
   resources :notifications, only: %i[index show] do
     collection do
       get :menu
+      get "groups/:group_id/page", action: :group_page, as: :group_page
       patch :mark_group_read
     end
 

@@ -25,6 +25,22 @@ module RecordingStudioNotifications
       notification_type_leading_icon(group.notification_type, unread: group.unread_count.positive?)
     end
 
+    def notification_group_dom_id(group)
+      "#{group.id}-container"
+    end
+
+    def notification_group_items_dom_id(group)
+      "#{group.id}-notifications"
+    end
+
+    def notification_group_next_page_dom_id(group, page)
+      "#{group.id}-next-page-#{page}"
+    end
+
+    def group_notifications_per_page
+      NotificationsController::GROUP_NOTIFICATIONS_PER_PAGE
+    end
+
     def notification_type_leading_icon(notification_type, unread: false)
       icon_classes = ["text-[var(--surface-muted-content-color)]"]
       icon_classes << "fp-red-dot" if unread

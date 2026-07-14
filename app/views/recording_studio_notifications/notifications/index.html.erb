@@ -21,7 +21,7 @@
   ) %>
 
   <% if @notification_sections.any? %>
-    <div id="notifications-list" class="flex flex-col gap-6">
+    <div id="notifications-list" class="flex flex-col">
       <%= render partial: "recording_studio_notifications/notifications/page", locals: { notification_sections: @notification_sections } %>
     </div>
 

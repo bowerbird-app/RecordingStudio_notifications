@@ -45,7 +45,7 @@ RecordingStudioNotifications.configure do |config|
     default_channels: [:in_app],
     available_channels: [:in_app],
     allowed_cadences: %i[individual daily weekly monthly],
-    default_cadence: :weekly,
+    default_cadence: :daily,
     scope: :optional_root
   )
 

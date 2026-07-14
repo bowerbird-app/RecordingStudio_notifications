@@ -179,6 +179,8 @@ class NotificationAcceptanceTest < Minitest::Test
                                            __dir__))
     page_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_page.html.erb",
                         __dir__))
+    group_partial = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_group.html.erb",
+                          __dir__))
     notification_partial = File.read(File.expand_path(
       "../app/views/recording_studio_notifications/notifications/_notification.html.erb", __dir__
     ))
@@ -194,12 +196,16 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, "@inbox_scope = notifications_inbox_scope"
     assert_includes controller, 'require "recording_studio_notifications/services/inbox_grouping"'
     assert_includes controller, "def menu"
+    assert_includes controller, "def group_page"
+    assert_includes controller, "GROUP_NOTIFICATIONS_PER_PAGE = 20"
     assert_includes controller, "def mark_group_read"
     assert_includes controller, "visible_notification_group(params[:group_id])"
     assert_includes controller, "group.notifications.select(&:unread?)"
+    assert_includes controller, "notification_group_dom_id(updated_group)"
     assert_includes controller, "@inbox_scope = \"all\""
     assert_includes controller, "polling_interval_seconds"
     assert_includes routes, "get :menu"
+    assert_includes routes, 'get "groups/:group_id/page", action: :group_page'
     assert_includes routes, "patch :mark_group_read"
     assert_includes controller, "def recording_studio_root_switchable_scope_key"
     assert_includes model, "for_current_root_inbox"
@@ -207,21 +213,30 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
     assert_includes application_controller, "actor || RecordingStudioNotifications.configuration.resolve_actor"
     assert_includes index_view, "icon: \"cog\""
+    assert_includes index_view, "id=\"notifications-list\" class=\"flex flex-col\""
+    refute_includes index_view, "id=\"notifications-list\" class=\"flex flex-col gap-6\""
     assert_includes page_view, "notification_sections.flat_map(&:groups)"
-    assert_includes page_view, "FlatPack::List::Component.new(spacing: :dense, class: \"space-y-0\")"
+    assert_includes page_view, "recording_studio_notifications/notifications/group"
     assert_includes page_view, "divide-y divide-(--surface-border-color)"
-    assert_includes page_view, "FlatPack::Accordion::Component.new"
-    assert_includes page_view, "left_slot: notification_group_leading_icon(group)"
-    assert_includes page_view, "group.notification_type_label"
-    assert_includes page_view, "group.period_label"
-    assert_includes page_view, "'unread' if unread"
-    assert_includes page_view, "[&_[data-flat-pack--accordion-target=trigger]]:bg-[var(--list-item-active-background-color)]"
-    assert_includes page_view, "[&_[data-flat-pack--accordion-target=trigger]]:min-h-[54px]"
-    assert_includes page_view, "!border-0"
+    assert_includes group_partial, "notification_group_dom_id(group)"
+    assert_includes group_partial, "FlatPack::List::Component.new(spacing: :dense, class: \"space-y-0\")"
+    assert_includes group_partial, "FlatPack::Accordion::Component.new"
+    assert_includes group_partial, "left_slot: notification_group_leading_icon(group)"
+    assert_includes group_partial, "group.notification_type_label"
+    assert_includes group_partial, "group.period_label"
+    assert_includes group_partial, "'unread' if unread"
+    assert_includes group_partial, "[&_[data-flat-pack--accordion-target=trigger]]:bg-[var(--list-item-active-background-color)]"
+    assert_includes group_partial, "[&_[data-flat-pack--accordion-target=trigger]]:min-h-[54px]"
+    assert_includes group_partial, "[&_[data-flat-pack--accordion-target=content][aria-expanded=true]]:!max-h-none"
+    assert_includes group_partial, "!border-0"
+    assert_includes group_partial, "group.notifications.first(group_notifications_per_page)"
+    assert_includes group_partial, "notifications/group_next_page"
     refute_includes page_view, "<h2"
     assert_includes notification_partial, "FlatPack::Timestamp::Component.new("
     assert_includes notification_partial, "shorten_timestamp: true"
     assert_includes notifications_helper, "fp-red-dot"
+    assert_includes notifications_helper, "def notification_group_next_page_dom_id(group, page)"
+    assert_includes notifications_helper, "NotificationsController::GROUP_NOTIFICATIONS_PER_PAGE"
     assert_includes index_view, "notification_sections"
     refute_includes index_view, "inbox_scope: :all"
     refute_includes index_view, "inbox_scope: :current_root"
