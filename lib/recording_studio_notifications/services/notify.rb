@@ -210,6 +210,7 @@ module RecordingStudioNotifications
 
       def effective_cadence
         @effective_cadence ||= begin
+          return :individual unless RecordingStudioNotifications.configuration.rollup_delivery_enabled
           return type_definition.required_cadence if type_definition.required_cadence
           return type_definition.default_cadence unless preference_table_available?
 

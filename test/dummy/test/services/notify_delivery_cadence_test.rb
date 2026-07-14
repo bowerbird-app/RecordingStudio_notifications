@@ -184,6 +184,23 @@ class NotifyDeliveryCadenceTest < ActiveSupport::TestCase
     end
   end
 
+  test "disabled rollups deliver non-individual cadence notifications immediately" do
+    RecordingStudioNotifications.configuration.rollup_delivery_enabled = false
+
+    notification = RecordingStudioNotifications.notify(
+      notification_type: :grouped_delivery_test,
+      recipient: @recipient,
+      title: "Immediate while rollups are disabled",
+      deliver_later: false
+    )
+    delivery = notification.deliveries.sole
+
+    assert delivery.delivered?
+    refute delivery.deferred_rollup?
+    assert_nil delivery.metadata["rollup_key"]
+    assert_equal [[notification.id, delivery.id]], @adapter.calls
+  end
+
   test "grouped external delivery requires a rollup-capable adapter" do
     RecordingStudioNotifications.channels.register(:immediate_only_test, ImmediateOnlyAdapter.new)
     register_type(

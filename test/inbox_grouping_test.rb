@@ -24,6 +24,7 @@ class InboxGroupingTest < Minitest::Test
       allowed_cadences: %i[individual monthly],
       default_cadence: :monthly
     )
+    RecordingStudioNotifications.configuration.rollup_delivery_enabled = true
   end
 
   def teardown
@@ -58,6 +59,23 @@ class InboxGroupingTest < Minitest::Test
     assert_equal 2, groups.size
     assert groups.all?(&:individual?)
     assert_equal [1, 1], groups.map { |group| group.notifications.size }
+  end
+
+  def test_disabled_rollups_force_individual_inbox_groups
+    RecordingStudioNotifications.configuration.rollup_delivery_enabled = false
+    notifications = [
+      notification(id: "1", type: :page_comment, at: Time.utc(2026, 7, 13, 12)),
+      notification(id: "2", type: :page_comment, at: Time.utc(2026, 7, 13, 11))
+    ]
+
+    groups = RecordingStudioNotifications::Services::InboxGrouping.new(
+      recipient: Object.new,
+      notifications: notifications,
+      time_zone: "UTC"
+    ).call.first.groups
+
+    assert_equal 2, groups.size
+    assert groups.all?(&:individual?)
   end
 
   def test_stable_two_day_and_biweekly_periods_use_fixed_anchors

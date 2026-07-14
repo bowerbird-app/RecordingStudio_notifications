@@ -8,6 +8,9 @@ RecordingStudioNotifications.configure do |config|
     controller.send(:current_root_recording) if controller.respond_to?(:current_root_recording, true)
   end
 
+  # Enable grouped cadence behavior in the dummy app, including in-app digest grouping.
+  config.rollup_delivery_enabled = true
+
   config.notification_types.register(
     :workspace_change,
     label: "Workspace change",

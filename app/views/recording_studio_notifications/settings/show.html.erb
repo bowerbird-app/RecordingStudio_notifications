@@ -57,7 +57,7 @@
                     searchable: false,
                     value: @selected_cadences.fetch(type.key)
                   ) %>
-                <% elsif type.required_cadence.present? %>
+                <% elsif rollup_delivery_enabled? && type.required_cadence.present? %>
                   <p class="text-sm text-(--surface-muted-content-color)">
                     Notification cadence: <%= type.required_cadence.to_s.humanize %>. This cadence is required for <%= type.label.downcase %>.
                   </p>

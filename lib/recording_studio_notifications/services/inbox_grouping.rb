@@ -96,6 +96,7 @@ module RecordingStudioNotifications
 
       def effective_cadence_for(notification, type)
         return :individual unless type.respond_to?(:default_cadence)
+        return :individual unless RecordingStudioNotifications.configuration.rollup_delivery_enabled
 
         Preference.cadence_for(
           recipient: @recipient,

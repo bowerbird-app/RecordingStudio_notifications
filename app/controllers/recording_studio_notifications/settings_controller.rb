@@ -4,7 +4,7 @@ module RecordingStudioNotifications
   class SettingsController < ApplicationController
     layout "recording_studio_notifications/blank"
 
-    helper_method :channel_configurable?, :cadence_selectable?
+    helper_method :channel_configurable?, :cadence_selectable?, :rollup_delivery_enabled?
 
     before_action :set_recipient
     before_action :authorize_settings
@@ -57,7 +57,7 @@ module RecordingStudioNotifications
       RecordingStudioNotifications.notification_types.values.select do |type|
         next false if type.key == :generic
 
-        channel_configurable?(type) || cadence_selectable?(type) || type.required_cadence.present?
+        channel_configurable?(type) || (rollup_delivery_enabled? && (cadence_selectable?(type) || type.required_cadence.present?))
       end
     end
 
@@ -183,7 +183,11 @@ module RecordingStudioNotifications
     end
 
     def cadence_selectable?(type)
-      type.required_cadence.nil? && type.allowed_cadences.size > 1
+      rollup_delivery_enabled? && type.required_cadence.nil? && type.allowed_cadences.size > 1
+    end
+
+    def rollup_delivery_enabled?
+      RecordingStudioNotifications.configuration.rollup_delivery_enabled
     end
 
   end
