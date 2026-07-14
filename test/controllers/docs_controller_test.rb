@@ -28,6 +28,10 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "1. Add the gem"
     assert_includes response.body, "recording_studio_notifications"
     assert_includes response.body, "bin/rails generate recording_studio_notifications:install"
+    assert_includes response.body, "/recording_studio_notifications"
+    assert_includes response.body, "--mount-path=/notifications"
+    assert_includes response.body, "bin/rails tailwindcss:build"
+    assert_includes response.body, "bin/rails generate recording_studio_notifications:migrations"
   end
 
   test "config page renders successfully" do
@@ -42,6 +46,16 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "allowed_cadences:"
     assert_includes response.body, "recording_studio_notifications:deliver_rollups"
     assert_includes response.body, "deliver_rollup"
+    assert_includes response.body, "an empty list permits no absolute hosts"
+    assert_includes response.body, "always persisted without a root recording"
+    assert_includes response.body, "first 20 source notifications"
+    assert_includes response.body, "under the engine mount path"
+    assert_includes response.body, "all notifications deliver and display individually"
+    assert_includes response.body, "including the in-app channel"
+    assert_includes response.body, "Crash-recovery timeout for rollups stuck in progress"
+    assert_includes response.body, "without waiting for this timeout"
+    assert_includes response.body, "<th class=\"py-2 pr-4 font-semibold\">Default</th>"
+    assert_includes response.body, "[:individual]"
   end
 
   test "recordable types page renders configured recordables dynamically" do
@@ -110,10 +124,16 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     get docs_methods_path
     assert_response :success
     assert_select "h1", text: "Methods"
-    assert_includes response.body, "Document the public methods your addon exposes."
+    assert_includes response.body, "Public APIs for creating, querying, grouping, and managing notifications."
+    assert_includes response.body, ".notify(**attributes)"
+    assert_includes response.body, ".notify_each(recipients:, **attributes)"
+    assert_includes response.body, ".register_notification_type(...) / .register_channel(...)"
     assert_includes response.body, ".for_recipient(recipient)"
     assert_includes response.body, "RecordingStudioNotifications::Notification.for_recipient(user).newest_first"
     assert_includes response.body, "#mark_read!"
+    assert_includes response.body, "#notification_type_definition"
+    assert_includes response.body, "Preference.cadence_for / .set_cadence!"
+    assert_includes response.body, "Delivery status methods"
   end
 
   test "sidebar includes documentation links" do

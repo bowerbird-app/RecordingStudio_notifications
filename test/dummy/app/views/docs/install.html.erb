@@ -31,7 +31,7 @@
 
   <%= render FlatPack::SectionTitle::Component.new(
     title: "3. Run the install generator",
-    subtitle: "Mounts the engine, creates a configuration initializer, and sets up Tailwind sources.",
+    subtitle: "Mounts the engine at /recording_studio_notifications by default, creates a configuration initializer, and configures Tailwind sources when detected.",
   ) %>
 
   <%= render FlatPack::CodeBlock::Component.new(
@@ -40,6 +40,8 @@
       bin/rails generate recording_studio_notifications:install
     CODE
   ) %>
+
+  <p class="text-sm">To use a different route, pass <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">--mount-path</code> when running the generator, for example <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">--mount-path=/notifications</code>.</p>
 
   <%= render FlatPack::SectionTitle::Component.new(
     title: "4. Install and run migrations",
@@ -55,7 +57,19 @@
   ) %>
 
   <%= render FlatPack::SectionTitle::Component.new(
-    title: "5. Verify",
+    title: "5. Build Tailwind CSS (if applicable)",
+    subtitle: "Rebuild styles after the generator adds its Tailwind source directives.",
+  ) %>
+
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :bash,
+    code: <<~CODE
+      bin/rails tailwindcss:build
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "6. Verify",
     subtitle: "Start your server and visit the mounted engine path to confirm everything is wired up.",
   ) %>
 
@@ -63,7 +77,7 @@
     language: :bash,
     code: <<~CODE
       bin/rails server
-      # Visit http://localhost:3000/notifications
+      # Visit http://localhost:3000/recording_studio_notifications
     CODE
   ) %>
 
@@ -82,7 +96,17 @@
           CODE
         ) %>
 
-        <p class="text-sm">Optionally create <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">config/initializers/recording_studio_notifications.rb</code> for configuration. See the <%= link_to "Configuration page", docs_config_path, class: "underline" %> for available options.</p>
+        <p class="text-sm">Create <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">config/initializers/recording_studio_notifications.rb</code>, register the notification types your app emits, then copy and run the engine migrations.</p>
+
+        <%= render FlatPack::CodeBlock::Component.new(
+          language: :bash,
+          code: <<~CODE
+            bin/rails generate recording_studio_notifications:migrations
+            bin/rails db:migrate
+          CODE
+        ) %>
+
+        <p class="text-sm">If your app uses Tailwind, add the engine and FlatPack <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">@source</code> directives to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">app/assets/tailwind/application.css</code>, then run <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">bin/rails tailwindcss:build</code>. See the <%= link_to "Configuration page", docs_config_path, class: "underline" %> for initializer options.</p>
       </div>
     <% end %>
   <% end %>

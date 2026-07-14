@@ -41,7 +41,8 @@
         # Notification menu polling interval in seconds
         config.polling_interval_seconds = 60
 
-        # Keep scheduled rollup delivery disabled until adapters and a scheduler are configured.
+        # Disable all cadence rollups: notifications deliver and display individually.
+        # Enable only after configuring rollup-capable adapters and a recurring scheduler.
         config.rollup_delivery_enabled = false
         config.rollup_reservation_timeout = 15.minutes
       end
@@ -80,7 +81,7 @@
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">allowed_url_hosts</code></td>
           <td class="py-2 pr-4"><code class="text-xs">Array</code></td>
           <td class="py-2 pr-4"><code class="text-xs">[]</code></td>
-          <td class="py-2">Hosts allowed for notification redirect URLs. Empty means all hosts allowed.</td>
+          <td class="py-2">Hosts allowed for absolute HTTP(S) notification redirect URLs. Relative paths are always allowed; an empty list permits no absolute hosts.</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_channels</code></td>
@@ -116,13 +117,13 @@
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">rollup_delivery_enabled</code></td>
           <td class="py-2 pr-4"><code class="text-xs">Boolean</code></td>
           <td class="py-2 pr-4"><code class="text-xs">false</code></td>
-          <td class="py-2">Enables scheduled delivery of completed external notification rollups after adapters and a recurring scheduler are ready.</td>
+          <td class="py-2">Enables configured cadence rollups. When false, all notifications deliver and display individually, including the in-app channel; when true, non-individual cadences enable inbox digest grouping and scheduled external rollups.</td>
         </tr>
         <tr>
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">rollup_reservation_timeout</code></td>
           <td class="py-2 pr-4"><code class="text-xs">ActiveSupport::Duration</code></td>
           <td class="py-2 pr-4"><code class="text-xs">15.minutes</code></td>
-          <td class="py-2">Returns interrupted rollup reservations to the pending queue for a later scheduler retry.</td>
+          <td class="py-2">Crash-recovery timeout for rollups stuck in progress: after this interval, a later scheduler run returns them to pending. Explicitly failed rollups are eligible to retry on the next scheduler run without waiting for this timeout.</td>
         </tr>
       </tbody>
     </table>
@@ -191,6 +192,7 @@
         <tr class="border-b border-slate-200">
           <th class="py-2 pr-4 font-semibold">Parameter</th>
           <th class="py-2 pr-4 font-semibold">Required</th>
+          <th class="py-2 pr-4 font-semibold">Default</th>
           <th class="py-2 font-semibold">Description</th>
         </tr>
       </thead>
@@ -198,66 +200,79 @@
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">key</code> (first arg)</td>
           <td class="py-2 pr-4">Yes</td>
+          <td class="py-2 pr-4">—</td>
           <td class="py-2">Symbol key used when calling notify (e.g., <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:page_comment</code>).</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">label:</code></td>
           <td class="py-2 pr-4">Yes</td>
+          <td class="py-2 pr-4">—</td>
           <td class="py-2">Human-readable label shown in the UI.</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">description:</code></td>
           <td class="py-2 pr-4">No</td>
+          <td class="py-2 pr-4"><code class="text-xs">nil</code></td>
           <td class="py-2">Optional longer description for admin/settings views.</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">category:</code></td>
           <td class="py-2 pr-4">No</td>
+          <td class="py-2 pr-4"><code class="text-xs">:general</code></td>
           <td class="py-2">Preference grouping key used in settings sections (for example <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:page</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:workspace</code>). Defaults to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:general</code>.</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">icon:</code></td>
           <td class="py-2 pr-4">No</td>
+          <td class="py-2 pr-4"><code class="text-xs">:bell</code></td>
           <td class="py-2">Heroicons v2 icon name used in the FlatPack notification menu. Defaults to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:bell</code>.</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_channels:</code></td>
           <td class="py-2 pr-4">No</td>
+          <td class="py-2 pr-4"><code class="text-xs">nil</code></td>
           <td class="py-2">Channels a recipient gets by default if they have no preference. Defaults to config.default_channels.</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">required_channels:</code></td>
           <td class="py-2 pr-4">No</td>
+          <td class="py-2 pr-4"><code class="text-xs">[]</code></td>
           <td class="py-2">Channels that MUST be delivered regardless of recipient preferences (e.g., system-wide in-app).</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">available_channels:</code></td>
           <td class="py-2 pr-4">No</td>
+          <td class="py-2 pr-4"><code class="text-xs">nil</code></td>
           <td class="py-2">All channels this type can use. Defaults to default_channels + required_channels.</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">allowed_cadences:</code></td>
           <td class="py-2 pr-4">No</td>
+          <td class="py-2 pr-4"><code class="text-xs">[:individual]</code></td>
           <td class="py-2">Cadences a recipient may select. Supported values are <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:individual</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:daily</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:every_other_day</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:weekly</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:biweekly</code>, and <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:monthly</code>.</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_cadence:</code></td>
           <td class="py-2 pr-4">No</td>
+          <td class="py-2 pr-4"><code class="text-xs">:individual</code></td>
           <td class="py-2">Cadence used when a recipient has no override. Defaults to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:individual</code>.</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">required_cadence:</code></td>
           <td class="py-2 pr-4">No</td>
+          <td class="py-2 pr-4"><code class="text-xs">nil</code></td>
           <td class="py-2">Forces one cadence for the type and takes precedence over recipient preferences.</td>
         </tr>
         <tr class="border-b border-slate-100">
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">scope:</code></td>
           <td class="py-2 pr-4">No</td>
+          <td class="py-2 pr-4"><code class="text-xs">:optional_root</code></td>
           <td class="py-2">One of <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:root</code>, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:global</code>, or <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code>. Default: <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code>.</td>
         </tr>
         <tr>
           <td class="py-2 pr-4"><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">creation_action:</code></td>
           <td class="py-2 pr-4">No</td>
+          <td class="py-2 pr-4"><code class="text-xs">nil</code></td>
           <td class="py-2">Optional RecordingStudioAccessible action symbol. If set, the actor is authorized via Accessible before creating the notification.</td>
         </tr>
       </tbody>
@@ -269,7 +284,7 @@
     <li>Icons come from Heroicons v2 names, passed as symbols like <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:bell</code> or <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:chat_bubble_left_ellipsis</code>.</li>
     <li>If you omit <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">icon:</code>, the registry defaults to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:bell</code>.</li>
     <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:root</code> — A <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">root_recording</code> must be provided.</li>
-    <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:global</code> — Must NOT have a root recording (or notifiable/recording).</li>
+    <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:global</code> — Is always persisted without a root recording or Recording Studio recording, even if one is supplied.</li>
     <li><code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:optional_root</code> — Either is allowed. Global notifications appear alongside root-scoped ones in the inbox.</li>
   </ul>
 
@@ -279,13 +294,15 @@
   ) %>
 
   <ul class="list-disc space-y-2 pl-6 text-sm">
+    <li>Set <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">rollup_delivery_enabled</code> to <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">true</code> before any non-individual cadence takes effect. While it is false, every channel, including <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">:in_app</code>, delivers and displays notifications individually.</li>
     <li><strong>Individual</strong> notifications retain immediate, per-notification delivery and display as single inbox rows.</li>
     <li><strong>Daily, every-other-day, weekly, biweekly, and monthly</strong> cadence types retain individual source records but group them into an inbox accordion for their local period.</li>
+    <li>Digest accordions render the first 20 source notifications. Opening a large digest loads later 20-item batches automatically as the reader scrolls, without reloading the inbox.</li>
     <li>The effective cadence is <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">required_cadence</code>, then the recipient override, then <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_cadence</code>.</li>
     <li>The notification settings page lets recipients choose allowed cadences. Selecting a type's default removes its override; a required cadence cannot be changed.</li>
   </ul>
 
-  <p class="text-sm">Grouped external channels are delivered once the period closes. The in-app channel stays available immediately because the source notifications already appear in their inbox group.</p>
+  <p class="text-sm">When rollups are enabled, grouped external channels are delivered once the period closes. The in-app channel stays available immediately because the source notifications already appear in their inbox group.</p>
 
   <%= render FlatPack::CodeBlock::Component.new(
     language: :ruby,
@@ -515,7 +532,7 @@
     <li><strong>Optional channels</strong> check the recipient's preference. If no preference exists, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">default_channels</code> from the type registration is used.</li>
   </ol>
 
-  <p class="text-sm">Users manage their per-type preferences from the settings page at <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">/notifications/settings</code>.</p>
+  <p class="text-sm">Users manage their per-type preferences from the settings page at <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">/settings</code> under the engine mount path (for example, <code class="rounded bg-slate-100 px-1 py-0.5 text-xs">/notifications/settings</code>).</p>
 
   <%= render FlatPack::SectionTitle::Component.new(
     title: "Using Hooks to Trigger Notifications",

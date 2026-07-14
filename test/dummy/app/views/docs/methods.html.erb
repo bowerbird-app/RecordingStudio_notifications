@@ -1,8 +1,57 @@
 <div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Methods",
-    subtitle: "Document the public methods your addon exposes.",
+    subtitle: "Public APIs for creating, querying, grouping, and managing notifications.",
     variant: :h1
+  ) %>
+
+  <%# --- Public API --- %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".notify(**attributes)",
+    subtitle: "Create one notification, its channel deliveries, and immediate delivery work when applicable.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      RecordingStudioNotifications.notify(
+        notification_type: :page_comment,
+        recipient: user,
+        title: "New comment",
+        url: "/pages/42",
+        idempotency_key: "comment-42-user-#{user.id}"
+      )
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".notify_each(recipients:, **attributes)",
+    subtitle: "Create the same notification for each recipient and return the resulting notification records.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications.notify_each(recipients: workspace_members, notification_type: :workspace_change, title: \"Workspace updated\")"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".register_notification_type(...) / .register_channel(...)",
+    subtitle: "Convenience APIs for registering notification type metadata and channel adapters.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      RecordingStudioNotifications.register_notification_type(:task_assigned, label: "Task assigned")
+      RecordingStudioNotifications.register_channel(:email, NotificationChannels::EmailAdapter.new)
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".configuration / .notification_types / .channels",
+    subtitle: "Access the active configuration, registered notification types, and registered channel adapters.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications.notification_types.fetch(:page_comment)"
   ) %>
 
   <%# --- Scopes --- %>
@@ -187,6 +236,55 @@
   <%= render FlatPack::CodeBlock::Component.new(
     language: :ruby,
     code: "notification.notification_type_key"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#notification_type_definition",
+    subtitle: "Returns the registered notification type metadata, including its label, scope, channels, and cadence settings.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.notification_type_definition"
+  ) %>
+
+  <%# --- Preferences and deliveries --- %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Preference.enabled_for? / .set!",
+    subtitle: "Read or save a recipient's optional channel preference for a notification type.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      RecordingStudioNotifications::Preference.set!(
+        recipient: user,
+        notification_type: :page_comment,
+        channel: :email,
+        enabled: true
+      )
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Preference.cadence_for / .set_cadence!",
+    subtitle: "Read or save a recipient's cadence selection. Cadence behavior takes effect only when rollup delivery is enabled.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Preference.set_cadence!(recipient: user, notification_type: :page_comment, cadence: :daily)"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Delivery status methods",
+    subtitle: "Inspect or update the delivery state for one notification channel.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      delivery.pending?
+      delivery.mark_delivered!
+      delivery.mark_failed!(error)
+    CODE
   ) %>
 
   <p class="text-sm text-(--body-muted-content-color)">
