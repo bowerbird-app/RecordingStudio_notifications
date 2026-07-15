@@ -36,10 +36,8 @@ module RecordingStudioNotifications
 
       visible = visible_notifications(scoped_notifications)
       limit = normalized_menu_limit
-      recent_groups = grouped_notification_sections(visible).flat_map(&:groups)
-        .sort_by { |group| [group.latest_notification.created_at, group.id] }
-        .reverse
-        .first(limit)
+      groups = grouped_notification_sections(visible).flat_map(&:groups)
+      recent_groups = groups.sort_by { |group| [group.latest_notification.created_at, group.id] }.reverse.first(limit)
       payload = recent_groups.map { |group| menu_group_payload(group) }
       unread_count = visible.count(&:unread?)
 
@@ -120,7 +118,7 @@ module RecordingStudioNotifications
       return head :not_found unless group
 
       Notification.transaction do
-        group.notifications.select(&:unread?).each { |notification| notification.mark_read! }
+        group.notifications.select(&:unread?).each(&:mark_read!)
       end
 
       respond_to do |format|

@@ -16,10 +16,9 @@ module RecordingStudioNotifications
 
       def serialize_group(group:, href: nil, child_href_resolver: nil)
         latest_notification = group.latest_notification
-        child_href_resolver ||= ->(_notification) { nil }
 
         children = group.notifications.map do |notification|
-          serialize(notification: notification, href: child_href_resolver.call(notification))
+          serialize(notification: notification, href: child_href_resolver&.call(notification))
         end
 
         serialize(notification: latest_notification, href: href).merge(
