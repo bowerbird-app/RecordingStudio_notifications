@@ -48,7 +48,7 @@ module RecordingStudioNotifications
       private
 
       def same_actor_and_recipient?
-        @recipient && @actor.class.name == @recipient.class.name && @actor.id.to_s == @recipient.id.to_s
+        @recipient && @actor.instance_of?(@recipient.class) && @actor.id.to_s == @recipient.id.to_s
       end
 
       def accessible_action_available?

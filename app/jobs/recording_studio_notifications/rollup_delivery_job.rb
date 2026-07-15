@@ -27,10 +27,10 @@ module RecordingStudioNotifications
     def reserve_rollup!(rollup_key, now)
       Delivery.transaction do
         deliveries = Delivery.retryable_rollups
-          .where("metadata ->> 'rollup_key' = ?", rollup_key)
-          .lock
-          .to_a
-          .select { |delivery| period_closed?(delivery, now) }
+                             .where("metadata ->> 'rollup_key' = ?", rollup_key)
+                             .lock
+                             .to_a
+                             .select { |delivery| period_closed?(delivery, now) }
         return [] if deliveries.empty?
 
         deliveries.each { |delivery| delivery.reserve_rollup!(at: now) }
@@ -66,8 +66,8 @@ module RecordingStudioNotifications
       end
 
       Delivery.transaction { deliveries.each(&:mark_delivered!) }
-    rescue StandardError => error
-      Delivery.transaction { deliveries.each { |delivery| delivery.mark_failed!(error) } } if deliveries
+    rescue StandardError => e
+      Delivery.transaction { deliveries.each { |delivery| delivery.mark_failed!(e) } } if deliveries
       raise if RecordingStudioNotifications.configuration.raise_on_delivery_error
     end
 

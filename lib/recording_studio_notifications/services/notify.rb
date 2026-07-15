@@ -67,16 +67,25 @@ module RecordingStudioNotifications
         raise ArgumentError, "recipient is required" unless @recipient
         raise ArgumentError, "title is required" if @title.to_s.blank?
         raise ArgumentError, "notification_type is not registered" unless type_definition
-        raise ArgumentError, "root_recording is required" if type_definition.scope == :root && resolved_root_recording.blank?
+
+        if type_definition.scope == :root && resolved_root_recording.blank?
+          raise ArgumentError,
+                "root_recording is required"
+        end
         raise ArgumentError, "root_recording does not match recording or notifiable" unless consistent_root_scope?
         raise ArgumentError, "at least one channel is required" if channel_keys.empty?
 
-        unregistered_channel = channel_keys.find { |channel| !RecordingStudioNotifications.channels.registered?(channel) }
+        unregistered_channel = channel_keys.find do |channel|
+          !RecordingStudioNotifications.channels.registered?(channel)
+        end
         raise ArgumentError, "channel is not registered: #{unregistered_channel}" if unregistered_channel
 
         if type_definition.available_channels
           unavailable_channel = channel_keys.find { |channel| !type_definition.available_channels.include?(channel) }
-          raise ArgumentError, "channel is not available for #{@notification_type}: #{unavailable_channel}" if unavailable_channel
+          if unavailable_channel
+            raise ArgumentError,
+                  "channel is not available for #{@notification_type}: #{unavailable_channel}"
+          end
         end
 
         unsupported_rollup_channel = channel_keys.find do |channel|

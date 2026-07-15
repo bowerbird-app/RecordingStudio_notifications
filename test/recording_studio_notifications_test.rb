@@ -48,7 +48,9 @@ class RecordingStudioNotificationsTest < Minitest::Test
     routes = File.read(File.expand_path("dummy/config/routes.rb", __dir__))
     initializer = File.read(File.expand_path("dummy/config/initializers/recording_studio_notifications.rb", __dir__))
     controllers_index = File.read(File.expand_path("dummy/app/javascript/controllers/index.js", __dir__))
-    polling_controller = File.read(File.expand_path("dummy/app/javascript/controllers/notification_polling_controller.js", __dir__))
+    polling_controller = File.read(File.expand_path(
+                                     "dummy/app/javascript/controllers/notification_polling_controller.js", __dir__
+                                   ))
 
     assert_includes routes, "mount RecordingStudioNotifications::Engine"
     assert_includes initializer, "config.notification_types.register"

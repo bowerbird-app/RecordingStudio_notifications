@@ -26,7 +26,7 @@ module RecordingStudioNotifications
     scope :for_root_recording, ->(recording) { where(root_recording: recording) }
     scope :rootless_or_global, -> { where(root_recording_id: nil) }
     scope :of_type, ->(type) { where(notification_type: type.to_s) }
-    scope :for_current_root_inbox, ->(root_recording) {
+    scope :for_current_root_inbox, lambda { |root_recording|
       root_recording ? where(root_recording_id: [nil, root_recording.id]) : rootless_or_global
     }
 

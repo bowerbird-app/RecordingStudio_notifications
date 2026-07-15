@@ -8,7 +8,8 @@ module RecordingStudioNotifications
 
     validates :recipient, :notification_type, presence: true
     validates :enabled, inclusion: { in: [true, false] }, if: :channel_preference?
-    validates :channel, uniqueness: { scope: %i[recipient_type recipient_id notification_type] }, if: :channel_preference?
+    validates :channel, uniqueness: { scope: %i[recipient_type recipient_id notification_type] },
+                        if: :channel_preference?
     validate :registered_notification_type
     validate :valid_preference_shape
     validate :available_optional_channel

@@ -7,8 +7,8 @@ require_relative "channel_registry"
 module RecordingStudioNotifications
   class Configuration
     attr_accessor :actor_resolver, :current_root_resolver, :allowed_url_hosts, :default_channels,
-          :deliver_later, :queue_name, :raise_on_delivery_error, :polling_interval_seconds,
-            :rollup_reservation_timeout, :rollup_delivery_enabled
+                  :deliver_later, :queue_name, :raise_on_delivery_error, :polling_interval_seconds,
+                  :rollup_reservation_timeout, :rollup_delivery_enabled
     attr_reader :hooks, :notification_types, :channels
 
     def initialize

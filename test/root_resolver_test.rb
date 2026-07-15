@@ -16,9 +16,7 @@ class RootResolverTest < Minitest::Test
         recording.root || recording
       end
 
-      define_singleton_method(:root_recording_for) do |recordable|
-        recordable.root
-      end
+      define_singleton_method(:root_recording_for, &:root)
     end
     Object.const_set(:RecordingStudio, recording_studio)
   end

@@ -54,7 +54,6 @@ module RecordingStudioNotifications
         default_sort :created_at, direction: :desc
         paginate per_page: 50
       end
-
     end
   end
 end

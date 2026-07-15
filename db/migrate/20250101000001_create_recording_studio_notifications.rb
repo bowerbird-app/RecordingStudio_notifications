@@ -34,7 +34,7 @@ class CreateRecordingStudioNotifications < ActiveRecord::Migration[8.1]
     add_index :recording_studio_notifications_notifications, %i[root_recording_id created_at],
               name: "idx_rsn_notifications_root_created"
     add_index :recording_studio_notifications_notifications, :recording_id,
-          name: "idx_rsn_notifications_recording"
+              name: "idx_rsn_notifications_recording"
 
     create_table :recording_studio_notifications_deliveries, id: :uuid, default: -> { "gen_random_uuid()" } do |t|
       t.uuid :notification_id, null: false
@@ -48,7 +48,7 @@ class CreateRecordingStudioNotifications < ActiveRecord::Migration[8.1]
     end
 
     add_index :recording_studio_notifications_deliveries, %i[notification_id channel], unique: true,
-              name: "idx_rsn_deliveries_notification_channel"
+                                                                                       name: "idx_rsn_deliveries_notification_channel"
     add_index :recording_studio_notifications_deliveries, %i[channel status],
               name: "idx_rsn_deliveries_channel_status"
     add_foreign_key :recording_studio_notifications_deliveries,

@@ -3,7 +3,7 @@
 module RecordingStudioNotifications
   class NotifyJob < ApplicationJob
     def perform(attributes)
-      RecordingStudioNotifications.notify(**attributes.symbolize_keys.merge(deliver_later: false))
+      RecordingStudioNotifications.notify(**attributes.symbolize_keys, deliver_later: false)
     end
   end
 end

@@ -21,11 +21,14 @@ module RecordingStudioNotifications
       end
 
       def copy_initializer
-        template "recording_studio_notifications_initializer.rb", "config/initializers/recording_studio_notifications.rb"
+        template "recording_studio_notifications_initializer.rb",
+                 "config/initializers/recording_studio_notifications.rb"
       end
 
       def add_yaml_config
-        return unless yes?("Would you like to add `config/recording_studio_notifications.yml` for environment-specific settings? [y/N]")
+        unless yes?("Would you like to add `config/recording_studio_notifications.yml` for environment-specific settings? [y/N]")
+          return
+        end
 
         template "recording_studio_notifications.yml", "config/recording_studio_notifications.yml"
       end

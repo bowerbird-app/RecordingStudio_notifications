@@ -58,7 +58,7 @@ class InboxGroupingTest < Minitest::Test
 
     assert_equal 2, groups.size
     assert groups.all?(&:individual?)
-    assert_equal [1, 1], groups.map { |group| group.notifications.size }
+    assert_equal([1, 1], groups.map { |group| group.notifications.size })
   end
 
   def test_disabled_rollups_force_individual_inbox_groups
@@ -99,7 +99,8 @@ class InboxGroupingTest < Minitest::Test
   def test_group_heading_derives_unread_state_from_source_notifications
     notifications = [
       notification(id: "1", type: :page_comment, at: Time.utc(2026, 7, 13, 12)),
-      FakeNotification.new(id: "2", notification_type: "page_comment", created_at: Time.utc(2026, 7, 13, 11), read_at: Time.utc(2026, 7, 13, 12))
+      FakeNotification.new(id: "2", notification_type: "page_comment", created_at: Time.utc(2026, 7, 13, 11),
+                           read_at: Time.utc(2026, 7, 13, 12))
     ]
 
     group = grouping(notifications, cadence: :daily).call.first.groups.first

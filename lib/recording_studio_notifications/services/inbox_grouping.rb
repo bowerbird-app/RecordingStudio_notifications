@@ -41,7 +41,7 @@ module RecordingStudioNotifications
           when :monthly
             start_date.strftime("%b %Y")
           else
-            "#{start_date.strftime("%b %-d")} – #{end_date.strftime("%b %-d")}"
+            "#{start_date.strftime('%b %-d')} – #{end_date.strftime('%b %-d')}"
           end
         end
 
@@ -83,13 +83,14 @@ module RecordingStudioNotifications
         end
 
         grouped_notifications.values
-          .group_by(&:notification_type)
-          .map do |type, groups|
-            sorted_groups = groups.sort_by { |group| [group.latest_notification.created_at, group.id] }.reverse
-            Section.new(notification_type: type, label: sorted_groups.first.notification_type_label, groups: sorted_groups)
-          end
+                             .group_by(&:notification_type)
+                             .map do |type, groups|
+          sorted_groups = groups.sort_by { |group| [group.latest_notification.created_at, group.id] }.reverse
+          Section.new(notification_type: type, label: sorted_groups.first.notification_type_label,
+                      groups: sorted_groups)
+        end
           .sort_by { |section| [section.groups.first.latest_notification.created_at, section.notification_type.to_s] }
-          .reverse
+                             .reverse
       end
 
       private

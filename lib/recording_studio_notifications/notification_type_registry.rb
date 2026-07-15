@@ -40,7 +40,12 @@ module RecordingStudioNotifications
       normalized_required = normalize_channels(required_channels)
       default_channels_provided = !default_channels.nil?
       normalized_default = default_channels_provided ? normalize_channels(default_channels) : nil
-      available_source = available_channels.nil? ? default_available_channels(normalized_default, normalized_required) : available_channels
+      available_source = if available_channels.nil?
+                           default_available_channels(normalized_default,
+                                                      normalized_required)
+                         else
+                           available_channels
+                         end
       normalized_available = available_source.nil? ? nil : normalize_channels(available_source)
       normalized_scope = normalize_scope!(scope)
       normalized_category = normalize_category(category)

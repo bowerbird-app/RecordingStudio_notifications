@@ -6,21 +6,23 @@ module RecordingStudioNotifications
 
     class << self
       def apply_model_extensions(target)
-        apply_extensions(target, RecordingStudioNotifications.configuration.hooks.model_extensions_for(extension_keys_for(target)))
+        apply_extensions(target,
+                         RecordingStudioNotifications.configuration.hooks.model_extensions_for(extension_keys_for(target)))
       end
 
       def apply_controller_extensions(target)
-        apply_extensions(target, RecordingStudioNotifications.configuration.hooks.controller_extensions_for(extension_keys_for(target)))
+        apply_extensions(target,
+                         RecordingStudioNotifications.configuration.hooks.controller_extensions_for(extension_keys_for(target)))
       end
 
       private
 
-      def define_default_accessible_action(action, &block)
+      def define_default_accessible_action(action, &)
         return unless RecordingStudioAccessible.respond_to?(:define_action)
         return if RecordingStudioAccessible.respond_to?(:action_defined?) &&
                   RecordingStudioAccessible.action_defined?(action)
 
-        RecordingStudioAccessible.define_action(action, &block)
+        RecordingStudioAccessible.define_action(action, &)
       end
 
       def apply_extensions(target, extensions)
@@ -49,7 +51,8 @@ module RecordingStudioNotifications
     end
 
     # Run before_initialize hooks
-    initializer "recording_studio_notifications.before_initialize", before: "recording_studio_notifications.load_config" do |_app|
+    initializer "recording_studio_notifications.before_initialize",
+                before: "recording_studio_notifications.load_config" do |_app|
       RecordingStudioNotifications::Hooks.run(:before_initialize, self)
     end
 
@@ -90,11 +93,13 @@ module RecordingStudioNotifications
     end
 
     # Run after_initialize hooks
-    initializer "recording_studio_notifications.after_initialize", after: "recording_studio_notifications.load_config" do |_app|
+    initializer "recording_studio_notifications.after_initialize",
+                after: "recording_studio_notifications.load_config" do |_app|
       RecordingStudioNotifications::Hooks.run(:after_initialize, self)
     end
 
-    initializer "recording_studio_notifications.record_accessible_actions", after: "recording_studio_notifications.load_config" do |_app|
+    initializer "recording_studio_notifications.record_accessible_actions",
+                after: "recording_studio_notifications.load_config" do |_app|
       next unless defined?(RecordingStudioAccessible)
       next unless RecordingStudioAccessible.respond_to?(:register_action)
 
@@ -113,22 +118,25 @@ module RecordingStudioNotifications
         recording_required: false
       )
 
-      RecordingStudioNotifications::Engine.send(:define_default_accessible_action, :view_notifications) do |actor:, context: {}, **|
+      RecordingStudioNotifications::Engine.send(:define_default_accessible_action,
+                                                :view_notifications) do |actor:, context: {}, **|
         recipient = context[:recipient]
         actor.present? && recipient.present? &&
-          actor.class.name == recipient.class.name &&
+          actor.instance_of?(recipient.class) &&
           actor.id.to_s == recipient.id.to_s
       end
 
-      RecordingStudioNotifications::Engine.send(:define_default_accessible_action, :"recording_studio_notifications.manage_preferences") do |actor:, context: {}, **|
+      RecordingStudioNotifications::Engine.send(:define_default_accessible_action,
+                                                :"recording_studio_notifications.manage_preferences") do |actor:, context: {}, **|
         recipient = context[:recipient]
         actor.present? && recipient.present? &&
-          actor.class.name == recipient.class.name &&
+          actor.instance_of?(recipient.class) &&
           actor.id.to_s == recipient.id.to_s
       end
     end
 
-    initializer "recording_studio_notifications.register_admin_capabilities", after: "recording_studio_notifications.load_config" do |_app|
+    initializer "recording_studio_notifications.register_admin_capabilities",
+                after: "recording_studio_notifications.load_config" do |_app|
       next unless defined?(RecordingStudioAdmin)
 
       require "recording_studio_notifications/admin/all_notifications_screen"

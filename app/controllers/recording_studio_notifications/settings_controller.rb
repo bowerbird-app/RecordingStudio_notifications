@@ -90,10 +90,10 @@ module RecordingStudioNotifications
     def channel_select_options_map
       flat_notification_types.each_with_object({}) do |type, map|
         options = Array(type.available_channels).map do |channel|
-          [channel_option_label(type, channel), channel.to_s, {disabled: type.required_channels.include?(channel)}]
+          [channel_option_label(type, channel), channel.to_s, { disabled: type.required_channels.include?(channel) }]
         end
 
-        options.unshift(["None", "__none__"]) if type.required_channels.empty?
+        options.unshift(%w[None __none__]) if type.required_channels.empty?
 
         map[type.key] = options
       end
@@ -189,6 +189,5 @@ module RecordingStudioNotifications
     def rollup_delivery_enabled?
       RecordingStudioNotifications.configuration.rollup_delivery_enabled
     end
-
   end
 end

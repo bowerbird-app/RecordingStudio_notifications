@@ -176,17 +176,17 @@ class NotificationAcceptanceTest < Minitest::Test
                                        ))
     model = File.read(File.expand_path("../app/models/recording_studio_notifications/notification.rb", __dir__))
     index_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/index.html.erb",
-                                           __dir__))
+                                            __dir__))
     page_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_page.html.erb",
-                        __dir__))
+                                           __dir__))
     group_partial = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_group.html.erb",
-                          __dir__))
+                                               __dir__))
     notification_partial = File.read(File.expand_path(
-      "../app/views/recording_studio_notifications/notifications/_notification.html.erb", __dir__
-    ))
+                                       "../app/views/recording_studio_notifications/notifications/_notification.html.erb", __dir__
+                                     ))
     notifications_helper = File.read(File.expand_path(
-      "../app/helpers/recording_studio_notifications/notifications_helper.rb", __dir__
-    ))
+                                       "../app/helpers/recording_studio_notifications/notifications_helper.rb", __dir__
+                                     ))
     initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_notifications.rb",
                                              __dir__))
     accessible_initializer = File.read(File.expand_path(
@@ -225,7 +225,8 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes group_partial, "group.notification_type_label"
     assert_includes group_partial, "group.period_label"
     assert_includes group_partial, "'unread' if unread"
-    assert_includes group_partial, "[&_[data-flat-pack--accordion-target=trigger]]:bg-[var(--list-item-active-background-color)]"
+    assert_includes group_partial,
+                    "[&_[data-flat-pack--accordion-target=trigger]]:bg-[var(--list-item-active-background-color)]"
     assert_includes group_partial, "[&_[data-flat-pack--accordion-target=trigger]]:min-h-[54px]"
     assert_includes group_partial, "[&_[data-flat-pack--accordion-target=content][aria-expanded=true]]:!max-h-none"
     assert_includes group_partial, "!border-0"
@@ -248,7 +249,8 @@ class NotificationAcceptanceTest < Minitest::Test
 
   def test_settings_ui_and_routes_exist_with_scoped_dropdown_layering
     routes = File.read(File.expand_path("../config/routes.rb", __dir__))
-    controller = File.read(File.expand_path("../app/controllers/recording_studio_notifications/settings_controller.rb", __dir__))
+    controller = File.read(File.expand_path("../app/controllers/recording_studio_notifications/settings_controller.rb",
+                                            __dir__))
     settings = File.read(File.expand_path("../app/views/recording_studio_notifications/settings/show.html.erb",
                                           __dir__))
     views = Dir[File.expand_path("../app/views/recording_studio_notifications/**/*.erb", __dir__)].map do |path|
@@ -268,12 +270,13 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, "next if preference.channel.blank?"
     assert_includes controller, ".group_by { |type| notification_type_category(type) }"
     assert_includes controller, "next false if type.key == :generic"
-    assert_includes controller, "rollup_delivery_enabled? && (cadence_selectable?(type) || type.required_cadence.present?)"
+    assert_includes controller,
+                    "rollup_delivery_enabled? && (cadence_selectable?(type) || type.required_cadence.present?)"
     assert_includes controller, "def rollup_delivery_enabled?"
     assert_includes controller, "Array(submitted[type.key.to_s]).flatten.map(&:to_s).reject(&:blank?)"
     assert_includes controller, "selected_channels = [] if selected_channels.include?(\"__none__\")"
     assert_includes controller, "disabled: type.required_channels.include?(channel)"
-    assert_includes controller, "[\"None\", \"__none__\"]"
+    assert_includes controller, "%w[None __none__]"
     assert_includes routes, "resource :settings"
     assert_includes settings, "Notification settings"
     assert_includes settings, "FlatPack::Accordion::Component.new"
@@ -305,8 +308,8 @@ class NotificationAcceptanceTest < Minitest::Test
     menu_partial = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_menu_component.html.erb",
                                               __dir__))
     polling_controller = File.read(File.expand_path(
-      "../test/dummy/app/javascript/controllers/notification_polling_controller.js", __dir__
-    ))
+                                     "../test/dummy/app/javascript/controllers/notification_polling_controller.js", __dir__
+                                   ))
 
     assert_includes helper, "include RecordingStudioNotifications::MenuHelper"
     assert_includes helper, "def demo_notification_path"
