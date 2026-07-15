@@ -6,8 +6,16 @@
   <% else %>
     <% unread = group.unread_count.positive? %>
     <% title = content_tag(:span, class: "flex w-full items-center justify-between gap-4 #{'unread' if unread}") do %>
-      <%= content_tag(:span, group.notification_type_label, class: "min-w-0 truncate") %>
-      <%= content_tag(:span, group.period_label, class: "shrink-0 text-sm font-normal text-(--surface-muted-content-color)") %>
+      <span class="min-w-0 space-y-0.5 text-left">
+        <span class="block truncate"><%= group.notification_type_label %></span>
+        <span class="block truncate text-xs font-normal text-(--surface-muted-content-color)"><%= group.period_label %></span>
+      </span>
+      <%= render FlatPack::Timestamp::Component.new(
+        timestamp: group.latest_notification.created_at,
+        shorten_timestamp: true,
+        fallback_text: "",
+        class_name: "shrink-0 text-sm font-normal text-(--surface-muted-content-color) whitespace-nowrap"
+      ) %>
     <% end %>
     <%= render FlatPack::Accordion::Component.new(
       allow_multiple: true,

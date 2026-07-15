@@ -232,7 +232,14 @@ module RecordingStudioNotifications
     def menu_group_payload(group)
       return menu_notification_payload(group.latest_notification) if group.individual?
 
-      MenuPayload.serialize_group(group: group, href: notifications_path(anchor: group.id))
+      menu_notification_payload(group.latest_notification).merge(
+        title: group.notification_type_label,
+        body: group.period_label,
+        href: nil,
+        unread: group.unread_count.positive?,
+        rollup: true,
+        children: group.notifications.map { |notification| menu_notification_payload(notification) }
+      )
     end
 
     def grouped_notification_sections(notifications)

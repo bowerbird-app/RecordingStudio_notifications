@@ -14,17 +14,19 @@ module RecordingStudioNotifications
         }
       end
 
-      def serialize_group(group:, href:)
+      def serialize_group(group:, href: nil, child_href_resolver: nil)
         latest_notification = group.latest_notification
+        child_href_resolver ||= ->(_notification) { nil }
 
-        {
-          title: "#{group.notification_type_label}: #{group.period_label}",
-          body: "#{group.unread_count} unread · #{group.notifications.size} notifications",
-          href: href,
+        children = group.notifications.map do |notification|
+          serialize(notification: notification, href: child_href_resolver.call(notification))
+        end
+
+        serialize(notification: latest_notification, href: href).merge(
           unread: group.unread_count.positive?,
-          time: latest_notification.created_at,
-          icon: icon_for(latest_notification)
-        }
+          rollup: true,
+          children: children
+        )
       end
 
       private
