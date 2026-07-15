@@ -1,0 +1,7 @@
+<%= turbo_stream.append "notifications-list" do %>
+  <%= render partial: "recording_studio_notifications/notifications/page", locals: { notification_sections: @notification_sections } %>
+<% end %>
+
+<%= turbo_stream.replace "notifications_next_page" do %>
+  <%= render partial: "recording_studio_notifications/notifications/next_page", locals: { page: @page, has_next_page: @has_next_page } %>
+<% end %>

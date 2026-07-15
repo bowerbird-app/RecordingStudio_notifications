@@ -1,0 +1,17 @@
+<% if defined?(FlatPack::Notification::Component) %>
+  <%= render FlatPack::Notification::Component.new(
+    unread_count: unread_count,
+    see_all_href: see_all_href,
+    notifications: notifications
+  ) %>
+<% else %>
+  <% label = unread_count.to_i.positive? ? "Notifications (#{unread_count})" : "Notifications" %>
+
+  <%= render FlatPack::Button::Component.new(
+    text: label,
+    url: see_all_href,
+    style: :ghost,
+    size: :md,
+    icon: :bell
+  ) %>
+<% end %>

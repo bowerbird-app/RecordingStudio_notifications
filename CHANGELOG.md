@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- The abandoned notification cadence and digest implementation, including its database tables, scheduler, settings, seed data, and documentation. Notifications now use the standard immediate delivery path.
+
 ## [0.1.1] - 2026-04-28
 
 ### Changed
@@ -25,6 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/gem_template/compare/v0.1.1...HEAD
-[0.1.1]: https://github.com/bowerbird-app/gem_template/releases/tag/v0.1.1
-[0.1.0]: https://github.com/bowerbird-app/gem_template/releases/tag/v0.1.0
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/bowerbird-app/recording_studio_notifications/releases/tag/v0.1.1
+[0.1.0]: https://github.com/bowerbird-app/recording_studio_notifications/releases/tag/v0.1.0

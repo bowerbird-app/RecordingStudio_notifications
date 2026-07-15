@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  recording_studio_admin_for :admin, at: "/admin"
+  mount RecordingStudioAccessible::Engine, at: "/admin/access"
   devise_for :users
 
   # RecordingStudio engine is data/API-focused and has no browser root route.
@@ -6,6 +8,11 @@ Rails.application.routes.draw do
   get "/recording_studio", to: redirect("/"), as: nil
   mount RecordingStudio::Engine, at: "/recording_studio"
   mount RecordingStudioRootSwitchable::Engine, at: "/recording_studio_root_switchable"
+
+  mount RecordingStudioNotifications::Engine, at: "/notifications"
+
+  # Legacy path from mounted index; keep old links working.
+  get "/notifications/notifications", to: redirect("/notifications")
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -22,7 +29,28 @@ Rails.application.routes.draw do
   get "docs/recordable_types", to: "docs#recordable_types", as: :docs_recordable_types
   get "docs/recordings_tree", to: "docs#recordings_tree", as: :docs_recordings_tree
   get "docs/gem_views", to: "docs#gem_views", as: :docs_gem_views
+  get "docs/gem_view", to: "docs#gem_view", as: :docs_gem_view
+  get "docs/all_notifications", to: "docs#all_notifications", as: :docs_all_notifications
+  get "docs/notification_detail", to: "docs#notification_detail", as: :docs_notification_detail
+  get "docs/notification_settings", to: "docs#notification_settings", as: :docs_notification_settings
   get "docs/methods", to: "docs#methods", as: :docs_methods
+
+  mount RecordingStudioCommentable::Engine, at: "/commentable"
+  scope module: :recording_studio_commentable do
+    resources :recordings, only: [] do
+      resources :comments, only: [:index, :new, :create] do
+        collection do
+          get :all, path: "all"
+        end
+      end
+    end
+  end
+  resources :pages, only: %i[index show new create] do
+    member do
+      post :comment
+    end
+  end
+  resources :system_notifications, only: %i[index new create show]
 
   # Defines the root path route ("/")
   root "home#index"

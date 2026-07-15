@@ -2,9 +2,45 @@
   <% sidebar.header do %>
     <%= render FlatPack::Sidebar::Header::Component.new(
       brand_abbr: "RS",
-      title: "Addon Template",
+      title: "Notifications",
       subtitle: "Recording Studio"
-    ) %>
+    ) do %>
+      <div class="flex items-center gap-3" data-flat-pack--sidebar-layout-target="headerRow">
+        <div class="flex items-center gap-3" data-flat-pack--sidebar-layout-target="headerBrand">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold bg-[var(--sidebar-header-badge-background-color)] text-[var(--sidebar-header-badge-text-color)]">RS</div>
+          <div class="flex items-center h-8" data-flat-pack--sidebar-layout-target="headerLabel">
+            <div class="font-semibold text-sm text-[var(--sidebar-header-text-color)]">Notifications</div>
+            <span class="ml-2 inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] leading-none font-medium bg-[var(--badge-default-background-color)] text-[var(--badge-default-text-color)] border-[var(--badge-default-border-color)]">
+              v<%= RecordingStudioNotifications::VERSION %>
+            </span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="hidden items-center justify-center p-2 rounded-lg text-[var(--sidebar-header-icon-color)] hover:bg-[var(--sidebar-header-icon-hover-background-color)] hover:text-[var(--sidebar-header-icon-hover-color)] transition-colors"
+          data-flat-pack--sidebar-layout-target="collapsedToggle"
+          data-action="click->flat-pack--sidebar-layout#toggleDesktop"
+          aria-label="Open sidebar"
+          aria-expanded="false"
+        >
+          <%= render FlatPack::Shared::IconComponent.new(name: :menu, size: :md) %>
+        </button>
+
+        <button
+          type="button"
+          class="hidden ml-auto p-2 rounded-lg text-[var(--sidebar-header-icon-color)] hover:bg-[var(--sidebar-header-icon-hover-background-color)] hover:text-[var(--sidebar-header-icon-hover-color)] transition-colors"
+          data-flat-pack--sidebar-layout-target="desktopToggle"
+          data-action="click->flat-pack--sidebar-layout#toggleDesktop click->flat-pack--sidebar-layout#toggleMobile"
+          aria-label="Collapse sidebar"
+          aria-expanded="true"
+        >
+          <span class="flex-shrink-0 transition-transform duration-300" data-flat-pack--sidebar-layout-target="chevron">
+            <%= render FlatPack::Shared::IconComponent.new(name: :chevron_left, size: :md) %>
+          </span>
+        </button>
+      </div>
+    <% end %>
   <% end %>
 
   <% sidebar.items do %>
@@ -13,6 +49,18 @@
         label: "Home",
         href: main_app.root_path,
         icon: :home
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Pages",
+        href: main_app.pages_path,
+        icon: :document_text
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "System notifications",
+        href: main_app.system_notifications_path,
+        icon: :megaphone
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
@@ -25,6 +73,12 @@
         label: "Config",
         href: main_app.docs_config_path,
         icon: :settings
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Gem Views",
+        href: main_app.docs_gem_views_path,
+        icon: :document_magnifying_glass
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
@@ -46,11 +100,24 @@
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Gem Views",
-        href: main_app.docs_gem_views_path,
-        icon: :eye
+        label: "All Notifications",
+        href: recording_studio_notifications.root_path,
+        icon: :inbox
       ) %>
 
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Notification Settings",
+        href: recording_studio_notifications.settings_path,
+        icon: :adjustments_horizontal
+      ) %>
+
+      <% if request.path.start_with?("/admin") %>
+        <%= render FlatPack::Sidebar::Item::Component.new(
+          label: "Admin",
+          href: recording_studio_admin.root_path,
+          icon: :shield
+        ) %>
+      <% end %>
     </nav>
   <% end %>
 

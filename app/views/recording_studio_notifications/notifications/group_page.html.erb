@@ -1,0 +1,10 @@
+<%= turbo_frame_tag notification_group_next_page_dom_id(@group, @group_page) do %>
+  <% @group_notifications.each do |notification| %>
+    <%= render partial: "recording_studio_notifications/notifications/notification", locals: { notification: notification } %>
+  <% end %>
+  <%= render partial: "recording_studio_notifications/notifications/group_next_page", locals: {
+    group: @group,
+    page: @group_page,
+    has_next_page: @has_next_group_page
+  } %>
+<% end %>

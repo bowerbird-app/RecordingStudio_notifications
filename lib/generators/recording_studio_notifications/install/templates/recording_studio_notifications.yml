@@ -1,0 +1,13 @@
+development:
+  default_channels:
+    - in_app
+  deliver_later: true
+  queue_name: default
+  allowed_url_hosts: []
+
+production:
+  default_channels:
+    - in_app
+  deliver_later: true
+  queue_name: default
+  allowed_url_hosts: []

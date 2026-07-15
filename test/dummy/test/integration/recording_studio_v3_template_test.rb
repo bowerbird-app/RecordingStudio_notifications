@@ -4,22 +4,22 @@ require "test_helper"
 
 class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
   test "dummy app loads root switchable config and controller support" do
-    assert_equal [ "all_workspaces" ], RecordingStudioRootSwitchable.configuration.scopes.keys
+    assert_equal [ "all_workspaces", "admin_root" ], RecordingStudioRootSwitchable.configuration.scopes.keys
     assert_equal :application_layout, RecordingStudioRootSwitchable.configuration.layout
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
   end
 
   test "dummy app validates v3 recordable declarations" do
     assert RecordingStudio.validate_recordable_declarations!
-    assert_equal [ "Workspace" ], RecordingStudio.root_recordable_types
+    assert_equal [ "Workspace", "AdminRoot" ], RecordingStudio.root_recordable_types
     assert_equal [ "Workspace", "Folder" ], RecordingStudio.allowed_parent_types_for("Page")
   end
 
-  test "dummy app schema excludes removed access control tables" do
+  test "dummy app schema includes accessible integration tables" do
     connection = ActiveRecord::Base.connection
 
     assert connection.column_exists?(:recording_studio_recordings, :root_recording_id)
-    refute connection.table_exists?(:recording_studio_accesses)
+    assert connection.table_exists?(:recording_studio_accesses)
     refute connection.table_exists?(:recording_studio_access_boundaries)
     refute connection.table_exists?(:recording_studio_device_sessions)
   end
@@ -59,4 +59,5 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
   ensure
     Current.actor = nil
   end
+
 end

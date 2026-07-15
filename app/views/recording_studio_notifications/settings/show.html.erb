@@ -1,0 +1,78 @@
+<div class="mx-auto flex w-full max-w-3xl flex-col gap-6">
+  <style>
+    .rsn-settings-accordion [data-controller="flat-pack--accordion"] {
+      overflow: visible;
+    }
+
+    .rsn-settings-accordion [id^="settings-category-"][id$="-content"][aria-expanded="true"] {
+      overflow: visible;
+    }
+
+    .rsn-settings-accordion .flat-pack-select-wrapper {
+      position: relative;
+      z-index: 0;
+    }
+
+    .rsn-settings-accordion .flat-pack-select-wrapper:focus-within {
+      z-index: 40;
+    }
+  </style>
+
+  <%= render FlatPack::PageNav::Component.new(
+    anchor_url: main_app.root_path
+  ) %>
+
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Notification settings",
+    variant: :h1
+  ) %>
+
+  <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4 rsn-settings-accordion", data: { controller: "notification-settings", action: "change->notification-settings#syncNoneSelection" } do %>
+    <% if @notification_type_groups.any? %>
+      <%= render FlatPack::Accordion::Component.new(allow_multiple: true) do |accordion| %>
+        <% @notification_type_groups.each do |category, types| %>
+          <% accordion.item(id: "settings-category-#{category}", title: category.to_s.titleize, open: true) do %>
+            <div class="flex flex-col gap-3">
+              <% types.each do |type| %>
+                <% if channel_configurable?(type) %>
+                  <%= render FlatPack::Select::Component.new(
+                    name: "preferences[#{type.key}]",
+                    options: @channel_select_options.fetch(type.key),
+                    label: type.label,
+                    placeholder: (type.optional_channels.any? ? "Search and select channels..." : "Required channels only"),
+                    help_text: type.description.presence || (type.optional_channels.any? ? "Required channels stay enabled and optional channels can be added or removed." : "This notification type has required channels only."),
+                    disabled: type.optional_channels.empty?,
+                    searchable: true,
+                    multiple: true,
+                    value: @selected_channels.fetch(type.key)
+                  ) %>
+                <% end %>
+
+                <% if cadence_selectable?(type) %>
+                  <%= render FlatPack::Select::Component.new(
+                    name: "cadences[#{type.key}]",
+                    options: @cadence_select_options.fetch(type.key),
+                    label: "Notification cadence",
+                    help_text: "Controls when this notification type is delivered and how it is grouped in your inbox.",
+                    searchable: false,
+                    value: @selected_cadences.fetch(type.key)
+                  ) %>
+                <% elsif rollup_delivery_enabled? && type.required_cadence.present? %>
+                  <p class="text-sm text-(--surface-muted-content-color)">
+                    Notification cadence: <%= type.required_cadence.to_s.humanize %>. This cadence is required for <%= type.label.downcase %>.
+                  </p>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <div class="pt-2">
+        <%= render FlatPack::Button::Component.new(text: "Save settings", style: :primary, size: :md, type: "submit") %>
+      </div>
+    <% else %>
+      <p class="text-sm text-(--surface-muted-content-color)">No optional notification channels are available.</p>
+    <% end %>
+  <% end %>
+</div>

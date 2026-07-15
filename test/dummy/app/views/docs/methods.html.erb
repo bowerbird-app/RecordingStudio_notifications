@@ -1,30 +1,294 @@
 <div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Methods",
-    subtitle: "Document the public methods your addon exposes.",
+    subtitle: "Public APIs for creating, querying, grouping, and managing notifications.",
     variant: :h1
   ) %>
 
-  <%= render FlatPack::SectionTitle::Component.new(
-    title: "Example method",
-    subtitle: "recordingstudio_addon.example_method",
-  ) %>
+  <%# --- Public API --- %>
 
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".notify(**attributes)",
+    subtitle: "Create one notification, its channel deliveries, and immediate delivery work when applicable.",
+  ) %>
   <%= render FlatPack::CodeBlock::Component.new(
     language: :ruby,
     code: <<~'CODE'
-      # Explain what this method does before the example.
-      result = RecordingstudioAddon.example_method(
-        # Replace with the real arguments this method accepts.
-        input: "demo value"
+      RecordingStudioNotifications.notify(
+        notification_type: :page_comment,
+        recipient: user,
+        title: "New comment",
+        url: "/pages/42",
+        idempotency_key: "comment-42-user-#{user.id}"
       )
+    CODE
+  ) %>
 
-      # Show what the method returns or what side effect it creates.
-      puts result
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".notify_each(recipients:, **attributes)",
+    subtitle: "Create the same notification for each recipient and return the resulting notification records.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications.notify_each(recipients: workspace_members, notification_type: :workspace_change, title: \"Workspace updated\")"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".register_notification_type(...) / .register_channel(...)",
+    subtitle: "Convenience APIs for registering notification type metadata and channel adapters.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      RecordingStudioNotifications.register_notification_type(:task_assigned, label: "Task assigned")
+      RecordingStudioNotifications.register_channel(:email, NotificationChannels::EmailAdapter.new)
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".configuration / .notification_types / .channels",
+    subtitle: "Access the active configuration, registered notification types, and registered channel adapters.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications.notification_types.fetch(:page_comment)"
+  ) %>
+
+  <%# --- Scopes --- %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".for_recipient(recipient)",
+    subtitle: "Filter notifications by a specific recipient (polymorphic).",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Notification.for_recipient(user).newest_first"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".for_root_recording(recording)",
+    subtitle: "Filter notifications belonging to a specific root recording.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Notification.for_root_recording(root).unread"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".rootless_or_global",
+    subtitle: "Filter notifications without a root recording (global-scoped).",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Notification.rootless_or_global.newest_first"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".unread",
+    subtitle: "Filter notifications that have not yet been read.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Notification.for_recipient(user).unread"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".read",
+    subtitle: "Filter notifications that have been read.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Notification.for_recipient(user).read"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".active",
+    subtitle: "Filter notifications that are not archived.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Notification.for_recipient(user).active"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".archived",
+    subtitle: "Filter notifications that have been archived.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Notification.for_recipient(user).archived"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".newest_first",
+    subtitle: "Order notifications by most recent first (created_at desc, id desc).",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Notification.for_recipient(user).newest_first"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".of_type(type_key)",
+    subtitle: "Filter notifications by a registered notification type key.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Notification.of_type(:comment).newest_first"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: ".for_current_root_inbox(root_recording)",
+    subtitle: "Filter for a combined inbox: global (rootless) notifications plus those matching the given root recording.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Notification.for_recipient(user).for_current_root_inbox(current_root).newest_first"
+  ) %>
+
+  <%# --- Instance Methods --- %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#mark_read!",
+    subtitle: "Mark the notification as read. Sets read_at to the given time (defaults to Time.current).",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.mark_read!"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#mark_unread!",
+    subtitle: "Mark the notification as unread. Sets read_at to nil.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.mark_unread!"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#archive!",
+    subtitle: "Archive the notification. Sets archived_at to the given time (defaults to Time.current).",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.archive!"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#unarchive!",
+    subtitle: "Unarchive the notification. Sets archived_at to nil.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.unarchive!"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#read?",
+    subtitle: "Returns true if the notification has been read (read_at is present).",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.read?"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#unread?",
+    subtitle: "Returns true if the notification has not been read.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.unread?"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#archived?",
+    subtitle: "Returns true if the notification is archived (archived_at is present).",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.archived?"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#global?",
+    subtitle: "Returns true if the notification type has a :global scope.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.global?"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#rootless?",
+    subtitle: "Returns true if root_recording_id is nil.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.rootless?"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#notification_type_key",
+    subtitle: "Returns the notification type as a symbol (e.g. :comment).",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.notification_type_key"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "#notification_type_definition",
+    subtitle: "Returns the registered notification type metadata, including its label, scope, channels, and cadence settings.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "notification.notification_type_definition"
+  ) %>
+
+  <%# --- Preferences and deliveries --- %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Preference.enabled_for? / .set!",
+    subtitle: "Read or save a recipient's optional channel preference for a notification type.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      RecordingStudioNotifications::Preference.set!(
+        recipient: user,
+        notification_type: :page_comment,
+        channel: :email,
+        enabled: true
+      )
+    CODE
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Preference.cadence_for / .set_cadence!",
+    subtitle: "Read or save a recipient's cadence selection. Cadence behavior takes effect only when rollup delivery is enabled.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: "RecordingStudioNotifications::Preference.set_cadence!(recipient: user, notification_type: :page_comment, cadence: :daily)"
+  ) %>
+
+  <%= render FlatPack::SectionTitle::Component.new(
+    title: "Delivery status methods",
+    subtitle: "Inspect or update the delivery state for one notification channel.",
+  ) %>
+  <%= render FlatPack::CodeBlock::Component.new(
+    language: :ruby,
+    code: <<~'CODE'
+      delivery.pending?
+      delivery.mark_delivered!
+      delivery.mark_failed!(error)
     CODE
   ) %>
 
   <p class="text-sm text-(--body-muted-content-color)">
-    Provide one section title and codeblock for each method
+    These scopes and methods are defined on
+    <%= link_to "RecordingStudioNotifications::Notification", "https://github.com/bowerbird-app/RecordingStudio_notifications/blob/main/app/models/recording_studio_notifications/notification.rb", class: "underline" %>.
   </p>
 </div>

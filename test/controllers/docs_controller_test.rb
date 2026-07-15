@@ -25,19 +25,37 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     get docs_install_path
     assert_response :success
     assert_select "h1", text: "Install"
-    assert_includes response.body, "Step 1"
-    assert_includes response.body, "Provide one section title for each step"
-    assert_includes response.body, "# Put the step instruction here."
+    assert_includes response.body, "1. Add the gem"
+    assert_includes response.body, "recording_studio_notifications"
+    assert_includes response.body, "bin/rails generate recording_studio_notifications:install"
+    assert_includes response.body, "/recording_studio_notifications"
+    assert_includes response.body, "--mount-path=/notifications"
+    assert_includes response.body, "bin/rails tailwindcss:build"
+    assert_includes response.body, "bin/rails generate recording_studio_notifications:migrations"
   end
 
   test "config page renders successfully" do
     get docs_config_path
     assert_response :success
-    assert_select "h1", text: "Config"
-    expected_placeholder = "Replace this placeholder with the configuration settings your generated gem exposes."
-
-    assert_includes response.body, expected_placeholder
-    assert_includes response.body, "# Add the config settings for the gem here."
+    assert_select "h1", text: "Configuration & Usage"
+    assert_includes response.body, "config.polling_interval_seconds = 60"
+    assert_includes response.body, "polling_interval_seconds"
+    assert_includes response.body, "Polling cadence in seconds for async notification menu refresh"
+    assert_includes response.body, "Per-Recipient Channel Preferences"
+    assert_includes response.body, "Notification Cadences &amp; Digests"
+    assert_includes response.body, "allowed_cadences:"
+    assert_includes response.body, "recording_studio_notifications:deliver_rollups"
+    assert_includes response.body, "deliver_rollup"
+    assert_includes response.body, "an empty list permits no absolute hosts"
+    assert_includes response.body, "always persisted without a root recording"
+    assert_includes response.body, "first 20 source notifications"
+    assert_includes response.body, "under the engine mount path"
+    assert_includes response.body, "all notifications deliver and display individually"
+    assert_includes response.body, "including the in-app channel"
+    assert_includes response.body, "Crash-recovery timeout for rollups stuck in progress"
+    assert_includes response.body, "without waiting for this timeout"
+    assert_includes response.body, "<th class=\"py-2 pr-4 font-semibold\">Default</th>"
+    assert_includes response.body, "[:individual]"
   end
 
   test "recordable types page renders configured recordables dynamically" do
@@ -98,19 +116,24 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     get docs_gem_views_path
     assert_response :success
     assert_select "h1", text: "Gem Views"
-    assert_select "table", minimum: 1
-    refute_includes response.body, "app/views/gem_template/home/index.html.erb"
+    assert_select "a[href*='/docs/gem_view?view=']", minimum: 1
+    refute_includes response.body, "app/views/recording_studio_notifications/home/index.html.erb"
   end
 
   test "methods page renders successfully" do
     get docs_methods_path
     assert_response :success
     assert_select "h1", text: "Methods"
-    assert_includes response.body, "Document the public methods your addon exposes."
-    assert_includes response.body, "Example method"
-    assert_includes response.body, "recordingstudio_addon.example_method"
-    assert_includes response.body, "# Explain what this method does before the example."
-    assert_includes response.body, "Provide one section title and codeblock for each method"
+    assert_includes response.body, "Public APIs for creating, querying, grouping, and managing notifications."
+    assert_includes response.body, ".notify(**attributes)"
+    assert_includes response.body, ".notify_each(recipients:, **attributes)"
+    assert_includes response.body, ".register_notification_type(...) / .register_channel(...)"
+    assert_includes response.body, ".for_recipient(recipient)"
+    assert_includes response.body, "RecordingStudioNotifications::Notification.for_recipient(user).newest_first"
+    assert_includes response.body, "#mark_read!"
+    assert_includes response.body, "#notification_type_definition"
+    assert_includes response.body, "Preference.cadence_for / .set_cadence!"
+    assert_includes response.body, "Delivery status methods"
   end
 
   test "sidebar includes documentation links" do

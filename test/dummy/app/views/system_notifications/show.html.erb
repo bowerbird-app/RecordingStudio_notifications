@@ -1,0 +1,24 @@
+<%= render FlatPack::PageTitle::Component.new(
+  title: @system_notification.title,
+  subtitle: "Global system announcement",
+  variant: :h1
+) %>
+
+<%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+  <% card.body do %>
+    <div class="space-y-3 text-sm text-[var(--surface-content-color)]">
+      <p class="text-[var(--surface-muted-content-color)]">
+        Created by <strong><%= @system_notification.creator&.email || "Unknown" %></strong>
+        <%= time_ago_in_words(@system_notification.created_at) %> ago
+      </p>
+
+      <p class="whitespace-pre-wrap"><%= @system_notification.body %></p>
+    </div>
+  <% end %>
+<% end %>
+
+<div class="mt-4">
+  <%= link_to system_notifications_path do %>
+    <%= render FlatPack::Button::Component.new(text: "Back to System Notifications", style: :secondary, icon: :arrow_left, size: :md) %>
+  <% end %>
+</div>

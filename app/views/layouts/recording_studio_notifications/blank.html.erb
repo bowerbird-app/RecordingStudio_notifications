@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html data-theme="rounded" class="h-full">
+  <head>
+    <title><%= content_for(:title) || "Notifications" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "flat_pack/application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "flat_pack/variables", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "flat_pack/rich_text", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="m-0 h-screen overflow-y-auto bg-[var(--surface-page-background-color)] text-[var(--surface-content-color)]">
+    <main class="mx-auto w-full max-w-6xl p-6">
+      <%= yield %>
+    </main>
+  </body>
+</html>

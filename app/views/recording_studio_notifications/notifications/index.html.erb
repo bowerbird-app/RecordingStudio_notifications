@@ -1,0 +1,38 @@
+<div class="mx-auto flex w-full max-w-5xl flex-col gap-6">
+  <%= render FlatPack::PageNav::Component.new(
+    anchor_url: main_app.root_path
+  ) do |nav| %>
+    <% nav.right do %>
+      <%= link_to settings_path do %>
+        <%= render FlatPack::Button::Component.new(
+          icon: "cog",
+          icon_only: true,
+          style: :secondary,
+          size: :md,
+          aria: { label: "Settings" }
+        ) %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Notifications",
+    variant: :h1
+  ) %>
+
+  <% if @notification_sections.any? %>
+    <div id="notifications-list" class="flex flex-col">
+      <%= render partial: "recording_studio_notifications/notifications/page", locals: { notification_sections: @notification_sections } %>
+    </div>
+
+    <div class="pt-2">
+      <%= render partial: "recording_studio_notifications/notifications/next_page", locals: { page: @page, has_next_page: @has_next_page } %>
+    </div>
+  <% else %>
+    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+      <% card.body do %>
+        <p class="text-sm text-(--surface-muted-content-color)">No notifications yet.</p>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

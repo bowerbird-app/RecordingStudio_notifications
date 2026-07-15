@@ -1,7 +1,7 @@
 <div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Template Demo",
-    subtitle: "This dummy app is the browser-facing demo surface for the template.",
+    title: "Notifications Demo",
+    subtitle: "This dummy app is the browser-facing demo surface for Recording Studio notifications.",
     variant: :h1
   ) %>
 
@@ -10,7 +10,7 @@
       <% card.header do %>
         <%= render FlatPack::PageTitle::Component.new(
           title: "What's working",
-          subtitle: "Core template capabilities already wired into the dummy app.",
+          subtitle: "Core notification capabilities already wired into the dummy app.",
           variant: :h3,
           class: "mb-0 pb-0"
         ) %>
@@ -18,9 +18,9 @@
 
       <% card.body do %>
         <ul class="space-y-3 text-sm leading-6">
-          <li>Rails engine routes are mounted and responding.</li>
-          <li>PostgreSQL UUID-oriented migrations are included in the engine.</li>
-          <li>Tailwind sources can be wired into a host app through the install generator.</li>
+          <li>Notification routes are mounted at <code>/notifications</code>.</li>
+          <li>UUID-backed notification and delivery tables are included in the engine.</li>
+          <li>The public API supports <code>notify</code>, <code>notify_each</code>, idempotency, root resolution, and URL safety.</li>
           <li>The dummy app exercises authentication, FlatPack layouts, and Recording Studio setup.</li>
         </ul>
       <% end %>
@@ -29,8 +29,8 @@
     <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
       <% card.header do %>
         <%= render FlatPack::PageTitle::Component.new(
-          title: "Next steps",
-          subtitle: "The usual first moves when turning the template into a real addon.",
+          title: "Try it",
+          subtitle: "Create in-app notifications from the Rails console.",
           variant: :h3,
           class: "mb-0 pb-0"
         ) %>
@@ -38,10 +38,10 @@
 
       <% card.body do %>
         <ol class="space-y-3 text-sm leading-6 list-decimal pl-5">
-          <li>Run <code>bin/rename_gem your_addon_name</code> when you are ready to rename the engine.</li>
-          <li>Replace the sample migration with your addon tables and install them into the host app.</li>
-          <li>Configure Recording Studio recordable types and capabilities in the host app initializer.</li>
-          <li>Use the dummy app to validate layout, asset scanning, and authentication flows.</li>
+          <li>Open <code>bin/rails console</code>.</li>
+          <li>Set <code>Current.actor = User.first</code>.</li>
+          <li>Call <code>RecordingStudioNotifications.notify(notification_type: :workspace_change, recipient: User.first, title: "Workspace updated", url: "/")</code>.</li>
+          <li>Visit <code>/notifications</code> to view the in-app notification.</li>
         </ol>
       <% end %>
     <% end %>
@@ -89,8 +89,8 @@
       <% card.body do %>
         <ul class="space-y-3 text-sm leading-6">
           <li>Add the gem to your host app and run <code>bundle install</code>.</li>
-          <li>Run <code>rails generate gem_template:install</code> to mount the engine and add configuration.</li>
-          <li>Run <code>rails generate gem_template:migrations</code> to copy engine migrations into the host app.</li>
+          <li>Run <code>rails generate recording_studio_notifications:install</code> to mount the engine and add configuration.</li>
+          <li>Run <code>rails generate recording_studio_notifications:migrations</code> to copy engine migrations into the host app.</li>
           <li>Rebuild Tailwind if needed with <code>bin/rails tailwindcss:build</code>.</li>
         </ul>
       <% end %>

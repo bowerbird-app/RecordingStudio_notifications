@@ -1,14 +1,28 @@
 <div class="mx-auto flex w-full max-w-6xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Gem Views",
-    subtitle: "These are the view templates currently shipped by the gem.",
+    subtitle: "These are the view templates currently shipped by the gem. Click one to preview it rendered.",
     variant: :h1
   ) %>
 
-  <% view_rows = Array(@engine_views).map { |view_path| { path: view_path, source: "Gem engine" } } %>
-
-  <%= render FlatPack::Table::Component.new(data: view_rows, class: "text-sm") do |table| %>
-    <% table.column(title: "View path") { |view| view[:path] } %>
-    <% table.column(title: "Source") { |view| view[:source] } %>
+  <% if Array(@engine_views).any? %>
+    <div class="flex flex-col gap-3">
+      <% Array(@engine_views).each do |view_path| %>
+        <%= link_to docs_gem_view_path(view: view_path),
+              class: "flex items-center justify-between rounded-lg border border-[var(--border-color)] p-4 hover:bg-[var(--surface-hover-color)] transition-colors" do %>
+          <div class="flex items-center gap-3">
+            <span class="text-sm" aria-hidden="true">📄</span>
+            <span class="font-mono text-sm text-(--surface-content-color)"><%= view_path %></span>
+          </div>
+          <span class="text-sm text-(--surface-muted-content-color)" aria-hidden="true">→</span>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+      <% card.body do %>
+        <p class="text-sm text-(--surface-muted-content-color)">No gem views found.</p>
+      <% end %>
+    <% end %>
   <% end %>
 </div>

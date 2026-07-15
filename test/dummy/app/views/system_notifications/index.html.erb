@@ -1,0 +1,17 @@
+<%= render FlatPack::PageTitle::Component.new(
+  title: "System notifications",
+  subtitle: "Create global announcements for all users",
+  variant: :h1
+) %>
+
+<div class="flex justify-end mb-4">
+  <%= link_to new_system_notification_path do %>
+    <%= render FlatPack::Button::Component.new(text: "New System Notification", style: :primary, icon: :plus, size: :md) %>
+  <% end %>
+</div>
+
+<%= render FlatPack::Table::Component.new(data: @system_notifications) do |table| %>
+  <% table.column(title: "Title", html: ->(notification) { link_to notification.title, system_notification_path(notification), class: "text-[var(--color-primary)] hover:underline" }) %>
+  <% table.column(title: "Created by", html: ->(notification) { notification.creator&.email || "Unknown" }) %>
+  <% table.column(title: "Created", html: ->(notification) { "#{time_ago_in_words(notification.created_at)} ago" }) %>
+<% end %>

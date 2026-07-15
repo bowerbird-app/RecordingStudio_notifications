@@ -5,6 +5,16 @@ RecordingStudioRootSwitchable.configure do |config|
     Current.actor || controller.current_user
   end
 
+  config.default_scope_key_resolver = lambda do |controller:, scopes:, **|
+    request_path = controller.request.path.to_s
+
+    if request_path.start_with?("/admin")
+      scopes.find { |scope| scope.key == "admin_root" }&.key || scopes.first&.key
+    else
+      scopes.find { |scope| scope.key == "all_workspaces" }&.key || scopes.first&.key
+    end
+  end
+
   # Render the mounted switcher pages inside the app shell when users visit them.
   config.layout = :application_layout
 
@@ -23,11 +33,38 @@ RecordingStudioRootSwitchable.configure do |config|
     scope.label = "All workspaces"
     scope.description = "Every workspace root in the dummy app."
     scope.available_roots = lambda do |**|
-      Workspace.order(:name).filter_map do |workspace|
+      workspace_roots = Workspace.order(:name).filter_map do |workspace|
         RecordingStudio.root_recording_for(workspace)
       end
+
+      admin_root = AdminRoot.first
+      admin_roots = admin_root ? [RecordingStudio.root_recording_for(admin_root)] : []
+
+      (workspace_roots + admin_roots).uniq { |recording| recording.id }
     end
     scope.access_check = ->(**) { true }
+
+    scope.default_root = lambda do |roots:, **|
+      roots.first
+    end
+  end
+
+  config.scope :admin_root do |scope|
+    scope.label = "Admin"
+    scope.description = "Admin root context used by /admin surfaces."
+    scope.available_roots = lambda do |**|
+      admin_root = AdminRoot.first
+      next [] unless admin_root
+
+      [RecordingStudio.root_recording_for(admin_root)]
+    end
+    scope.access_check = lambda do |actor:, recording:, **|
+      actor.present? && recording.present? && RecordingStudioAccessible.authorized?(
+        actor: actor,
+        recording: recording,
+        role: :view
+      )
+    end
 
     scope.default_root = lambda do |roots:, **|
       roots.first

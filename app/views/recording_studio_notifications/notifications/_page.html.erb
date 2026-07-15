@@ -1,0 +1,7 @@
+<% notification_groups = notification_sections.flat_map(&:groups).sort_by { |group| [group.latest_notification.created_at, group.id] }.reverse %>
+
+<div class="divide-y divide-(--surface-border-color)">
+  <% notification_groups.each_with_index do |group, index| %>
+    <%= render partial: "recording_studio_notifications/notifications/group", locals: { group: group, index: index } %>
+  <% end %>
+</div>
