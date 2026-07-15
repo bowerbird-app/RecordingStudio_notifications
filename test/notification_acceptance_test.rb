@@ -178,7 +178,7 @@ class NotificationAcceptanceTest < Minitest::Test
     index_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/index.html.erb",
                                             __dir__))
     title_partial = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_title.html.erb",
-                           __dir__))
+                                               __dir__))
     page_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_page.html.erb",
                                            __dir__))
     group_partial = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_group.html.erb",
@@ -300,7 +300,11 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes settings, "multiple: true"
     assert_includes settings, "searchable: true"
     assert_includes settings, 'name: "cadences[#{type.key}]"'
-    assert_includes settings, "Notification cadence"
+    assert_includes settings, "label: \"Channel\""
+    assert_includes settings, "label: \"Frequency\""
+    assert_includes settings, "Change notification cadence."
+    assert_includes settings, "mt-3 grid gap-4 md:grid-cols-2"
+    assert_includes settings, "class: \"w-full\""
     assert_includes settings, "This cadence is required for"
     assert_includes views, "FlatPack::"
     refute_includes views, "notification_bell"

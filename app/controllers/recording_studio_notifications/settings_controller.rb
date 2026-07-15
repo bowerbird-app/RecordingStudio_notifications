@@ -101,9 +101,11 @@ module RecordingStudioNotifications
 
     def selected_channels_map
       flat_notification_types.each_with_object({}) do |type, map|
-        map[type.key] = type.optional_channels.select do |channel|
+        selected_optional_channels = type.optional_channels.select do |channel|
           preference_enabled?(type, channel)
-        end.map(&:to_s)
+        end
+
+        map[type.key] = (type.required_channels + selected_optional_channels).map(&:to_s)
       end
     end
 

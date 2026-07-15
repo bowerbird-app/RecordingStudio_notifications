@@ -27,14 +27,14 @@ module RecordingStudioNotifications
 
       content_tag(:span, class: "relative inline-flex shrink-0") do
         safe_join([
-          notification_type_leading_icon(group.notification_type),
-          content_tag(
-            :span,
-            notification_group_badge_text(unread_count),
-            class: "absolute -right-2 -top-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold leading-none text-white",
-            aria: { label: "#{unread_count} unread notifications" }
-          )
-        ])
+                    notification_type_leading_icon(group.notification_type),
+                    content_tag(
+                      :span,
+                      notification_group_badge_text(unread_count),
+                      class: "absolute -right-2 -top-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold leading-none text-white",
+                      aria: { label: "#{unread_count} unread notifications" }
+                    )
+                  ])
       end
     end
 

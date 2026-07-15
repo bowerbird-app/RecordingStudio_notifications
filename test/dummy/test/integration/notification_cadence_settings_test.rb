@@ -25,6 +25,7 @@ class NotificationCadenceSettingsTest < ActionDispatch::IntegrationTest
       label: "Required settings cadence test",
       scope: :global,
       default_channels: [:in_app],
+      required_channels: [:in_app],
       available_channels: [:in_app],
       allowed_cadences: %i[daily weekly],
       default_cadence: :weekly,
@@ -37,11 +38,18 @@ class NotificationCadenceSettingsTest < ActionDispatch::IntegrationTest
     get "/notifications/settings"
 
     assert_response :success
-    assert_includes response.body, "Notification cadence"
-    assert_includes response.body, "Controls when this notification type is delivered and how it is grouped in your inbox."
+    assert_includes response.body, "Settings cadence test"
+    assert_includes response.body, ">Channel</label>"
+    assert_includes response.body, ">Frequency</label>"
+    assert_includes response.body, "Change notification cadence."
     assert_includes response.body, "This cadence is required for required settings cadence test."
+    assert_includes response.body, "mt-3 grid gap-4 md:grid-cols-2"
+    assert_includes response.body, "border-[var(--surface-border-color)] w-full"
     assert_includes response.body, "cadences[settings_cadence_test]"
-    refute_includes response.body, "cadences[required_settings_cadence_test]"
+    assert_includes response.body, 'name="cadences[required_settings_cadence_test]"'
+    assert_includes response.body, 'value="daily" selected="selected">Daily</option>'
+    assert_includes response.body, 'name="preferences[required_settings_cadence_test][]" value="in_app"'
+    assert_includes response.body, 'disabled="disabled"'
   end
 
   test "settings persist an allowed cadence override independently of channels" do
