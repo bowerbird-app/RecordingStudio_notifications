@@ -1,19 +1,7 @@
 <div class="mx-auto flex w-full max-w-5xl flex-col gap-6">
   <%= render FlatPack::PageNav::Component.new(
     anchor_url: main_app.root_path
-  ) do |nav| %>
-    <% nav.right do %>
-      <%= link_to settings_path do %>
-        <%= render FlatPack::Button::Component.new(
-          icon: "cog",
-          icon_only: true,
-          style: :secondary,
-          size: :md,
-          aria: { label: "Settings" }
-        ) %>
-      <% end %>
-    <% end %>
-  <% end %>
+  ) %>
 
   <%= render partial: "recording_studio_notifications/notifications/title" %>
 

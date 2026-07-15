@@ -60,17 +60,6 @@ begin
     notification_type: :workspace_change,
     recipient: user,
     actor: user,
-    root_recording: root_recording,
-    recording: root_recording,
-    title: "Workspace updated",
-    body: "Studio Workspace settings changed.",
-    idempotency_key: "seed-workspace-change-#{root_recording.id}"
-  )
-
-  RecordingStudioNotifications::Services::Notify.call(
-    notification_type: :workspace_change,
-    recipient: user,
-    actor: user,
     root_recording: accessible_root_recording,
     recording: accessible_root_recording,
     title: "Client workspace updated",
@@ -121,6 +110,17 @@ begin
       idempotency_key: "seed-studio-workspace-update-#{index + 1}"
     )
   end
+
+  RecordingStudioNotifications::Services::Notify.call(
+    notification_type: :workspace_change,
+    recipient: user,
+    actor: user,
+    root_recording: root_recording,
+    recording: root_recording,
+    title: "Workspace updated",
+    body: "Studio Workspace settings changed.",
+    idempotency_key: "seed-workspace-change-#{root_recording.id}"
+  )
 
   if defined?(RecordingStudioAccessible) && RecordingStudioAccessible.respond_to?(:grant_access)
     ensure_access_for = lambda do |parent_recording, role|

@@ -25,11 +25,23 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
 
   test "digest groups do not render a mark-all-read control" do
     create_notification(title: "Unread in group", created_at: Time.current)
+    create_notification(title: "Another unread notification", created_at: 1.minute.ago)
 
     get "/notifications"
 
     assert_response :success
     assert_includes response.body, "Group action test"
+    assert_includes response.body, ">Settings</a>"
+    assert_includes response.body, "aria-label=\"2 unread notifications\""
+    assert_includes response.body, "bg-red-600"
+    assert_includes response.body, "relative inline-flex shrink-0"
+    assert_includes response.body, "absolute -right-2 -top-2"
+    assert_includes response.body, "inline-flex h-4 min-w-4 shrink-0"
+    assert_includes response.body, "inline-block w-5 h-5"
+    assert_includes response.body, "flex shrink-0 items-center gap-4"
+    assert_includes response.body, "data-flat-pack--accordion-target=\"icon\""
+    assert_includes response.body, "[&amp;_[data-flat-pack--accordion-target=icon]]:ml-4"
+    assert_includes response.body, "[&amp;_[data-flat-pack--accordion-target=icon]]:self-center"
     refute_includes response.body, "Mark all read"
   end
 
@@ -51,6 +63,8 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Clear all"
+    assert_includes response.body, ">Settings</a>"
+    assert_operator response.body.index("Clear all"), :<, response.body.index(">Settings</a>")
     assert_includes response.body, "fp-red-dot"
 
     patch "/notifications/notifications/clear_all", as: :turbo_stream
@@ -61,6 +75,8 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "action=\"update\" target=\"notifications-list\""
     assert_includes response.body, "target=\"notifications_next_page\""
     refute_includes response.body, "Clear all"
+    assert_includes response.body, ">Settings</a>"
+    refute_includes response.body, "unread notifications\""
     refute_includes response.body, "fp-red-dot"
     assert unread_notification.reload.cleared_at.present?
     assert_nil unread_notification.read_at

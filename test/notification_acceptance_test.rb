@@ -215,11 +215,12 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes model, "def clear!"
     assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
     assert_includes application_controller, "actor || RecordingStudioNotifications.configuration.resolve_actor"
-    assert_includes index_view, "icon: \"cog\""
     assert_includes index_view, "id=\"notifications-list\" class=\"flex flex-col\""
     assert_includes index_view, "notifications/notifications/title"
+    assert_includes title_partial, 'link_to "Settings", settings_path'
     assert_includes title_partial, 'link_to "Clear all", clear_all_notifications_path'
     assert_includes title_partial, "turbo_stream: true"
+    refute_includes index_view, "icon_only: true"
     refute_includes index_view, "id=\"notifications-list\" class=\"flex flex-col gap-6\""
     assert_includes page_view, "notification_sections.flat_map(&:groups)"
     assert_includes page_view, "recording_studio_notifications/notifications/group"
@@ -242,6 +243,9 @@ class NotificationAcceptanceTest < Minitest::Test
     refute_includes page_view, "<h2"
     assert_includes notification_partial, "FlatPack::Timestamp::Component.new("
     assert_includes notification_partial, "shorten_timestamp: true"
+    assert_includes notifications_helper, "notification_group_badge_text"
+    assert_includes notifications_helper, '#{unread_count} unread notifications'
+    assert_includes notifications_helper, "bg-red-600"
     assert_includes notifications_helper, "fp-red-dot"
     assert_includes notifications_helper, "def notification_group_next_page_dom_id(group, page)"
     assert_includes notifications_helper, "NotificationsController::GROUP_NOTIFICATIONS_PER_PAGE"

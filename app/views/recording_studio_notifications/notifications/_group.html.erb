@@ -10,16 +10,18 @@
         <span class="block truncate"><%= group.notification_type_label %></span>
         <span class="block truncate text-xs font-normal text-(--surface-muted-content-color)"><%= group.period_label %></span>
       </span>
-      <%= render FlatPack::Timestamp::Component.new(
-        timestamp: group.latest_notification.created_at,
-        shorten_timestamp: true,
-        fallback_text: "",
-        class_name: "shrink-0 text-sm font-normal text-(--surface-muted-content-color) whitespace-nowrap"
-      ) %>
+      <span class="flex shrink-0 items-center gap-4">
+        <%= render FlatPack::Timestamp::Component.new(
+          timestamp: group.latest_notification.created_at,
+          shorten_timestamp: true,
+          fallback_text: "",
+          class_name: "text-sm font-normal text-(--surface-muted-content-color) whitespace-nowrap"
+        ) %>
+      </span>
     <% end %>
     <%= render FlatPack::Accordion::Component.new(
       allow_multiple: true,
-      class: "overflow-visible !border-0 !rounded-none bg-transparent [&>div]:!border-0 [&_[data-flat-pack--accordion-target=icon]]:hidden [&_[data-flat-pack--accordion-target=content][aria-expanded=true]]:!max-h-none [&_[data-flat-pack--accordion-target=trigger]]:min-h-[54px] [&_[data-flat-pack--accordion-target=trigger]]:items-start [&_[data-flat-pack--accordion-target=trigger]]:px-3 [&_[data-flat-pack--accordion-target=trigger]]:py-2 [&_[data-flat-pack--accordion-target=trigger]]:hover:bg-[var(--list-item-hover-background-color)] [&_[data-flat-pack--accordion-target=trigger]>span:first-child]:flex-1 [&_[data-flat-pack--accordion-target=trigger]>span:first-child>span:last-child]:flex-1 #{'[&_[data-flat-pack--accordion-target=trigger]]:bg-[var(--list-item-active-background-color)]' if unread}"
+      class: "overflow-visible !border-0 !rounded-none bg-transparent [&>div]:!border-0 [&_[data-flat-pack--accordion-target=content][aria-expanded=true]]:!max-h-none [&_[data-flat-pack--accordion-target=trigger]]:min-h-[54px] [&_[data-flat-pack--accordion-target=trigger]]:items-start [&_[data-flat-pack--accordion-target=trigger]]:px-3 [&_[data-flat-pack--accordion-target=trigger]]:py-2 [&_[data-flat-pack--accordion-target=trigger]]:hover:bg-[var(--list-item-hover-background-color)] [&_[data-flat-pack--accordion-target=trigger]>span:first-child]:flex-1 [&_[data-flat-pack--accordion-target=trigger]>span:first-child>span:last-child]:flex-1 [&_[data-flat-pack--accordion-target=icon]]:ml-4 [&_[data-flat-pack--accordion-target=icon]]:self-center #{'[&_[data-flat-pack--accordion-target=trigger]]:bg-[var(--list-item-active-background-color)]' if unread}"
     ) do |accordion| %>
       <% accordion.item(
         id: group.id,

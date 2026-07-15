@@ -3,12 +3,16 @@
     title: "Notifications",
     variant: :h1
   ) do |page_title| %>
-    <% if @has_unread_notifications %>
-      <% page_title.slot do %>
-        <%= link_to "Clear all", clear_all_notifications_path,
-                    data: { turbo_method: :patch, turbo_stream: true },
+    <% page_title.slot do %>
+      <div class="flex items-center gap-4">
+        <% if @has_unread_notifications %>
+          <%= link_to "Clear all", clear_all_notifications_path,
+                      data: { turbo_method: :patch, turbo_stream: true },
+                      class: "text-sm font-medium text-[var(--color-primary)] hover:underline" %>
+        <% end %>
+        <%= link_to "Settings", settings_path,
                     class: "text-sm font-medium text-[var(--color-primary)] hover:underline" %>
-      <% end %>
+      </div>
     <% end %>
   <% end %>
 </div>
