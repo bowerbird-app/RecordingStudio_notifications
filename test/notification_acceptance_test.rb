@@ -177,6 +177,8 @@ class NotificationAcceptanceTest < Minitest::Test
     model = File.read(File.expand_path("../app/models/recording_studio_notifications/notification.rb", __dir__))
     index_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/index.html.erb",
                                             __dir__))
+    title_partial = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_title.html.erb",
+                           __dir__))
     page_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_page.html.erb",
                                            __dir__))
     group_partial = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_group.html.erb",
@@ -197,23 +199,27 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, 'require "recording_studio_notifications/services/inbox_grouping"'
     assert_includes controller, "def menu"
     assert_includes controller, "def group_page"
+    assert_includes controller, "def clear_all"
     assert_includes controller, "GROUP_NOTIFICATIONS_PER_PAGE = 20"
-    assert_includes controller, "def mark_group_read"
     assert_includes controller, "visible_notification_group(params[:group_id])"
-    assert_includes controller, "group.notifications.select(&:unread?)"
-    assert_includes controller, "notification_group_dom_id(updated_group)"
     assert_includes controller, "@inbox_scope = \"all\""
     assert_includes controller, "polling_interval_seconds"
     assert_includes routes, "get :menu"
     assert_includes routes, 'get "groups/:group_id/page", action: :group_page'
-    assert_includes routes, "patch :mark_group_read"
+    assert_includes routes, "patch :clear_all"
+    refute_includes routes, "mark_group_read"
     assert_includes controller, "def recording_studio_root_switchable_scope_key"
     assert_includes model, "for_current_root_inbox"
     assert_includes model, "rootless_or_global"
+    assert_includes model, "where(read_at: nil, cleared_at: nil)"
+    assert_includes model, "def clear!"
     assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
     assert_includes application_controller, "actor || RecordingStudioNotifications.configuration.resolve_actor"
     assert_includes index_view, "icon: \"cog\""
     assert_includes index_view, "id=\"notifications-list\" class=\"flex flex-col\""
+    assert_includes index_view, "notifications/notifications/title"
+    assert_includes title_partial, 'link_to "Clear all", clear_all_notifications_path'
+    assert_includes title_partial, "turbo_stream: true"
     refute_includes index_view, "id=\"notifications-list\" class=\"flex flex-col gap-6\""
     assert_includes page_view, "notification_sections.flat_map(&:groups)"
     assert_includes page_view, "recording_studio_notifications/notifications/group"
@@ -225,6 +231,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes group_partial, "group.notification_type_label"
     assert_includes group_partial, "group.period_label"
     assert_includes group_partial, "'unread' if unread"
+    refute_includes group_partial, "Mark all read"
     assert_includes group_partial,
                     "[&_[data-flat-pack--accordion-target=trigger]]:bg-[var(--list-item-active-background-color)]"
     assert_includes group_partial, "[&_[data-flat-pack--accordion-target=trigger]]:min-h-[54px]"

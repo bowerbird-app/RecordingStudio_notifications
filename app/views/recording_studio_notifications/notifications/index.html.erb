@@ -15,10 +15,7 @@
     <% end %>
   <% end %>
 
-  <%= render FlatPack::PageTitle::Component.new(
-    title: "Notifications",
-    variant: :h1
-  ) %>
+  <%= render partial: "recording_studio_notifications/notifications/title" %>
 
   <% if @notification_sections.any? %>
     <div id="notifications-list" class="flex flex-col">

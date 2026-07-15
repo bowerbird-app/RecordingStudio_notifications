@@ -23,47 +23,57 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     sign_in @user
   end
 
-  test "marking a group read updates only its visible unread source notifications" do
-    in_group_unread = create_notification(title: "Unread in group", created_at: Time.current)
-    in_group_read = create_notification(title: "Read in group", created_at: Time.current, read_at: Time.current)
-    outside_group = create_notification(title: "Unread outside group", created_at: 2.days.ago)
-    group = RecordingStudioNotifications::Services::InboxGrouping.new(
-      recipient: @user,
-      notifications: [in_group_unread, in_group_read]
-    ).call.first.groups.first
+  test "digest groups do not render a mark-all-read control" do
+    create_notification(title: "Unread in group", created_at: Time.current)
 
     get "/notifications"
 
     assert_response :success
-    assert_includes response.body, "Mark all read"
     assert_includes response.body, "Group action test"
-    assert_includes response.body, "fp-red-dot"
-    assert_includes response.body, "unread"
-
-    patch "/notifications/notifications/mark_group_read", params: { group_id: group.id }
-
-    assert_redirected_to "/notifications/notifications"
-    assert in_group_unread.reload.read?
-    assert in_group_read.reload.read?
-    assert outside_group.reload.unread?
+    refute_includes response.body, "Mark all read"
   end
 
-  test "marking a group read replaces the group for Turbo requests" do
-    unread_notification = create_notification(title: "Unread in group", created_at: Time.current)
-    read_notification = create_notification(title: "Read in group", created_at: Time.current, read_at: Time.current)
-    group = RecordingStudioNotifications::Services::InboxGrouping.new(
-      recipient: @user,
-      notifications: [unread_notification, read_notification]
-    ).call.first.groups.first
+  test "clear all clears unread notifications without marking them read" do
+    unread_notification = create_notification(title: "Unread notification", created_at: Time.current)
+    read_notification = create_notification(title: "Read notification", created_at: 1.minute.ago, read_at: Time.current)
+    other_user = User.create!(
+      email: "other-group-actions-#{SecureRandom.uuid}@example.test",
+      password: "Password123!",
+      password_confirmation: "Password123!"
+    )
+    other_users_notification = create_notification(
+      title: "Other user's unread notification",
+      created_at: Time.current,
+      recipient: other_user
+    )
 
-    patch "/notifications/notifications/mark_group_read", params: { group_id: group.id }, as: :turbo_stream
+    get "/notifications"
+
+    assert_response :success
+    assert_includes response.body, "Clear all"
+    assert_includes response.body, "fp-red-dot"
+
+    patch "/notifications/notifications/clear_all", as: :turbo_stream
 
     assert_response :success
     assert_equal "text/vnd.turbo-stream.html; charset=utf-8", response.content_type
-    assert_includes response.body, "target=\"#{group.id}-container\""
-    assert_includes response.body, "id=\"#{group.id}-container\""
-    refute_includes response.body, "Mark all read"
-    assert unread_notification.reload.read?
+    assert_includes response.body, "target=\"notifications-title\""
+    assert_includes response.body, "action=\"update\" target=\"notifications-list\""
+    assert_includes response.body, "target=\"notifications_next_page\""
+    refute_includes response.body, "Clear all"
+    refute_includes response.body, "fp-red-dot"
+    assert unread_notification.reload.cleared_at.present?
+    assert_nil unread_notification.read_at
+    refute unread_notification.unread?
+    assert read_notification.reload.read?
+    assert_nil read_notification.cleared_at
+    assert other_users_notification.reload.unread?
+
+    get "/notifications"
+
+    assert_response :success
+    refute_includes response.body, "Clear all"
+    refute_includes response.body, "fp-red-dot"
   end
 
   test "digest groups load notifications in batches of 20" do
@@ -132,20 +142,11 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "unknown group ids do not update notifications" do
-    notification = create_notification(title: "Unread notification", created_at: Time.current)
-
-    patch "/notifications/notifications/mark_group_read", params: { group_id: "unknown-group" }
-
-    assert_response :not_found
-    assert notification.reload.unread?
-  end
-
   private
 
-  def create_notification(title:, created_at:, read_at: nil)
+  def create_notification(title:, created_at:, read_at: nil, recipient: @user)
     RecordingStudioNotifications::Notification.create!(
-      recipient: @user,
+      recipient: recipient,
       notification_type: :group_action_test,
       title: title,
       created_at: created_at,

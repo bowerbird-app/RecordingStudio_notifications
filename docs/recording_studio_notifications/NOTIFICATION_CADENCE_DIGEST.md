@@ -167,7 +167,7 @@ Display rules:
 - Group boundaries respect recipient-local dates and weeks.
 - Per-notification authorization is enforced before rendering.
 
-### Phase 4: Read, Archive, and Bulk Actions
+### Phase 4: Read and Archive Actions
 
 A group has no persisted read state. Derive its state from contained source notifications.
 
@@ -180,15 +180,15 @@ unread_count = notifications.count(&:unread?)
 | Expand/collapse | No notification state changes |
 | Open an item | Mark only that item read, then follow normal destination |
 | Mark one item read/unread | Update only that item |
-| Mark all read in group | Mark visible unread items in that group read |
+| Clear all | Set `cleared_at` for all visible unread items without changing `read_at` |
 | Archive an item | Remove it from active inbox and update counts |
 
 The global badge remains the total unread **source notification** count, not the number of groups.
 
 **Acceptance criteria**
 
-- Bulk actions update only currently visible, authorized notifications.
 - A group header accurately reflects unread count after reads or archives.
+- Cleared notifications render as read while retaining a blank `read_at` timestamp.
 - Expanding or collapsing never changes delivery, archive, or read state.
 
 ### Phase 5: Immediate and Rollup Delivery Pipeline

@@ -27,18 +27,6 @@
         left_slot: notification_group_leading_icon(group),
         open: index.zero?
       ) do %>
-        <% if unread %>
-          <div class="mb-2 flex justify-end">
-            <%= form_with url: mark_group_read_notifications_path(group_id: group.id), method: :patch do %>
-              <%= render FlatPack::Button::Component.new(
-                text: "Mark all read",
-                style: :ghost,
-                size: :sm,
-                type: "submit"
-              ) %>
-            <% end %>
-          </div>
-        <% end %>
         <% initial_notifications = group.notifications.first(group_notifications_per_page) %>
         <%= render FlatPack::List::Component.new(spacing: :comfortable, divider: true) do %>
           <div id="<%= notification_group_items_dom_id(group) %>">

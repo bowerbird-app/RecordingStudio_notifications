@@ -18,8 +18,8 @@ module RecordingStudioNotifications
     validate :root_recording_matches_type_scope
 
     scope :newest_first, -> { order(created_at: :desc, id: :desc) }
-    scope :unread, -> { where(read_at: nil) }
-    scope :read, -> { where.not(read_at: nil) }
+    scope :unread, -> { where(read_at: nil, cleared_at: nil) }
+    scope :read, -> { where.not(read_at: nil).or(where.not(cleared_at: nil)) }
     scope :archived, -> { where.not(archived_at: nil) }
     scope :active, -> { where(archived_at: nil) }
     scope :for_recipient, ->(recipient) { where(recipient: recipient) }
@@ -47,7 +47,7 @@ module RecordingStudioNotifications
     end
 
     def read?
-      read_at.present?
+      read_at.present? || cleared_at.present?
     end
 
     def unread?
@@ -63,7 +63,11 @@ module RecordingStudioNotifications
     end
 
     def mark_unread!
-      update!(read_at: nil)
+      update!(read_at: nil, cleared_at: nil)
+    end
+
+    def clear!(at: Time.current)
+      update!(cleared_at: cleared_at || at)
     end
 
     def archive!(at: Time.current)

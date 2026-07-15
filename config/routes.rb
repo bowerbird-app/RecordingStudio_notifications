@@ -7,7 +7,7 @@ RecordingStudioNotifications::Engine.routes.draw do
     collection do
       get :menu
       get "groups/:group_id/page", action: :group_page, as: :group_page
-      patch :mark_group_read
+      patch :clear_all
     end
 
     member do

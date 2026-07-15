@@ -15,10 +15,7 @@ module RecordingStudioNotifications
     def index
       return unless authorize_notifications!(recipient: @recipient)
 
-      @inbox_scope = notifications_inbox_scope
-      @current_root_recording = current_notifications_root_recording
-      @page = current_page
-      @notification_sections, @has_next_page = visible_notification_sections_page(scoped_notifications)
+      prepare_inbox
 
       respond_to do |format|
         format.html
@@ -109,30 +106,23 @@ module RecordingStudioNotifications
       redirect_back fallback_location: notification_path(@notification), notice: "Notification marked unread."
     end
 
-    def mark_group_read
+    def clear_all
       return unless authorize_notifications!(recipient: @recipient)
 
-      @inbox_scope = notifications_inbox_scope
-      @current_root_recording = current_notifications_root_recording
-      group = visible_notification_group(params[:group_id])
-      return head :not_found unless group
+      prepare_inbox
 
       Notification.transaction do
-        group.notifications.select(&:unread?).each(&:mark_read!)
+        @visible_notifications.select(&:unread?).each(&:clear!)
       end
 
       respond_to do |format|
         format.html do
-          redirect_back fallback_location: notifications_path, notice: "Notification group marked read."
+          redirect_back fallback_location: notifications_path,
+                        notice: "Unread notifications cleared.",
+                        status: :see_other
         end
         format.turbo_stream do
-          updated_group = visible_notification_group(params[:group_id])
-
-          render turbo_stream: turbo_stream.replace(
-            notification_group_dom_id(updated_group),
-            partial: "recording_studio_notifications/notifications/group",
-            locals: { group: updated_group, index: 0 }
-          )
+          prepare_inbox
         end
       end
     end
@@ -168,6 +158,15 @@ module RecordingStudioNotifications
       notifications = Notification.for_recipient(@recipient).active
       notifications = notifications.for_current_root_inbox(@current_root_recording) if @inbox_scope == "current_root"
       notifications.newest_first
+    end
+
+    def prepare_inbox
+      @inbox_scope = notifications_inbox_scope
+      @current_root_recording = current_notifications_root_recording
+      @page = current_page
+      @visible_notifications = visible_notifications(scoped_notifications)
+      @has_unread_notifications = @visible_notifications.any?(&:unread?)
+      @notification_sections, @has_next_page = visible_notification_sections_page(@visible_notifications)
     end
 
     def visible_notifications(notifications)
