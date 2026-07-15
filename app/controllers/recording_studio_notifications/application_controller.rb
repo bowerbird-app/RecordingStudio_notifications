@@ -4,9 +4,7 @@ module RecordingStudioNotifications
   parent_controller = defined?(::ApplicationController) ? ::ApplicationController : ActionController::Base
 
   class ApplicationController < parent_controller
-    if defined?(::RecordingStudio::RootSwitchable::ControllerSupport)
-      include ::RecordingStudio::RootSwitchable::ControllerSupport
-    end
+    include ::RecordingStudio::RootSwitchable::ControllerSupport if defined?(::RecordingStudio::RootSwitchable::ControllerSupport)
 
     protect_from_forgery with: :exception
 

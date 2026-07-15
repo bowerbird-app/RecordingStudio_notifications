@@ -26,9 +26,7 @@ module RecordingStudioNotifications
       end
 
       def add_yaml_config
-        unless yes?("Would you like to add `config/recording_studio_notifications.yml` for environment-specific settings? [y/N]")
-          return
-        end
+        return unless yes?("Would you like to add `config/recording_studio_notifications.yml` for environment-specific settings? [y/N]")
 
         template "recording_studio_notifications.yml", "config/recording_studio_notifications.yml"
       end

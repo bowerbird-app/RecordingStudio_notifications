@@ -62,9 +62,7 @@ module RecordingStudioNotifications
       end
 
       normalized_required.each do |channel|
-        unless normalized_available.include?(channel)
-          raise ArgumentError, "required channel #{channel.inspect} must be available"
-        end
+        raise ArgumentError, "required channel #{channel.inspect} must be available" unless normalized_available.include?(channel)
       end
 
       metadata = NotificationType.new(

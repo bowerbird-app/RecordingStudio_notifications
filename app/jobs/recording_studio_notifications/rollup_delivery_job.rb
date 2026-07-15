@@ -44,9 +44,7 @@ module RecordingStudioNotifications
       metadata = first_delivery.metadata
       adapter = RecordingStudioNotifications.channels.fetch(first_delivery.channel.to_sym)
 
-      unless adapter.respond_to?(:deliver_rollup)
-        raise ArgumentError, "channel #{first_delivery.channel.inspect} does not support rollup delivery"
-      end
+      raise ArgumentError, "channel #{first_delivery.channel.inspect} does not support rollup delivery" unless adapter.respond_to?(:deliver_rollup)
 
       ActiveSupport::Notifications.instrument(
         "deliver_rollup.recording_studio_notifications",

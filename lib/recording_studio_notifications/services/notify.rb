@@ -91,9 +91,7 @@ module RecordingStudioNotifications
         unsupported_rollup_channel = channel_keys.find do |channel|
           deferred_rollup_channel?(channel) && !RecordingStudioNotifications.channels.fetch(channel).respond_to?(:deliver_rollup)
         end
-        if unsupported_rollup_channel
-          raise ArgumentError, "channel does not support grouped delivery: #{unsupported_rollup_channel}"
-        end
+        raise ArgumentError, "channel does not support grouped delivery: #{unsupported_rollup_channel}" if unsupported_rollup_channel
 
         UrlSafety.sanitize!(@url)
       end

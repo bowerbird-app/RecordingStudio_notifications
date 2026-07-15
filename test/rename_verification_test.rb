@@ -237,9 +237,7 @@ class RenameVerificationTest < Minitest::Test
 
     ruby_files.each do |file|
       content = File.read(file)
-      if content.include?("recording_studio_notifications") || content.include?("RecordingStudioNotifications")
-        files_with_old_refs << file
-      end
+      files_with_old_refs << file if content.include?("recording_studio_notifications") || content.include?("RecordingStudioNotifications")
     end
 
     assert files_with_old_refs.empty?,
