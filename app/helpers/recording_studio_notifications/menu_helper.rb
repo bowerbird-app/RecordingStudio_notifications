@@ -10,7 +10,7 @@ module RecordingStudioNotifications
       content_tag(
         :div,
         data: {
-          controller: "notification-polling",
+          controller: "recording-studio-notifications--notification-polling",
           notification_polling_url_value: recording_studio_notifications.menu_notifications_path(format: :json),
           notification_polling_interval_value: interval_seconds,
           notification_polling_limit_value: limit

@@ -70,6 +70,25 @@ Notification type scopes are:
 
 The top-nav notification menu loads asynchronously after page render and then polls for updates on `config.polling_interval_seconds` (default: 60 seconds).
 
+To add the menu to a host layout, include the engine helper and render it for the signed-in recipient:
+
+```ruby
+# app/helpers/application_helper.rb
+module ApplicationHelper
+  include RecordingStudioNotifications::MenuHelper
+end
+```
+
+```erb
+<%= recording_studio_notifications_async_menu(recipient: current_user, limit: 5) %>
+```
+
+The engine ships the `recording-studio-notifications--notification-polling` Stimulus controller. The install generator adds it to a standard controller loader; custom loaders must include:
+
+```javascript
+lazyLoadControllersFrom("controllers/recording_studio_notifications", application)
+```
+
 ## Usage
 
 ```ruby

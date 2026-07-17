@@ -10,3 +10,4 @@ Next steps:
 6. Mount routes are added at the configured mount path. Adjust auth, layout, and current actor integration to match your host app.
 7. Use `RecordingStudioNotifications.notify(...)` or enqueue `RecordingStudioNotifications::NotifyJob` from your app code.
 8. The bundled channel is `:in_app`. Webhook delivery is intentionally a seam: register a channel adapter when your host app exposes a public outgoing provider API.
+9. The installer adds the engine notification-polling controller to a standard Stimulus controller loader. If your app has a custom loader, add `lazyLoadControllersFrom("controllers/recording_studio_notifications", application)` to it.

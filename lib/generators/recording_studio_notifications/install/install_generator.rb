@@ -51,6 +51,29 @@ module RecordingStudioNotifications
         show_manual_tailwind_notice(missing_lines)
       end
 
+      def add_notification_polling_controller_loader
+        controllers_index_path = Rails.root.join("app/javascript/controllers/index.js")
+        loader_line = 'lazyLoadControllersFrom("controllers/recording_studio_notifications", application)'
+
+        unless File.exist?(controllers_index_path)
+          say "Stimulus controller index not detected. Add this line to your controller loader:", :yellow
+          say "  #{loader_line}", :yellow
+          return
+        end
+
+        controllers_index = File.read(controllers_index_path)
+        return if controllers_index.include?(loader_line)
+
+        unless controllers_index.include?('import { lazyLoadControllersFrom } from "@hotwired/stimulus-loading"')
+          say "Could not find the Stimulus lazy loader. Add this line to your controller loader:", :yellow
+          say "  #{loader_line}", :yellow
+          return
+        end
+
+        append_to_file controllers_index_path, "\n#{loader_line}\n"
+        say "Added RecordingStudioNotifications polling controller to the Stimulus loader.", :green
+      end
+
       def show_readme
         readme "INSTALL.md" if behavior == :invoke
       end

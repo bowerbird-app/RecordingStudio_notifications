@@ -319,17 +319,19 @@ class NotificationAcceptanceTest < Minitest::Test
     top_nav = File.read(File.expand_path("../test/dummy/app/views/layouts/flat_pack/_top_nav.html.erb", __dir__))
     sidebar = File.read(File.expand_path("../test/dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
     tailwind = File.read(File.expand_path("../test/dummy/app/assets/tailwind/application.css", __dir__))
+    controllers_index = File.read(File.expand_path("../test/dummy/app/javascript/controllers/index.js", __dir__))
     menu_helper = File.read(File.expand_path("../app/helpers/recording_studio_notifications/menu_helper.rb", __dir__))
     menu_partial = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/_menu_component.html.erb",
                                               __dir__))
     polling_controller = File.read(File.expand_path(
-                                     "../test/dummy/app/javascript/controllers/notification_polling_controller.js", __dir__
+                                     "../app/javascript/recording_studio_notifications/controllers/notification_polling_controller.js", __dir__
                                    ))
 
     assert_includes helper, "include RecordingStudioNotifications::MenuHelper"
     assert_includes helper, "def demo_notification_path"
     assert_includes helper, "def demo_notifications"
     assert_includes helper, "recording_studio_notifications_async_menu(recipient: current_user, limit: limit)"
+    assert_includes menu_helper, "recording-studio-notifications--notification-polling"
     assert_includes menu_helper, "notification_polling_url_value"
     assert_includes menu_helper, "notification_polling_interval_value"
     assert_includes menu_helper, "notification_polling_limit_value"
@@ -337,6 +339,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes polling_controller, "this.refresh()"
     assert_includes polling_controller, "setInterval"
     assert_includes polling_controller, "polling_interval_seconds"
+    assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/recording_studio_notifications", application)'
     assert_includes top_nav, "recording_studio_notifications_menu"
     assert_includes sidebar, "RecordingStudioNotifications::VERSION"
     refute_includes sidebar, "FlatPack::VERSION"

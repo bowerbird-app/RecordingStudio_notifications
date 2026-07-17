@@ -122,6 +122,31 @@ class InstallGeneratorTest < Minitest::Test
     end
   end
 
+  def test_adds_notification_polling_controller_to_stimulus_loader
+    with_temp_app do |dir|
+      controllers_path = File.join(dir, "app/javascript/controllers")
+      FileUtils.mkdir_p(controllers_path)
+      index_path = File.join(controllers_path, "index.js")
+      File.write(index_path, <<~JAVASCRIPT)
+        import { application } from "controllers/application"
+        import { lazyLoadControllersFrom } from "@hotwired/stimulus-loading"
+
+        lazyLoadControllersFrom("controllers", application)
+      JAVASCRIPT
+
+      generator = build_generator(dir)
+
+      Rails.stub(:root, Pathname.new(dir)) do
+        generator.stub(:say, nil) do
+          generator.add_notification_polling_controller_loader
+        end
+      end
+
+      assert_includes File.read(index_path),
+                      'lazyLoadControllersFrom("controllers/recording_studio_notifications", application)'
+    end
+  end
+
   def test_show_readme_displays_install_guide_for_invoke_behavior
     generator = build_generator(File.expand_path("..", __dir__))
     shown_templates = []
@@ -141,6 +166,7 @@ class InstallGeneratorTest < Minitest::Test
     assert_includes install_guide, "bin/rails generate recording_studio_notifications:migrations"
     assert_includes install_guide, "bin/rails db:migrate"
     assert_includes install_guide, "auth, layout, and current actor integration"
+    assert_includes install_guide, "recording_studio_notifications"
   end
 
   private

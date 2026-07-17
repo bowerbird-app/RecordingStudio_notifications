@@ -4,6 +4,16 @@ module RecordingStudioNotifications
   class Engine < ::Rails::Engine
     isolate_namespace RecordingStudioNotifications
 
+    initializer "recording_studio_notifications.assets" do |app|
+      app.config.assets.paths << root.join("app/javascript") if app.config.respond_to?(:assets)
+    end
+
+    initializer "recording_studio_notifications.importmap", before: "importmap" do |app|
+      next unless app.config.respond_to?(:importmap)
+
+      app.config.importmap.paths << root.join("config/importmap.rb")
+    end
+
     class << self
       def apply_model_extensions(target)
         apply_extensions(target,

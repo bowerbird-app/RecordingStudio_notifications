@@ -49,16 +49,19 @@ class RecordingStudioNotificationsTest < Minitest::Test
     initializer = File.read(File.expand_path("dummy/config/initializers/recording_studio_notifications.rb", __dir__))
     controllers_index = File.read(File.expand_path("dummy/app/javascript/controllers/index.js", __dir__))
     polling_controller = File.read(File.expand_path(
-                                     "dummy/app/javascript/controllers/notification_polling_controller.js", __dir__
+                                     "../app/javascript/recording_studio_notifications/controllers/notification_polling_controller.js", __dir__
                                    ))
+    engine_importmap = File.read(File.expand_path("../config/importmap.rb", __dir__))
 
     assert_includes routes, "mount RecordingStudioNotifications::Engine"
     assert_includes initializer, "config.notification_types.register"
     assert_includes initializer, ":page_comment"
     assert_includes initializer, ":page_created"
     assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/flat_pack", application)'
+    assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/recording_studio_notifications", application)'
     assert_includes polling_controller, "class extends Controller"
     assert_includes polling_controller, "this.refresh()"
+    assert_includes engine_importmap, 'under: "controllers/recording_studio_notifications"'
   end
 
   def test_engine_views_use_flatpack_menu_component_and_scoped_settings_layering
