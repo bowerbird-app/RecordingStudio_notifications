@@ -195,14 +195,14 @@ class NotificationAcceptanceTest < Minitest::Test
                                          "../test/dummy/config/initializers/recording_studio_accessible.rb", __dir__
                                        ))
 
-    assert_includes controller, "@inbox_scope = notifications_inbox_scope"
     assert_includes controller, 'require "recording_studio_notifications/services/inbox_grouping"'
     assert_includes controller, "def menu"
     assert_includes controller, "def group_page"
     assert_includes controller, "def clear_all"
     assert_includes controller, "GROUP_NOTIFICATIONS_PER_PAGE = 20"
     assert_includes controller, "visible_notification_group(params[:group_id])"
-    assert_includes controller, "@inbox_scope = \"all\""
+    assert_includes controller, "@inbox_scope = notifications_inbox_scope"
+    refute_includes controller, "@inbox_scope = \"all\""
     assert_includes controller, "polling_interval_seconds"
     assert_includes routes, "get :menu"
     assert_includes routes, 'get "groups/:group_id/page", action: :group_page'

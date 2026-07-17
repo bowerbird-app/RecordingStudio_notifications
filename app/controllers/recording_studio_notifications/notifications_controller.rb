@@ -26,9 +26,8 @@ module RecordingStudioNotifications
     def menu
       return unless authorize_notifications!(recipient: @recipient)
 
-      # Menu polling should not depend on current-root query params from the host page.
-      # Show a recent feed across all accessible notifications for the actor.
-      @inbox_scope = "all"
+      # Keep menu results aligned with inbox filtering: current root + rootless.
+      @inbox_scope = notifications_inbox_scope
       @current_root_recording = current_notifications_root_recording
 
       visible = visible_notifications(scoped_notifications)
