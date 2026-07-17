@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-07-17
+
+### Fixed
+- Scoped notification menu and /notifications inbox visibility to the current root plus rootless notifications, excluding notifications from other workspace roots.
+
 ## [0.2.2] - 2026-07-17
 
 ### Fixed
@@ -49,7 +54,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.1.1...v0.2.0
