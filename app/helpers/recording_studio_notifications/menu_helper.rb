@@ -11,14 +11,15 @@ module RecordingStudioNotifications
         :div,
         data: {
           controller: "recording-studio-notifications--notification-polling",
-          notification_polling_url_value: recording_studio_notifications.menu_notifications_path(format: :json),
-          notification_polling_interval_value: interval_seconds,
-          notification_polling_limit_value: limit
+          "recording-studio-notifications--notification-polling-url-value":
+            recording_studio_notifications.menu_notifications_path(format: :json),
+          "recording-studio-notifications--notification-polling-interval-value": interval_seconds,
+          "recording-studio-notifications--notification-polling-limit-value": limit
         }
       ) do
         content_tag(
           :div,
-          data: { notification_polling_target: "content" }
+          data: { "recording-studio-notifications--notification-polling-target": "content" }
         ) do
           render(
             partial: "recording_studio_notifications/notifications/menu_component",
