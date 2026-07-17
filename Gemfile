@@ -6,7 +6,7 @@ source "https://rubygems.org"
 gem "devise"
 gemspec
 
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.125"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.127"
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "recording_studio/v3.0.0"
 gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "0.3.1"
 
