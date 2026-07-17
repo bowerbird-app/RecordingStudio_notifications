@@ -354,6 +354,9 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes readme, "Current-root inbox behavior"
     assert_includes readme, "CaptainHook"
     assert_includes readme, "not RecordingStudio recordings or recordables"
+    assert_includes readme, "recording-studio-notifications--notification-polling"
+    assert_includes readme, "deliver_rollup"
+    assert_includes readme, "recording_studio_notifications:deliver_rollups"
   end
 
   def test_commentable_hook_wires_notification
