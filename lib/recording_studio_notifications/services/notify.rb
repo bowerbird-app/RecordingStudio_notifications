@@ -212,7 +212,7 @@ module RecordingStudioNotifications
       end
 
       def deferred_rollup_channel?(channel)
-        effective_cadence != :individual && channel.to_sym != :in_app
+        effective_cadence != :individual
       end
 
       def effective_cadence
