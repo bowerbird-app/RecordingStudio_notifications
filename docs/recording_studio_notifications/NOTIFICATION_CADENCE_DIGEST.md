@@ -197,7 +197,7 @@ The selected cadence applies to each enabled channel for that notification type.
 
 | Channel | Individual cadence | Grouped cadence |
 | --- | --- | --- |
-| `:in_app` | Individual source notification | Source notifications shown in period group |
+| `:in_app` | One immediate in-app notification per source notification | One in-app rollup at period close |
 | `:email` | One immediate email per source notification | One period rollup email |
 | `:slack` | One immediate Slack send per source notification | One period rollup Slack send |
 | `:push` | One immediate push per source notification | One rollup when supported by channel format |

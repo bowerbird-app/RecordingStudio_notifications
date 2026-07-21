@@ -89,18 +89,25 @@ class NotifyDeliveryCadenceTest < ActiveSupport::TestCase
     end
   end
 
-  test "grouped in-app delivery remains immediate while external rollups are deferred" do
-    notification = RecordingStudioNotifications.notify(
-      notification_type: :grouped_in_app_delivery_test,
-      recipient: @recipient,
-      title: "Daily inbox notification",
-      deliver_later: false
-    )
-    delivery = notification.deliveries.sole
+  test "grouped in-app delivery is deferred until the cadence period closes" do
+    travel_to Time.utc(2026, 7, 8, 12) do
+      notification = RecordingStudioNotifications.notify(
+        notification_type: :grouped_in_app_delivery_test,
+        recipient: @recipient,
+        title: "Daily inbox notification",
+        deliver_later: false
+      )
+      delivery = notification.deliveries.sole
 
-    assert_equal "in_app", delivery.channel
-    assert delivery.delivered?
-    refute delivery.deferred_rollup?
+      assert_equal "in_app", delivery.channel
+      assert delivery.pending?
+      assert delivery.deferred_rollup?
+
+      RecordingStudioNotifications::RollupDeliveryJob.perform_now(now: Time.utc(2026, 7, 9, 0))
+
+      assert delivery.reload.delivered?
+      refute delivery.deferred_rollup?
+    end
   end
 
   test "one closed rollup period dispatches all associated source deliveries once" do
