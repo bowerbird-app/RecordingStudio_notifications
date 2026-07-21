@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-07-21
+
+### Fixed
+- Deferred grouped cadence delivery for all channels, including `:in_app`, when rollups are enabled.
+- Hid pending in-app rollup notifications from inbox/menu until the cadence period closes and rollup delivery completes.
+- Removed persistent accordion item borders in grouped notification rows to keep list styling consistent.
+
+### Changed
+- Updated cadence docs and dummy app cadence coverage to reflect deferred in-app rollup behavior.
+
 ## [0.2.3] - 2026-07-17
 
 ### Fixed
@@ -54,7 +64,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.3...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.4...HEAD
+[0.2.4]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.0...v0.2.1
