@@ -1,3 +1,14 @@
+<style>
+  .rsn-rollup-accordion [class*="border-[var(--accordion-item-border-color)]"] {
+    border-color: transparent !important;
+    border-bottom-color: transparent !important;
+  }
+
+  .rsn-rollup-accordion .border-b {
+    border-bottom-color: transparent !important;
+  }
+</style>
+
 <div class="mx-auto flex w-full max-w-5xl flex-col gap-6">
   <%= render FlatPack::PageNav::Component.new(
     anchor_url: main_app.root_path

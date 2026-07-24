@@ -122,6 +122,11 @@ begin
     idempotency_key: "seed-workspace-change-#{root_recording.id}"
   )
 
+  # Finalize seeded cadence rollups so grouped in-app notifications are visible immediately.
+  if RecordingStudioNotifications.configuration.rollup_delivery_enabled
+    RecordingStudioNotifications::RollupDeliveryJob.perform_now(now: Time.utc(2099, 1, 1))
+  end
+
   if defined?(RecordingStudioAccessible) && RecordingStudioAccessible.respond_to?(:grant_access)
     ensure_access_for = lambda do |parent_recording, role|
       root_for_parent = RecordingStudio.root_recording_or_self(parent_recording)
