@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-07-24
+
+### Fixed
+- Removed grouped notification accordion border bleed in FlatPack versions that render item border wrappers at deeper selector depth.
+- Finalized dummy seeded cadence rollups during seeding so grouped in-app notifications are immediately visible in demo inbox/menu views.
+
 ## [0.2.4] - 2026-07-21
 
 ### Fixed
@@ -64,7 +70,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.4...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.5...HEAD
+[0.2.5]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.1...v0.2.2
