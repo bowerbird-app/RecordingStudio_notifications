@@ -244,7 +244,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes notification_partial, "FlatPack::Timestamp::Component.new("
     assert_includes notification_partial, "shorten_timestamp: true"
     assert_includes notifications_helper, "notification_group_badge_text"
-    assert_includes notifications_helper, '#{unread_count} unread notifications'
+    assert_match(/#\{unread_count\} unread notifications/, notifications_helper)
     assert_includes notifications_helper, "bg-red-600"
     assert_includes notifications_helper, "fp-red-dot"
     assert_includes notifications_helper, "def notification_group_next_page_dom_id(group, page)"
