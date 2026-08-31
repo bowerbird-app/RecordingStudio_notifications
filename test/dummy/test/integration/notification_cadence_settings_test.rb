@@ -48,8 +48,11 @@ class NotificationCadenceSettingsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "cadences[settings_cadence_test]"
     assert_includes response.body, 'name="cadences[required_settings_cadence_test]"'
     assert_includes response.body, 'value="daily" selected="selected">Daily</option>'
-    assert_includes response.body, 'name="preferences[required_settings_cadence_test][]" value="in_app"'
-    assert_includes response.body, 'disabled="disabled"'
+    required_section = response.body[/Required settings cadence test.*?<\/section>/m, 0]
+    assert required_section
+    assert_includes required_section, "rsn-required-channel-chip"
+    assert_includes required_section, "In app"
+    refute_match(/role="option"[^>]*data-value="in_app"/, required_section)
   end
 
   test "settings persist an allowed cadence override independently of channels" do

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Required channel pills on notification settings no longer show "(required)" or a remove control; hovering shows a tooltip explaining the channel cannot be removed.
+- Required channels no longer appear in the notification settings channel dropdown; they stay visible as non-removable pills only.
 - Corrected Tailwind `@source` paths for `app/assets/tailwind/application.css` so they resolve from Rails.root (`../../../vendor/bundle/...`) and match git-gem folder names (`flatpack-*`, `recording_studio_notifications-*`).
 - Updated the dummy app Tailwind sources so FlatPack components and Recording Studio gem views are scanned during `tailwindcss:build`.
 

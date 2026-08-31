@@ -4,7 +4,7 @@ module RecordingStudioNotifications
   class SettingsController < ApplicationController
     layout "recording_studio_notifications/blank"
 
-    helper_method :channel_configurable?, :cadence_selectable?, :rollup_delivery_enabled?
+    helper_method :channel_configurable?, :cadence_selectable?, :rollup_delivery_enabled?, :channel_settings_help_text
 
     before_action :set_recipient
     before_action :authorize_settings
@@ -90,8 +90,8 @@ module RecordingStudioNotifications
 
     def channel_select_options_map
       flat_notification_types.each_with_object({}) do |type, map|
-        options = Array(type.available_channels).map do |channel|
-          [channel_option_label(type, channel), channel.to_s, { disabled: type.required_channels.include?(channel) }]
+        options = type.optional_channels.map do |channel|
+          [channel_option_label(type, channel), channel.to_s]
         end
 
         options.unshift(%w[None __none__]) if type.required_channels.empty?
@@ -106,7 +106,7 @@ module RecordingStudioNotifications
           preference_enabled?(type, channel)
         end
 
-        map[type.key] = (type.required_channels + selected_optional_channels).map(&:to_s)
+        map[type.key] = selected_optional_channels.map(&:to_s)
       end
     end
 
@@ -136,6 +136,16 @@ module RecordingStudioNotifications
 
     def channel_option_label(_type, channel)
       channel.to_s.humanize
+    end
+
+    def channel_settings_help_text(type)
+      if type.required_channels.any? && type.optional_channels.any?
+        "Required channels stay enabled and optional channels can be added or removed."
+      elsif type.required_channels.any?
+        "This notification type has required channels only."
+      else
+        "Choose which channels to receive notifications on."
+      end
     end
 
     def required_channels_by_type
