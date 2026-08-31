@@ -2,6 +2,8 @@ source "https://rubygems.org"
 
 # Use the recording_studio_notifications engine
 gem "recording_studio_notifications", path: "../.."
+gem "recording_studio_notifications_email", "~> 0.1.0",
+    github: "bowerbird-app/RecordingStudio_notifications_email"
 
 # RecordingStudio engine
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "recording_studio/v3.0.0"
