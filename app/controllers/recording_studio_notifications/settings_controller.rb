@@ -66,6 +66,7 @@ module RecordingStudioNotifications
       @preferences = preference_map
       @channel_select_options = channel_select_options_map
       @selected_channels = selected_channels_map
+      @required_channels_by_type = required_channels_by_type
       @cadence_select_options = cadence_select_options_map
       @selected_cadences = selected_cadences_map
     end
@@ -133,10 +134,14 @@ module RecordingStudioNotifications
       @preferences.fetch([type.key, channel], Array(type.default_channels).include?(channel))
     end
 
-    def channel_option_label(type, channel)
-      return channel.to_s.humanize unless type.required_channels.include?(channel)
+    def channel_option_label(_type, channel)
+      channel.to_s.humanize
+    end
 
-      "#{channel.to_s.humanize} (required)"
+    def required_channels_by_type
+      flat_notification_types.each_with_object({}) do |type, map|
+        map[type.key.to_s] = type.required_channels.map(&:to_s)
+      end
     end
 
     def preference_map

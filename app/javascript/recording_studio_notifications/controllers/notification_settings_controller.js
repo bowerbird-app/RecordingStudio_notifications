@@ -1,9 +1,16 @@
 import { Controller } from "@hotwired/stimulus"
 import { application } from "controllers/application"
 
+const REQUIRED_CHANNEL_TOOLTIP = "This channel can't be removed"
+
 export default class extends Controller {
+  static values = {
+    requiredChannels: { type: Object, default: {} }
+  }
+
   connect() {
     this.previousSelections = new WeakMap()
+    requestAnimationFrame(() => this.decorateRequiredChips())
   }
 
   syncNoneSelection(event) {
@@ -34,6 +41,7 @@ export default class extends Controller {
     if (flatPackSelectController) {
       flatPackSelectController.selectedValues = new Set(normalized)
       flatPackSelectController.syncSelectedState()
+      this.decorateRequiredChips()
       return
     }
 
@@ -41,6 +49,47 @@ export default class extends Controller {
     this.writeHiddenInputs(hiddenInputs, inputName, normalized)
     this.syncOptionState(selectRoot, normalized)
     this.syncChipState(selectRoot, normalized)
+    this.decorateRequiredChips()
+  }
+
+  decorateRequiredChips() {
+    this.element.querySelectorAll("[data-controller~='flat-pack--select']").forEach((selectRoot) => {
+      const typeKey = this.typeKeyForSelect(selectRoot)
+      if (!typeKey) return
+
+      const required = new Set((this.requiredChannelsValue[typeKey] || []).map(String))
+
+      selectRoot.querySelectorAll("[data-flat-pack--select-target='chip']").forEach((chip) => {
+        if (!required.has(chip.dataset.value)) return
+
+        chip.querySelectorAll("[data-action*='removeChip']").forEach((removeControl) => {
+          removeControl.remove()
+        })
+
+        if (chip.dataset.requiredChannelDecorated === "true") return
+
+        const chipVisual = chip.querySelector(".inline-flex.items-center")
+        if (chipVisual) {
+          chipVisual.dataset.tooltip = REQUIRED_CHANNEL_TOOLTIP
+          chipVisual.setAttribute("aria-label", REQUIRED_CHANNEL_TOOLTIP)
+          chipVisual.setAttribute("tabindex", "0")
+          chipVisual.classList.add("rsn-required-channel-chip")
+        }
+
+        chip.dataset.requiredChannelDecorated = "true"
+      })
+    })
+  }
+
+  typeKeyForSelect(selectRoot) {
+    const inputName =
+      selectRoot.dataset.flatPackSelectInputNameValue ||
+      selectRoot.querySelector("input[type='hidden']")?.name
+
+    if (!inputName) return null
+
+    const match = inputName.match(/preferences\[([^\]]+)\]/)
+    return match ? match[1] : null
   }
 
   hiddenValues(hiddenInputs) {

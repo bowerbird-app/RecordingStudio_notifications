@@ -9,24 +9,29 @@
   --color-danger-text-color: var(--color-danger-text-color);
 }
 
-/* Include RecordingStudioAdmin engine and FlatPack sources */
-@source "../../vendor/bundle/**/recording_studio_admin/app/views/**/*.erb";
-@source "../../vendor/bundle/**/recording_studio_admin/app/components/**/*.{rb,erb}";
-@source "../../vendor/bundle/**/flat_pack/app/components/**/*.{rb,erb}";
-
 /* Include dummy app views for Tailwind CSS */
 @source "../../views/**/*.erb";
 
-/* Include RecordingStudio engine views for Tailwind CSS */
-@source "../../../vendor/bundle/**/recording_studio/app/views/**/*.erb";
-@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recordingstudio-*/app/views/**/*.erb";
-
-/* Scan FlatPack components for classes used by the bundled ViewComponents */
-@source "../../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}";
-@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
-
-/* Include the engine's views in the Tailwind build */
+/* Include this engine's views (path gem / local checkout) */
 @source "../../../../../app/views/**/*.erb";
+
+/*
+ * Scan bundled gems. Prefer vendor/bundle (bundle config set --local path vendor/bundle)
+ * and keep /usr/local/bundle for Codespaces images. Git gems use name-hash folders,
+ * so match flatpack-* / RecordingStudio* rather than a bare package directory name.
+ */
+@source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/RecordingStudio*/app/views/**/*.erb";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/RecordingStudio_admin*/app/views/**/*.erb";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/RecordingStudio_admin*/app/components/**/*.{rb,erb}";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";
+
+@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
+@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/RecordingStudio*/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/RecordingStudio_admin*/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/RecordingStudio_admin*/app/components/**/*.{rb,erb}";
+@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/recordingstudio-*/app/views/**/*.erb";
 
 /* Keep FlatPack notification popover within viewport to avoid negative top placement on scroll. */
 [id^="flat-pack-notification-"][id$="-popover"] .max-h-96 {

@@ -16,6 +16,41 @@
     .rsn-settings-accordion .flat-pack-select-wrapper:focus-within {
       z-index: 40;
     }
+
+    .rsn-required-channel-chip {
+      cursor: help;
+      position: relative;
+    }
+
+    .rsn-required-channel-chip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 0.5rem);
+      left: 50%;
+      z-index: 50;
+      width: max-content;
+      max-width: var(--tooltip-max-width, 16rem);
+      padding: var(--tooltip-padding-y, 0.375rem) var(--tooltip-padding-x, 0.625rem);
+      border-radius: var(--tooltip-radius, 0.375rem);
+      border: 1px solid var(--tooltip-border-color, var(--surface-border-color));
+      background: var(--tooltip-background-color, var(--surface-content-color));
+      color: var(--tooltip-text-color, var(--surface-background-color));
+      box-shadow: var(--tooltip-shadow, 0 10px 15px -3px rgb(0 0 0 / 0.1));
+      font-size: var(--tooltip-font-size, 0.875rem);
+      font-weight: 500;
+      line-height: 1.25;
+      white-space: normal;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateX(-50%) translateY(0.25rem);
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+
+    .rsn-required-channel-chip:hover::after,
+    .rsn-required-channel-chip:focus-visible::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 
   <%= render FlatPack::PageNav::Component.new(
@@ -27,7 +62,11 @@
     variant: :h1
   ) %>
 
-  <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4 rsn-settings-accordion", data: { controller: "notification-settings", action: "change->notification-settings#syncNoneSelection" } do %>
+  <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4 rsn-settings-accordion", data: {
+        controller: "recording-studio-notifications--notification-settings",
+        action: "change->recording-studio-notifications--notification-settings#syncNoneSelection",
+        recording_studio_notifications__notification_settings_required_channels_value: @required_channels_by_type.to_json
+      } do %>
     <% if @notification_type_groups.any? %>
       <%= render FlatPack::Accordion::Component.new(allow_multiple: true) do |accordion| %>
         <% @notification_type_groups.each do |category, types| %>
@@ -44,7 +83,6 @@
                         label: "Channel",
                         placeholder: (type.optional_channels.any? ? "Search and select channels..." : "Required channels only"),
                         help_text: type.description.presence || (type.optional_channels.any? ? "Required channels stay enabled and optional channels can be added or removed." : "This notification type has required channels only."),
-                        disabled: type.optional_channels.empty?,
                         searchable: true,
                         multiple: true,
                         value: @selected_channels.fetch(type.key),

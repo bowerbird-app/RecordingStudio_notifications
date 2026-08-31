@@ -119,10 +119,12 @@ module RecordingStudioNotifications
 
       def tailwind_source_lines
         [
-          '@source "../../vendor/bundle/**/recording_studio_notifications/app/views/**/*.erb";',
-          '@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
-          '@source "../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}";',
-          '@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";'
+          # From app/assets/tailwind/, Rails.root is ../../../ (not ../../).
+          # Git gems live under ruby/*/bundler/gems/<name>-<hash>/, so match with *-suffixes.
+          '@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
+          '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
+          '@source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
+          '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";'
         ]
       end
     end
