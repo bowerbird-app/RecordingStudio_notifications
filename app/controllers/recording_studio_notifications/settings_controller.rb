@@ -4,7 +4,7 @@ module RecordingStudioNotifications
   class SettingsController < ApplicationController
     layout "recording_studio_notifications/blank"
 
-    helper_method :channel_configurable?, :cadence_selectable?, :rollup_delivery_enabled?
+    helper_method :channel_configurable?, :cadence_selectable?, :rollup_delivery_enabled?, :channel_settings_help_text
 
     before_action :set_recipient
     before_action :authorize_settings
@@ -66,6 +66,7 @@ module RecordingStudioNotifications
       @preferences = preference_map
       @channel_select_options = channel_select_options_map
       @selected_channels = selected_channels_map
+      @required_channels_by_type = required_channels_by_type
       @cadence_select_options = cadence_select_options_map
       @selected_cadences = selected_cadences_map
     end
@@ -90,7 +91,11 @@ module RecordingStudioNotifications
     def channel_select_options_map
       flat_notification_types.each_with_object({}) do |type, map|
         options = Array(type.available_channels).map do |channel|
-          [channel_option_label(type, channel), channel.to_s, { disabled: type.required_channels.include?(channel) }]
+          {
+            label: channel_option_label(type, channel),
+            value: channel.to_s,
+            disabled: type.required_channels.include?(channel)
+          }
         end
 
         options.unshift(%w[None __none__]) if type.required_channels.empty?
@@ -133,10 +138,24 @@ module RecordingStudioNotifications
       @preferences.fetch([type.key, channel], Array(type.default_channels).include?(channel))
     end
 
-    def channel_option_label(type, channel)
-      return channel.to_s.humanize unless type.required_channels.include?(channel)
+    def channel_option_label(_type, channel)
+      channel.to_s.humanize
+    end
 
-      "#{channel.to_s.humanize} (required)"
+    def channel_settings_help_text(type)
+      if type.required_channels.any? && type.optional_channels.any?
+        "Required channels stay enabled and optional channels can be added or removed."
+      elsif type.required_channels.any?
+        "This notification type has required channels only."
+      else
+        "Choose which channels to receive notifications on."
+      end
+    end
+
+    def required_channels_by_type
+      flat_notification_types.each_with_object({}) do |type, map|
+        map[type.key.to_s] = type.required_channels.map(&:to_s)
+      end
     end
 
     def preference_map

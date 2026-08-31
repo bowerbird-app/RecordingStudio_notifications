@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-08-31
+
+### Fixed
+- Required channel pills on notification settings no longer show "(required)" or a remove control; hovering shows a tooltip explaining the channel cannot be removed.
+- Required channels no longer appear in the notification settings channel dropdown list; they stay visible as non-removable pills in the select. When a type has no optional channels the whole channel select is disabled rather than hidden.
+- Corrected Tailwind `@source` paths for `app/assets/tailwind/application.css` so they resolve from Rails.root (`../../../vendor/bundle/...`) and match git-gem folder names (`flatpack-*`, `recording_studio_notifications-*`).
+- Updated the dummy app Tailwind sources so FlatPack components and Recording Studio gem views are scanned during `tailwindcss:build`.
+
+### Changed
+- Installed `recording_studio_notifications_email` in the dummy app and exposed `email` as an optional channel on its notification types.
+
+### Upgrade notes
+- If your host Tailwind entry still uses the old install-generator lines (`../../vendor/bundle/**/flatpack/...` or `**/recording_studio_notifications/...` without a `-*` suffix), replace them with the paths from `rails generate recording_studio_notifications:install` (or the README), then run `bin/rails tailwindcss:build`.
+- Prefer `bundle config set --local path vendor/bundle` (or an equivalent Bundler path that the `@source` globs cover) so Tailwind can see gem templates.
+
 ## [0.2.5] - 2026-07-24
 
 ### Fixed

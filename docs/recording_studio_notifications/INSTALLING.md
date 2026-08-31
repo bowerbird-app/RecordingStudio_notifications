@@ -98,8 +98,8 @@ See [CONFIGURATION.md](CONFIGURATION.md) for all options.
 If your app uses Tailwind, the generator adds `@source` directives to include engine views and FlatPack components:
 
 ```css
-@source "../../vendor/bundle/**/recording_studio_notifications/app/views/**/*.erb";
-@source "../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 ```
 
 This ensures Tailwind scans the engine's templates for class names during CSS compilation.
@@ -140,8 +140,8 @@ end
 Add to your `app/assets/tailwind/application.css`:
 
 ```css
-@source "../../vendor/bundle/**/recording_studio_notifications/app/views/**/*.erb";
-@source "../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 ```
 
 Then rebuild:

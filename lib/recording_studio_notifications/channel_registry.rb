@@ -50,8 +50,7 @@ module RecordingStudioNotifications
         notification
       end
 
-      def deliver_rollup(notifications:, deliveries:, rollup_key:, cadence:, period_starts_at:, period_ends_at:,
-                         idempotency_key:)
+      def deliver_rollup(notifications:, **)
         notifications
       end
     end

@@ -18,7 +18,7 @@ RecordingStudioNotifications.configure do |config|
     description: "Root-scoped notification for workspace-level updates.",
     icon: :bell,
     default_channels: [:in_app],
-    available_channels: [:in_app],
+    available_channels: %i[in_app email],
     allowed_cadences: %i[individual daily weekly monthly],
     default_cadence: :monthly,
     scope: :root
@@ -32,7 +32,7 @@ RecordingStudioNotifications.configure do |config|
     icon: :exclamation_triangle,
     default_channels: [],
     required_channels: [:in_app],
-    available_channels: [:in_app],
+    available_channels: %i[in_app email],
     allowed_cadences: %i[individual daily weekly],
     default_cadence: :individual,
     required_cadence: :individual,
@@ -46,7 +46,7 @@ RecordingStudioNotifications.configure do |config|
     description: "Optional-root notification for comments on pages.",
     icon: :chat_bubble_left_ellipsis,
     default_channels: [:in_app],
-    available_channels: [:in_app],
+    available_channels: %i[in_app email],
     allowed_cadences: %i[individual daily weekly monthly],
     default_cadence: :daily,
     scope: :optional_root
@@ -59,7 +59,7 @@ RecordingStudioNotifications.configure do |config|
     description: "Root-scoped notification when a new page is created.",
     icon: :document_text,
     default_channels: [:in_app],
-    available_channels: [:in_app],
+    available_channels: %i[in_app email],
     allowed_cadences: %i[individual daily weekly],
     default_cadence: :weekly,
     scope: :root

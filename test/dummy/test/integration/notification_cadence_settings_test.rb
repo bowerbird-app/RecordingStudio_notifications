@@ -35,6 +35,9 @@ class NotificationCadenceSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "settings render selectable and required notification cadence guidance" do
+    assert RecordingStudioNotifications.channels.registered?(:email)
+    assert_equal "notifications@example.test", RecordingStudioNotificationsEmail.configuration.from
+
     get "/notifications/settings"
 
     assert_response :success
@@ -48,8 +51,18 @@ class NotificationCadenceSettingsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "cadences[settings_cadence_test]"
     assert_includes response.body, 'name="cadences[required_settings_cadence_test]"'
     assert_includes response.body, 'value="daily" selected="selected">Daily</option>'
-    assert_includes response.body, 'name="preferences[required_settings_cadence_test][]" value="in_app"'
-    assert_includes response.body, 'disabled="disabled"'
+    required_section = response.body[/Required settings cadence test.*?<\/section>/m, 0]
+    assert required_section
+    assert_includes required_section, 'name="preferences[required_settings_cadence_test][]" value="in_app"'
+    assert_includes required_section, 'data-flat-pack--select-target="chip" data-value="in_app"'
+    assert_includes required_section, 'disabled="disabled" data-action="flat-pack--select#toggle"'
+
+    system_section = response.body[/System announcement.*?<\/section>/m, 0]
+    assert system_section
+    assert_includes system_section, 'data-flat-pack--select-target="chip" data-value="in_app"'
+    assert_includes system_section, 'role="option"'
+    assert_includes system_section, 'data-value="email"'
+    refute_includes system_section, 'disabled="disabled" data-action="flat-pack--select#toggle"'
   end
 
   test "settings persist an allowed cadence override independently of channels" do

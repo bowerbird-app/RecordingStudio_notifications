@@ -244,7 +244,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes notification_partial, "FlatPack::Timestamp::Component.new("
     assert_includes notification_partial, "shorten_timestamp: true"
     assert_includes notifications_helper, "notification_group_badge_text"
-    assert_includes notifications_helper, '#{unread_count} unread notifications'
+    assert_match(/#\{unread_count\} unread notifications/, notifications_helper)
     assert_includes notifications_helper, "bg-red-600"
     assert_includes notifications_helper, "fp-red-dot"
     assert_includes notifications_helper, "def notification_group_next_page_dom_id(group, page)"
@@ -264,6 +264,9 @@ class NotificationAcceptanceTest < Minitest::Test
                                             __dir__))
     settings = File.read(File.expand_path("../app/views/recording_studio_notifications/settings/show.html.erb",
                                           __dir__))
+    controller_js = File.read(File.expand_path(
+                                "../app/javascript/recording_studio_notifications/controllers/notification_settings_controller.js", __dir__
+                              ))
     views = Dir[File.expand_path("../app/views/recording_studio_notifications/**/*.erb", __dir__)].map do |path|
       File.read(path)
     end.join("
@@ -287,7 +290,14 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, "Array(submitted[type.key.to_s]).flatten.map(&:to_s).reject(&:blank?)"
     assert_includes controller, "selected_channels = [] if selected_channels.include?(\"__none__\")"
     assert_includes controller, "disabled: type.required_channels.include?(channel)"
+    assert_includes controller, "channel_settings_help_text"
+    assert_includes controller, "required_channels_by_type"
     assert_includes controller, "%w[None __none__]"
+    refute_includes settings, "(required)"
+    assert_includes settings, "rsn-required-channel-chip"
+    assert_includes controller_js, "removeRequiredOptions"
+    assert_includes settings, "recording-studio-notifications--notification-settings"
+    assert_includes settings, "recording_studio_notifications__notification_settings_required_channels_value"
     assert_includes routes, "resource :settings"
     assert_includes settings, "Notification settings"
     assert_includes settings, "FlatPack::Accordion::Component.new"
@@ -295,8 +305,9 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes settings, "FlatPack::Select::Component.new"
     assert_includes settings, "@notification_type_groups.each do |category, types|"
     assert_includes settings, "category.to_s.titleize"
-    assert_includes settings, "disabled: type.optional_channels.empty?"
     assert_includes settings, "Required channels only"
+    assert_includes settings, "disabled: type.optional_channels.empty?"
+    assert_includes settings, "channel_settings_help_text(type)"
     assert_includes settings, "multiple: true"
     assert_includes settings, "searchable: true"
     assert_includes settings, 'name: "cadences[#{type.key}]"'
