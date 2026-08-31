@@ -59,6 +59,8 @@ export default class extends Controller {
 
       const required = new Set((this.requiredChannelsValue[typeKey] || []).map(String))
 
+      this.removeRequiredOptions(selectRoot, required)
+
       selectRoot.querySelectorAll("[data-flat-pack--select-target='chip']").forEach((chip) => {
         if (!required.has(chip.dataset.value)) return
 
@@ -79,6 +81,21 @@ export default class extends Controller {
         chip.dataset.requiredChannelDecorated = "true"
       })
     })
+  }
+
+  removeRequiredOptions(selectRoot, required) {
+    if (required.size === 0) return
+
+    const optionsList = selectRoot.querySelector("[data-flat-pack--select-target='optionsList']")
+    if (!optionsList) return
+
+    required.forEach((channel) => {
+      optionsList.querySelectorAll(`[role='option'][data-value='${CSS.escape(channel)}']`).forEach((option) => {
+        option.remove()
+      })
+    })
+
+    optionsList.dataset.resultsCount = String(optionsList.querySelectorAll("[role='option']").length)
   }
 
   typeKeyForSelect(selectRoot) {

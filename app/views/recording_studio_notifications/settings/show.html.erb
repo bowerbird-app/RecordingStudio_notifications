@@ -77,53 +77,18 @@
                   <h2 class="text-sm font-semibold text-[var(--surface-content-color)]"><%= type.label %></h2>
                   <div class="mt-3 grid gap-4 md:grid-cols-2">
                     <% if channel_configurable?(type) %>
-                      <div class="flat-pack-select-wrapper w-full">
-                        <% if type.required_channels.any? %>
-                          <span class="w-full block text-sm font-medium text-[var(--surface-content-color)] mb-1.5">Channel</span>
-                          <div class="flex flex-wrap gap-1 mb-2">
-                            <% type.required_channels.each do |channel| %>
-                              <span class="rsn-required-channel-chip inline-flex items-center gap-1.5 rounded-[var(--chip-border-radius)] font-medium border transition-colors duration-base bg-[var(--surface-muted-background-color)] text-[var(--surface-content-color)] border-[var(--surface-border-color)] text-xs px-[var(--chip-padding-x-sm)] py-[var(--button-padding-y-sm)]"
-                                    data-tooltip="This channel can't be removed"
-                                    aria-label="This channel can't be removed"
-                                    tabindex="0">
-                                <%= channel.to_s.humanize %>
-                              </span>
-                            <% end %>
-                          </div>
-                        <% end %>
-
-                        <% if type.optional_channels.any? %>
-                          <%= render FlatPack::Select::Component.new(
-                            name: "preferences[#{type.key}]",
-                            options: @channel_select_options.fetch(type.key),
-                            label: (type.required_channels.any? ? nil : "Channel"),
-                            placeholder: "Search and select channels...",
-                            help_text: type.description.presence || channel_settings_help_text(type),
-                            searchable: true,
-                            multiple: true,
-                            value: @selected_channels.fetch(type.key),
-                            class: "w-full"
-                          ) %>
-                        <% elsif type.required_channels.any? %>
-                          <% if type.description.present? %>
-                            <p class="mt-1 text-xs text-[var(--surface-muted-content-color)]"><%= type.description %></p>
-                          <% else %>
-                            <p class="mt-1 text-xs text-[var(--surface-muted-content-color)]"><%= channel_settings_help_text(type) %></p>
-                          <% end %>
-                        <% else %>
-                          <%= render FlatPack::Select::Component.new(
-                            name: "preferences[#{type.key}]",
-                            options: @channel_select_options.fetch(type.key),
-                            label: "Channel",
-                            placeholder: "Search and select channels...",
-                            help_text: type.description.presence || channel_settings_help_text(type),
-                            searchable: true,
-                            multiple: true,
-                            value: @selected_channels.fetch(type.key),
-                            class: "w-full"
-                          ) %>
-                        <% end %>
-                      </div>
+                      <%= render FlatPack::Select::Component.new(
+                        name: "preferences[#{type.key}]",
+                        options: @channel_select_options.fetch(type.key),
+                        label: "Channel",
+                        placeholder: (type.optional_channels.any? ? "Search and select channels..." : "Required channels only"),
+                        help_text: type.description.presence || channel_settings_help_text(type),
+                        searchable: true,
+                        multiple: true,
+                        disabled: type.optional_channels.empty?,
+                        value: @selected_channels.fetch(type.key),
+                        class: "w-full"
+                      ) %>
                     <% end %>
 
                     <% if cadence_selectable?(type) %>

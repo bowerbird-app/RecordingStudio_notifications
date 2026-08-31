@@ -90,8 +90,12 @@ module RecordingStudioNotifications
 
     def channel_select_options_map
       flat_notification_types.each_with_object({}) do |type, map|
-        options = type.optional_channels.map do |channel|
-          [channel_option_label(type, channel), channel.to_s]
+        options = Array(type.available_channels).map do |channel|
+          {
+            label: channel_option_label(type, channel),
+            value: channel.to_s,
+            disabled: type.required_channels.include?(channel)
+          }
         end
 
         options.unshift(%w[None __none__]) if type.required_channels.empty?
@@ -106,7 +110,7 @@ module RecordingStudioNotifications
           preference_enabled?(type, channel)
         end
 
-        map[type.key] = selected_optional_channels.map(&:to_s)
+        map[type.key] = (type.required_channels + selected_optional_channels).map(&:to_s)
       end
     end
 
