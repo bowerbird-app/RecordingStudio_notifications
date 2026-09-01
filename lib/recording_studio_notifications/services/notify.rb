@@ -74,6 +74,15 @@ module RecordingStudioNotifications
         end
         raise ArgumentError, "root_recording does not match recording or notifiable" unless consistent_root_scope?
         raise ArgumentError, "at least one channel is required" if channel_keys.empty?
+        
+        inapplicable_required = type_definition.required_channels.find do |channel|
+          channel_keys.include?(channel) && !channel_applicable?(channel)
+        end
+
+        if inapplicable_required
+          raise ArgumentError,
+                "required channel is not available for recipient: #{inapplicable_required}"
+        end
 
         unregistered_channel = channel_keys.find do |channel|
           !RecordingStudioNotifications.channels.registered?(channel)
@@ -242,8 +251,16 @@ module RecordingStudioNotifications
           required = type_definition.required_channels
           optional = selected_optional_channels
           selected = (optional + required).uniq
-          selected.select { |channel| required.include?(channel) || preference_enabled?(channel, default: true) }
+          enabled = selected.select { |channel| required.include?(channel) || preference_enabled?(channel, default: true) }
+          enabled.select { |channel| channel_applicable?(channel) || required.include?(channel) }
         end
+      end
+      
+      def channel_applicable?(channel)
+        adapter = RecordingStudioNotifications.channels.fetch(channel)
+        return true unless adapter.respond_to?(:available_for?)
+      
+        adapter.available_for?(recipient: @recipient, notification: nil, delivery: nil)
       end
 
       def requested_optional_channels
