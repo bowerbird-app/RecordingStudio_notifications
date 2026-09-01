@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
 require_relative "cadence_period"
+require_relative "channel_applicability"
 
 module RecordingStudioNotifications
   module Services
     class Notify
+      include ChannelApplicability
+
       def self.call(...)
         new(...).call
       end
@@ -67,13 +70,11 @@ module RecordingStudioNotifications
         raise ArgumentError, "recipient is required" unless @recipient
         raise ArgumentError, "title is required" if @title.to_s.blank?
         raise ArgumentError, "notification_type is not registered" unless type_definition
-
-        if type_definition.scope == :root && resolved_root_recording.blank?
-          raise ArgumentError,
-                "root_recording is required"
-        end
+        raise ArgumentError, "root_recording is required" if type_definition.scope == :root && resolved_root_recording.blank?
         raise ArgumentError, "root_recording does not match recording or notifiable" unless consistent_root_scope?
         raise ArgumentError, "at least one channel is required" if channel_keys.empty?
+
+        validate_required_channels_available!(channel_keys)
 
         unregistered_channel = channel_keys.find do |channel|
           !RecordingStudioNotifications.channels.registered?(channel)
@@ -242,7 +243,8 @@ module RecordingStudioNotifications
           required = type_definition.required_channels
           optional = selected_optional_channels
           selected = (optional + required).uniq
-          selected.select { |channel| required.include?(channel) || preference_enabled?(channel, default: true) }
+          enabled = selected.select { |channel| required.include?(channel) || preference_enabled?(channel, default: true) }
+          enabled.select { |channel| channel_applicable?(channel) || required.include?(channel) }
         end
       end
 

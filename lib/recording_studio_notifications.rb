@@ -12,6 +12,7 @@ require "recording_studio_notifications/services/cadence_period"
 require "recording_studio_notifications/services/inbox_grouping"
 require "recording_studio_notifications/services/root_resolver"
 require "recording_studio_notifications/services/notification_authorization"
+require "recording_studio_notifications/delivery_payload_registry"
 
 if defined?(RecordingStudioAdmin)
   require "recording_studio_notifications/admin/all_notifications_screen"
@@ -55,6 +56,48 @@ module RecordingStudioNotifications
     def notify_each(recipients:, **attributes)
       Array(recipients).map do |recipient|
         notify(recipient: recipient, **attributes)
+      end
+    end
+
+    def delivery_payload_resolvers
+      @delivery_payload_resolvers ||= DeliveryPayloadRegistry.new
+    end
+
+    def register_delivery_payload_resolver(type, &)
+      delivery_payload_resolvers.register(type, &)
+    end
+
+    def delivery_payload_for(notification:, delivery:)
+      resolved = delivery_payload_resolvers.resolve(notification: notification, delivery: delivery)
+      return persisted_delivery_payload(notification) if resolved.nil?
+
+      normalize_delivery_payload(resolved)
+    rescue StandardError
+      raise DeliveryPayloadError, "delivery payload resolution failed"
+    end
+
+    private
+
+    def persisted_delivery_payload(notification)
+      DeliveryPayload.new(
+        title: notification.title,
+        body: notification.body,
+        url: notification.url
+      )
+    end
+
+    def normalize_delivery_payload(value)
+      case value
+      when DeliveryPayload
+        value
+      when Hash
+        DeliveryPayload.new(
+          title: value[:title] || value["title"],
+          body: value[:body] || value["body"],
+          url: value[:url] || value["url"]
+        )
+      else
+        raise DeliveryPayloadError, "delivery payload resolution failed"
       end
     end
   end
