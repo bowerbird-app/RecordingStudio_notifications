@@ -62,15 +62,15 @@ module RecordingStudioNotifications
     def delivery_payload_resolvers
       @delivery_payload_resolvers ||= DeliveryPayloadRegistry.new
     end
-    
-    def register_delivery_payload_resolver(type, &block)
-      delivery_payload_resolvers.register(type, &block)
+
+    def register_delivery_payload_resolver(type, &)
+      delivery_payload_resolvers.register(type, &)
     end
-    
+
     def delivery_payload_for(notification:, delivery:)
       resolved = delivery_payload_resolvers.resolve(notification: notification, delivery: delivery)
       return persisted_delivery_payload(notification) if resolved.nil?
-    
+
       normalize_delivery_payload(resolved)
     rescue StandardError
       raise DeliveryPayloadError, "delivery payload resolution failed"
@@ -85,7 +85,7 @@ module RecordingStudioNotifications
         url: notification.url
       )
     end
-    
+
     def normalize_delivery_payload(value)
       case value
       when DeliveryPayload
