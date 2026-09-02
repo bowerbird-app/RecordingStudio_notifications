@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** May 5, 2026
+> *   **Last Updated:** September 2, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -9,6 +9,8 @@
 # Local Development Setup
 
 This guide covers setting up the gem for local development outside of GitHub Codespaces.
+
+Cloud Agent Builds use `.cursor/install.sh` and `.cursor/fetch-skills.sh` instead of the Codespaces `postCreateCommand`. See [Cursor skills in Cloud Agents](../cursor-skills.md).
 
 ---
 
