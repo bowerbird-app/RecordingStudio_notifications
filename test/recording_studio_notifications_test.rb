@@ -24,7 +24,7 @@ class RecordingStudioNotificationsTest < Minitest::Test
     refute_includes gemspec, "GemTemplate"
 
     spec = Gem::Specification.load(gemspec_path)
-    assert spec.files.none? { |path| path.start_with?(".cursor/") }
+    assert(spec.files.none? { |path| path.start_with?(".cursor/") })
   end
 
   def test_engine_routes_notifications_as_root
