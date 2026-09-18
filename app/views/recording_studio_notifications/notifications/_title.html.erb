@@ -4,15 +4,21 @@
     variant: :h1
   ) do |page_title| %>
     <% page_title.slot do %>
-      <div class="flex items-center gap-4">
-        <% if @has_unread_notifications %>
-          <%= link_to "Clear all", clear_all_notifications_path,
-                      data: { turbo_method: :patch, turbo_stream: true },
-                      class: "text-sm font-medium text-[var(--color-primary)] hover:underline" %>
-        <% end %>
-        <%= link_to "Settings", settings_path,
-                    class: "text-sm font-medium text-[var(--color-primary)] hover:underline" %>
-      </div>
+      <% if @has_unread_notifications %>
+        <%= render FlatPack::Button::Component.new(
+          text: "Clear all",
+          url: clear_all_notifications_path,
+          style: :default,
+          size: :md,
+          data: { turbo_method: :patch, turbo_stream: true }
+        ) %>
+      <% end %>
+      <%= render FlatPack::Button::Component.new(
+        text: "Settings",
+        url: settings_path,
+        style: :default,
+        size: :md
+      ) %>
     <% end %>
   <% end %>
 </div>

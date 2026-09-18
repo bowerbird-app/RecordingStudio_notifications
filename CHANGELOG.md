@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-09-18
+
+### Changed
+- Inbox Clear all and Settings are FlatPack default buttons instead of text links.
+- Inbox content width is `max-w-3xl` on desktop so the list does not stretch edge to edge.
+
+### Fixed
+- Dummy Tailwind `@source` globs now include Cloud Agent gem installs under `/usr/local/lib/ruby/gems`, so FlatPack utilities compile.
+- Dummy `application` and `admin` layouts always include `tailwind.css` and drop the leftover `mt-28` scaffold wrapper.
+
+### Upgrade notes
+- If you overrode `app/views/recording_studio_notifications/notifications/_title.html.erb`, switch Clear all and Settings to `FlatPack::Button::Component` with `style: :default`.
+- If you overrode the inbox index template, keep the list at `max-w-3xl` (was `max-w-5xl`).
+- Dummy/host Tailwind configs that only scan `vendor/bundle` and `/usr/local/bundle` should also scan `Bundler.bundle_path` (Cloud Agents: `/usr/local/lib/ruby/gems/*/bundler/gems`), then run `bin/rails tailwindcss:build`.
+
 ## [0.3.1] - 2026-09-02
 
 Cloud Agent install no longer fails a warm environment rebuild. Skills still
@@ -117,7 +132,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.6...v0.3.0
 [0.2.6]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.5...v0.2.6

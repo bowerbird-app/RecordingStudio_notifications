@@ -216,10 +216,16 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
     assert_includes application_controller, "actor || RecordingStudioNotifications.configuration.resolve_actor"
     assert_includes index_view, "id=\"notifications-list\" class=\"flex flex-col\""
+    assert_includes index_view, "max-w-3xl"
+    refute_includes index_view, "max-w-5xl"
     assert_includes index_view, "notifications/notifications/title"
-    assert_includes title_partial, 'link_to "Settings", settings_path'
-    assert_includes title_partial, 'link_to "Clear all", clear_all_notifications_path'
+    assert_includes title_partial, "FlatPack::Button::Component.new"
+    assert_includes title_partial, 'text: "Settings"'
+    assert_includes title_partial, 'text: "Clear all"'
+    assert_includes title_partial, "style: :default"
     assert_includes title_partial, "turbo_stream: true"
+    refute_includes title_partial, "link_to \"Settings\""
+    refute_includes title_partial, "hover:underline"
     refute_includes index_view, "icon_only: true"
     refute_includes index_view, "id=\"notifications-list\" class=\"flex flex-col gap-6\""
     assert_includes page_view, "notification_sections.flat_map(&:groups)"
