@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Inbox Clear all and Settings are FlatPack default buttons instead of text links.
 - Inbox content width is `max-w-3xl` on desktop so the list does not stretch edge to edge.
+- Admin All notifications table sits in a FlatPack outlined card inside a 2-column grid so the table has a border and does not span the full desktop width.
 
 ### Fixed
 - Dummy Tailwind `@source` globs now include Cloud Agent gem installs under `/usr/local/lib/ruby/gems`, so FlatPack utilities compile.
@@ -20,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Upgrade notes
 - If you overrode `app/views/recording_studio_notifications/notifications/_title.html.erb`, switch Clear all and Settings to `FlatPack::Button::Component` with `style: :default`.
 - If you overrode the inbox index template, keep the list at `max-w-3xl` (was `max-w-5xl`).
+- If you overrode Recording Studio Admin `screens/_table_frame.html.erb` or `screens/_table_placeholder.html.erb`, keep the notifications screen (`recording_studio_notifications_all_notifications`) wrapped in `FlatPack::Grid::Component` (`cols: 2`) around `FlatPack::Card::Component` (`style: :outlined`).
 - Dummy/host Tailwind configs that only scan `vendor/bundle` and `/usr/local/bundle` should also scan `Bundler.bundle_path` (Cloud Agents: `/usr/local/lib/ruby/gems/*/bundler/gems`), then run `bin/rails tailwindcss:build`.
 
 ## [0.3.1] - 2026-09-02

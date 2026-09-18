@@ -34,6 +34,15 @@ class EngineTest < Minitest::Test
                     "isolate_namespace RecordingStudioNotifications"
   end
 
+  def test_admin_table_wrap_is_registered_with_admin
+    engine = File.read(File.expand_path("../lib/recording_studio_notifications/engine.rb", __dir__))
+
+    assert_includes engine, "recording_studio_notifications/admin/table_wrap_helper"
+    assert_includes engine, "prepend_admin_table_wrap_views!"
+    assert_includes engine, 'controller.prepend_view_path(view_path)'
+    assert_includes engine, "RecordingStudioNotifications::Admin::TableWrapHelper"
+  end
+
   private
 
   def find_initializer(name)

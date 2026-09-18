@@ -521,7 +521,16 @@ This pattern gives you:
 - standard read/unread/archive controls
 - channel-delivery extensibility later
 
-## 19. Final Notes
+## 19. Admin All Notifications Table
+
+When Recording Studio Admin is installed, this gem registers an **All notifications** screen. The table is rendered with Admin's FlatPack table, then wrapped in:
+
+- `FlatPack::Card::Component` (`style: :outlined`) for a border
+- `FlatPack::Grid::Component` (`cols: 2`) so the card uses half the desktop width
+
+The wrap is keyed to `recording_studio_notifications_all_notifications` and does not change other admin tables.
+
+## 20. Final Notes
 
 If you are just getting started, begin with:
 

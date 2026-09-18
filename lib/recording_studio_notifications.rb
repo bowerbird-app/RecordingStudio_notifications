@@ -17,6 +17,7 @@ require "recording_studio_notifications/delivery_payload_registry"
 if defined?(RecordingStudioAdmin)
   require "recording_studio_notifications/admin/all_notifications_screen"
   require "recording_studio_notifications/admin/all_notifications_section"
+  require "recording_studio_notifications/admin/table_wrap_helper"
 end
 
 module RecordingStudioNotifications
