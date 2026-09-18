@@ -18,7 +18,8 @@
 /*
  * Scan bundled gems. Prefer vendor/bundle (bundle config set --local path vendor/bundle)
  * and keep /usr/local/bundle for Codespaces images. Cloud Agent installs use
- * /usr/local/lib/ruby/gems. Git gems use name-hash folders, so match
+ * /usr/local/lib/ruby/gems. GitHub Actions Ruby uses /opt/hostedtoolcache.
+ * Git gems use name-hash folders, so match
  * flatpack-* / RecordingStudio* rather than a bare package directory name.
  */
 @source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
@@ -37,6 +38,10 @@
 @source "/usr/local/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 @source "/usr/local/lib/ruby/gems/*/bundler/gems/RecordingStudio*/app/views/**/*.erb";
 @source "/usr/local/lib/ruby/gems/*/bundler/gems/RecordingStudio*/app/components/**/*.{rb,erb}";
+
+@source "/opt/hostedtoolcache/Ruby/*/x64/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
+@source "/opt/hostedtoolcache/Ruby/*/x64/lib/ruby/gems/*/bundler/gems/RecordingStudio*/app/views/**/*.erb";
+@source "/opt/hostedtoolcache/Ruby/*/x64/lib/ruby/gems/*/bundler/gems/RecordingStudio*/app/components/**/*.{rb,erb}";
 
 /* Keep FlatPack notification popover within viewport to avoid negative top placement on scroll. */
 [id^="flat-pack-notification-"][id$="-popover"] .max-h-96 {

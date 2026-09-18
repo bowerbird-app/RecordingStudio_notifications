@@ -127,6 +127,10 @@ module RecordingStudioNotifications
           '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
           '@source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
           '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
+          '@source "/usr/local/lib/ruby/gems/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
+          '@source "/usr/local/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
+          '@source "/opt/hostedtoolcache/Ruby/*/x64/lib/ruby/gems/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
+          '@source "/opt/hostedtoolcache/Ruby/*/x64/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
           *bundler_install_source_lines
         ]
       end
