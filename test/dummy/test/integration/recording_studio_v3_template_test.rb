@@ -50,6 +50,15 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     assert_equal root_recording, page_recording.root_recording
     assert_equal 3, Workspace.count
 
+    admin = User.find_by!(email: "admin@admin.com")
+    seeded = RecordingStudioNotifications::Notification.where(recipient: admin)
+    types = seeded.distinct.pluck(:notification_type).sort
+
+    assert_equal %w[approval_requested mention page_comment page_created system_announcement workspace_change], types
+    assert seeded.unread.exists?
+    assert seeded.where.not(read_at: nil).exists?
+    refute seeded.where("title LIKE ?", "System announcement %").exists?
+
     assert_no_difference -> { User.count } do
       assert_no_difference -> { RecordingStudio::Recording.count } do
         load Rails.root.join("db/seeds.rb").to_s

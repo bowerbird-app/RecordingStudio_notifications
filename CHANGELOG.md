@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-09-18
+
+### Changed
+- Inbox Clear all and Settings are FlatPack default buttons instead of text links.
+- Inbox list sits in a FlatPack outlined card inside a 2-column grid so it has a border and does not span the full desktop width.
+- Dummy seeds mix mentions, approvals, page comments, new pages, workspace changes, and system announcements, with both read and unread rows and distinct icons.
+
+### Fixed
+- Dummy Tailwind `@source` globs now include Cloud Agent gem installs under `/usr/local/lib/ruby/gems`, so FlatPack utilities compile.
+- Dummy `application` and `admin` layouts always include `tailwind.css` and drop the leftover `mt-28` scaffold wrapper.
+- Inbox card body uses FlatPack default padding (`:md`) so unread row shading no longer sits flush against the outlined border.
+
+### Upgrade notes
+- If you overrode `app/views/recording_studio_notifications/notifications/_title.html.erb`, switch Clear all and Settings to `FlatPack::Button::Component` with `style: :default`.
+- If you overrode the inbox index template, wrap the list in `FlatPack::Grid::Component` (`cols: 2`) around `FlatPack::Card::Component` (`style: :outlined`) and keep the card body's default padding. Do not pass `padding: :none` on the filled list, and do not keep the old `max-w-3xl` / `max-w-5xl` width wrapper on the list.
+- Dummy/host Tailwind configs that only scan `vendor/bundle` and `/usr/local/bundle` should also scan `Bundler.bundle_path` (Cloud Agents: `/usr/local/lib/ruby/gems/*/bundler/gems`; GitHub Actions Ruby: `/opt/hostedtoolcache/Ruby/*/x64/lib/ruby/gems/*/bundler/gems`), then run `bin/rails tailwindcss:build`.
+
 ## [0.3.1] - 2026-09-02
 
 Cloud Agent install no longer fails a warm environment rebuild. Skills still
@@ -117,7 +134,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.6...v0.3.0
 [0.2.6]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.2.5...v0.2.6

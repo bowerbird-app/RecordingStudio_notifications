@@ -65,4 +65,30 @@ RecordingStudioNotifications.configure do |config|
     scope: :root
   )
 
+  config.notification_types.register(
+    :mention,
+    label: "Mention",
+    category: :page,
+    description: "Someone mentioned a person on a page.",
+    icon: :at_symbol,
+    default_channels: [:in_app],
+    available_channels: %i[in_app email],
+    allowed_cadences: %i[individual daily weekly],
+    default_cadence: :individual,
+    scope: :optional_root
+  )
+
+  config.notification_types.register(
+    :approval_requested,
+    label: "Approval requested",
+    category: :page,
+    description: "Someone asked for a page to be approved.",
+    icon: :check_circle,
+    default_channels: [:in_app],
+    available_channels: %i[in_app email],
+    allowed_cadences: %i[individual daily weekly],
+    default_cadence: :individual,
+    scope: :root
+  )
+
 end

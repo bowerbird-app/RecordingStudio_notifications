@@ -184,11 +184,7 @@ class InstallGeneratorTest < Minitest::Test
   end
 
   def tailwind_source_lines
-    [
-      '@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
-      '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
-      '@source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
-      '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";'
-    ]
+    generator = build_generator(File.expand_path("..", __dir__))
+    generator.send(:tailwind_source_lines)
   end
 end

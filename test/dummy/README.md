@@ -7,6 +7,7 @@ This Rails app exists to validate Recording Studio Notifications in a real host 
 - Devise authentication with a seeded admin user
 - `Current.actor` wiring for Recording Studio events
 - Root workspace plus seeded folder and page recordables
+- Seeded inbox mix: mentions, approvals, comments, new pages, workspace changes, and system announcements, read and unread, with different icons
 - FlatPack layout integration and Tailwind source scanning
 - Mounted `RecordingStudio::Engine` route behavior inside a host app
 - A starter sidebar menu and companion docs pages for gem-specific onboarding

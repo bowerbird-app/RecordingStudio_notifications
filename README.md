@@ -412,7 +412,7 @@ The engine provides:
 - `/notifications/menu.json` async top-nav menu payload (unread count + recent notifications)
 - `/settings` notification channel preferences
 
-Both views use FlatPack components and Tailwind utility classes only.
+The inbox list is wrapped in a FlatPack outlined card (default body padding) inside a 2-column grid. Inbox, settings, and menu views use FlatPack components and Tailwind utility classes only.
 
 ## Instrumentation
 

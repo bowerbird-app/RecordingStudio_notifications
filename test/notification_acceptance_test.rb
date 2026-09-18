@@ -216,10 +216,20 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
     assert_includes application_controller, "actor || RecordingStudioNotifications.configuration.resolve_actor"
     assert_includes index_view, "id=\"notifications-list\" class=\"flex flex-col\""
+    assert_includes index_view, "FlatPack::Grid::Component.new(cols: 2"
+    assert_includes index_view, "FlatPack::Card::Component.new(style: :outlined)"
+    assert_includes index_view, "card.body do"
+    refute_includes index_view, "padding: :none"
+    refute_includes index_view, "max-w-5xl"
+    refute_includes index_view, "max-w-3xl"
     assert_includes index_view, "notifications/notifications/title"
-    assert_includes title_partial, 'link_to "Settings", settings_path'
-    assert_includes title_partial, 'link_to "Clear all", clear_all_notifications_path'
+    assert_includes title_partial, "FlatPack::Button::Component.new"
+    assert_includes title_partial, 'text: "Settings"'
+    assert_includes title_partial, 'text: "Clear all"'
+    assert_includes title_partial, "style: :default"
     assert_includes title_partial, "turbo_stream: true"
+    refute_includes title_partial, "link_to \"Settings\""
+    refute_includes title_partial, "hover:underline"
     refute_includes index_view, "icon_only: true"
     refute_includes index_view, "id=\"notifications-list\" class=\"flex flex-col gap-6\""
     assert_includes page_view, "notification_sections.flat_map(&:groups)"
@@ -355,6 +365,8 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes sidebar, "RecordingStudioNotifications::VERSION"
     refute_includes sidebar, "FlatPack::VERSION"
     assert_includes tailwind, '[id^="flat-pack-notification-"][id$="-popover"] .max-h-96'
+    assert_includes tailwind, "/usr/local/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}"
+    assert_includes tailwind, "/opt/hostedtoolcache/Ruby/*/x64/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}"
   end
 
   def test_readme_documents_usage_and_integration

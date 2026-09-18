@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.3.1", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.3.2", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -61,6 +61,8 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_includes initializer, "config.notification_types.register"
     assert_includes initializer, ":page_comment"
     assert_includes initializer, ":page_created"
+    assert_includes initializer, ":mention"
+    assert_includes initializer, ":approval_requested"
     assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/flat_pack", application)'
     assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/recording_studio_notifications", application)'
     assert_includes polling_controller, "class extends Controller"
@@ -75,6 +77,10 @@ class RecordingStudioNotificationsTest < Minitest::Test
 
     assert_includes views, "FlatPack::"
     assert_includes views, "FlatPack::Notification::Component"
+    assert_includes views, "FlatPack::Grid::Component.new(cols: 2"
+    assert_includes views, "FlatPack::Card::Component.new(style: :outlined)"
+    assert_includes views, "card.body do"
+    refute_includes views, "padding: :none"
     assert_includes views, ".rsn-settings-accordion"
     assert_includes views, "overflow: visible"
   end
