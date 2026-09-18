@@ -218,6 +218,8 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes index_view, "id=\"notifications-list\" class=\"flex flex-col\""
     assert_includes index_view, "FlatPack::Grid::Component.new(cols: 2"
     assert_includes index_view, "FlatPack::Card::Component.new(style: :outlined)"
+    assert_includes index_view, "card.body do"
+    refute_includes index_view, "padding: :none"
     refute_includes index_view, "max-w-5xl"
     refute_includes index_view, "max-w-3xl"
     assert_includes index_view, "notifications/notifications/title"

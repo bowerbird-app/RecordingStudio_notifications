@@ -17,10 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Dummy Tailwind `@source` globs now include Cloud Agent gem installs under `/usr/local/lib/ruby/gems`, so FlatPack utilities compile.
 - Dummy `application` and `admin` layouts always include `tailwind.css` and drop the leftover `mt-28` scaffold wrapper.
+- Inbox card body uses FlatPack default padding (`:md`) so unread row shading no longer sits flush against the outlined border.
 
 ### Upgrade notes
 - If you overrode `app/views/recording_studio_notifications/notifications/_title.html.erb`, switch Clear all and Settings to `FlatPack::Button::Component` with `style: :default`.
-- If you overrode the inbox index template, wrap the list in `FlatPack::Grid::Component` (`cols: 2`) around `FlatPack::Card::Component` (`style: :outlined`). Do not keep the old `max-w-3xl` / `max-w-5xl` width wrapper on the list.
+- If you overrode the inbox index template, wrap the list in `FlatPack::Grid::Component` (`cols: 2`) around `FlatPack::Card::Component` (`style: :outlined`) and keep the card body's default padding. Do not pass `padding: :none` on the filled list, and do not keep the old `max-w-3xl` / `max-w-5xl` width wrapper on the list.
 - Dummy/host Tailwind configs that only scan `vendor/bundle` and `/usr/local/bundle` should also scan `Bundler.bundle_path` (Cloud Agents: `/usr/local/lib/ruby/gems/*/bundler/gems`; GitHub Actions Ruby: `/opt/hostedtoolcache/Ruby/*/x64/lib/ruby/gems/*/bundler/gems`), then run `bin/rails tailwindcss:build`.
 
 ## [0.3.1] - 2026-09-02

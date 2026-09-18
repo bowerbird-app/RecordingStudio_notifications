@@ -18,8 +18,8 @@
 
   <%= render FlatPack::Grid::Component.new(cols: 2, align: :start) do %>
     <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
-      <% if @notification_sections.any? %>
-        <% card.body(padding: :none) do %>
+      <% card.body do %>
+        <% if @notification_sections.any? %>
           <div id="notifications-list" class="flex flex-col">
             <%= render partial: "recording_studio_notifications/notifications/page", locals: { notification_sections: @notification_sections } %>
           </div>
@@ -27,9 +27,7 @@
           <div class="pt-2">
             <%= render partial: "recording_studio_notifications/notifications/next_page", locals: { page: @page, has_next_page: @has_next_page } %>
           </div>
-        <% end %>
-      <% else %>
-        <% card.body do %>
+        <% else %>
           <p class="text-sm text-(--surface-muted-content-color)">No notifications yet.</p>
         <% end %>
       <% end %>

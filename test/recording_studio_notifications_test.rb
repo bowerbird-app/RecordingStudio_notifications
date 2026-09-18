@@ -79,6 +79,8 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_includes views, "FlatPack::Notification::Component"
     assert_includes views, "FlatPack::Grid::Component.new(cols: 2"
     assert_includes views, "FlatPack::Card::Component.new(style: :outlined)"
+    assert_includes views, "card.body do"
+    refute_includes views, "padding: :none"
     assert_includes views, ".rsn-settings-accordion"
     assert_includes views, "overflow: visible"
   end
