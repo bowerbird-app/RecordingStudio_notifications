@@ -25,18 +25,6 @@ module RecordingStudioNotifications
                          RecordingStudioNotifications.configuration.hooks.controller_extensions_for(extension_keys_for(target)))
       end
 
-      def prepend_admin_table_wrap_views!
-        return unless defined?(RecordingStudioAdmin::ApplicationController)
-
-        controller = RecordingStudioAdmin::ApplicationController
-        helper_module = RecordingStudioNotifications::Admin::TableWrapHelper
-        controller.helper(helper_module) unless controller._helpers.included_modules.include?(helper_module)
-
-        return if controller < RecordingStudioNotifications::Admin::ViewPathPrepend
-
-        controller.include(RecordingStudioNotifications::Admin::ViewPathPrepend)
-      end
-
       private
 
       def define_default_accessible_action(action, &)
@@ -163,12 +151,10 @@ module RecordingStudioNotifications
 
       require "recording_studio_notifications/admin/all_notifications_screen"
       require "recording_studio_notifications/admin/all_notifications_section"
-      require "recording_studio_notifications/admin/table_wrap_helper"
 
       config.to_prepare do
         RecordingStudioAdmin.register_screen(RecordingStudioNotifications::Admin::AllNotificationsScreen)
         RecordingStudioAdmin.register_section(RecordingStudioNotifications::Admin::AllNotificationsSection)
-        RecordingStudioNotifications::Engine.prepend_admin_table_wrap_views!
       end
     end
 

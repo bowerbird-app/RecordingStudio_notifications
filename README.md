@@ -411,9 +411,8 @@ The engine provides:
 - `/notifications` inbox (current-root view, including global/rootless notifications)
 - `/notifications/menu.json` async top-nav menu payload (unread count + recent notifications)
 - `/settings` notification channel preferences
-- Admin All notifications table, wrapped in a FlatPack outlined card inside a 2-column grid so the table does not stretch full width on desktop
 
-Inbox, settings, and admin table views use FlatPack components and Tailwind utility classes only.
+The inbox list is wrapped in a FlatPack outlined card inside a 2-column grid. Inbox, settings, and menu views use FlatPack components and Tailwind utility classes only.
 
 ## Instrumentation
 
