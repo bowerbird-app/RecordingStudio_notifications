@@ -23,22 +23,12 @@
     <%= stylesheet_link_tag "flat_pack/application", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "flat_pack/variables", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "flat_pack/rich_text", "data-turbo-track": "reload" %>
-    <% assets = Rails.application.assets %>
-    <% tailwind_asset_present = if assets&.respond_to?(:find_asset)
-                                 assets.find_asset("tailwind.css").present?
-                               elsif assets&.respond_to?(:load_path)
-                                 assets.load_path.find("tailwind.css").present?
-                               else
-                                 false
-                               end %>
-    <% if tailwind_asset_present %>
-      <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
-    <% end %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+  <body class="m-0 min-h-screen bg-[var(--surface-page-background-color)] text-[var(--surface-content-color)]">
+    <main class="mx-auto w-full max-w-md p-6">
       <%= yield %>
     </main>
   </body>

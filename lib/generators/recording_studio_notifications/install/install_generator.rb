@@ -101,12 +101,14 @@ module RecordingStudioNotifications
       end
 
       def formatted_tailwind_source_block(missing_lines)
+        notifications, others = missing_lines.partition { |line| line.include?("recording_studio_notifications") }
+
         [
-          "\n/* Include RecordingStudioNotifications engine views for Tailwind CSS */",
-          missing_lines.first(2),
-          "\n/* Include FlatPack component sources for Tailwind CSS */",
-          missing_lines.drop(2)
-        ].flatten.reject(&:empty?).join("\n")
+          ("\n/* Include RecordingStudioNotifications engine views for Tailwind CSS */" if notifications.any?),
+          notifications,
+          ("\n/* Include FlatPack component sources for Tailwind CSS */" if others.any?),
+          others
+        ].flatten.compact.reject(&:empty?).join("\n")
       end
 
       def show_manual_tailwind_notice(missing_lines)
@@ -124,8 +126,21 @@ module RecordingStudioNotifications
           '@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
           '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
           '@source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
-          '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";'
+          '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
+          *bundler_install_source_lines
         ]
+      end
+
+      def bundler_install_source_lines
+        bundle_path = Bundler.bundle_path.to_s
+        return [] if bundle_path.blank?
+
+        [
+          %(@source "#{bundle_path}/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";),
+          %(@source "#{bundle_path}/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";)
+        ]
+      rescue StandardError
+        []
       end
     end
   end
