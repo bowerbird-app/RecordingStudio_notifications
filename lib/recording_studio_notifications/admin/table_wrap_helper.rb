@@ -19,8 +19,8 @@ module RecordingStudioNotifications
     module TableWrapHelper
       SCREEN_KEY = "recording_studio_notifications_all_notifications"
 
-      def wrap_recording_studio_notifications_admin_table(screen, &block)
-        table_html = capture(&block)
+      def wrap_recording_studio_notifications_admin_table(screen, &)
+        table_html = capture(&)
         return table_html unless notifications_admin_table?(screen)
 
         render(FlatPack::Grid::Component.new(cols: 2, align: :start)) do

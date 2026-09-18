@@ -361,7 +361,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes sidebar, "RecordingStudioNotifications::VERSION"
     refute_includes sidebar, "FlatPack::VERSION"
     assert_includes tailwind, '[id^="flat-pack-notification-"][id$="-popover"] .max-h-96'
-    assert_includes tailwind, '/usr/local/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}'
+    assert_includes tailwind, "/usr/local/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}"
   end
 
   def test_readme_documents_usage_and_integration
