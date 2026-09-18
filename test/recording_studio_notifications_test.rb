@@ -61,6 +61,8 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_includes initializer, "config.notification_types.register"
     assert_includes initializer, ":page_comment"
     assert_includes initializer, ":page_created"
+    assert_includes initializer, ":mention"
+    assert_includes initializer, ":approval_requested"
     assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/flat_pack", application)'
     assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/recording_studio_notifications", application)'
     assert_includes polling_controller, "class extends Controller"

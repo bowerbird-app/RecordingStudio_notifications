@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Inbox Clear all and Settings are FlatPack default buttons instead of text links.
 - Inbox list sits in a FlatPack outlined card inside a 2-column grid so it has a border and does not span the full desktop width.
+- Dummy seeds mix mentions, approvals, page comments, new pages, workspace changes, and system announcements, with both read and unread rows and distinct icons.
 
 ### Fixed
 - Dummy Tailwind `@source` globs now include Cloud Agent gem installs under `/usr/local/lib/ruby/gems`, so FlatPack utilities compile.

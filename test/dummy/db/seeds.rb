@@ -53,74 +53,243 @@ begin
 
   folder_recording = find_or_record_child.call(folder, root_recording, root_recording)
 
-  find_or_record_child.call(page, root_recording, folder_recording)
+  page_recording = find_or_record_child.call(page, root_recording, folder_recording)
+  page_url = "/pages/#{page.id}"
 
-  # Seed sample notifications for dummy app demonstration.
-  RecordingStudioNotifications::Services::Notify.call(
-    notification_type: :workspace_change,
-    recipient: user,
-    actor: user,
-    root_recording: accessible_root_recording,
-    recording: accessible_root_recording,
-    title: "Client workspace updated",
-    body: "Client Workspace preferences changed.",
-    idempotency_key: "seed-workspace-change-#{accessible_root_recording.id}"
-  )
+  seed_keys = []
+  seed_notification = lambda do |attrs|
+    key = attrs.fetch(:key)
+    seed_keys << key
+    notification = RecordingStudioNotifications.notify(
+      notification_type: attrs.fetch(:type),
+      recipient: attrs.fetch(:recipient),
+      actor: attrs[:actor] || user,
+      root_recording: attrs[:root_recording],
+      recording: attrs[:recording],
+      notifiable: attrs[:notifiable],
+      title: attrs.fetch(:title),
+      body: attrs[:body],
+      url: attrs[:url],
+      idempotency_key: key
+    )
+    notification.update!(
+      title: attrs.fetch(:title),
+      body: attrs[:body],
+      url: attrs[:url],
+      read_at: attrs[:read] ? (notification.read_at || Time.current) : nil,
+      cleared_at: nil
+    )
+    notification
+  end
 
-  RecordingStudioNotifications::Services::Notify.call(
-    notification_type: :workspace_change,
+  seed_notification.call(
+    type: :workspace_change,
     recipient: user,
-    actor: user,
     root_recording: private_root_recording,
     recording: private_root_recording,
     title: "Private workspace changed",
     body: "This should be hidden by Accessible view filtering.",
-    idempotency_key: "seed-workspace-change-private-#{private_root_recording.id}"
+    read: true,
+    key: "seed-workspace-change-private-#{private_root_recording.id}"
   )
 
-  RecordingStudioNotifications::Services::Notify.call(
-    notification_type: :system_announcement,
-    recipient: user,
-    actor: user,
-    title: "System maintenance",
-    body: "Global announcement: maintenance window tonight.",
-    idempotency_key: "seed-system-announcement"
-  )
+  inbox_roots = [
+    { name: "studio", root: root_recording, recording: page_recording },
+    { name: "client", root: accessible_root_recording, recording: accessible_root_recording }
+  ]
 
-  50.times do |index|
-    RecordingStudioNotifications::Services::Notify.call(
-      notification_type: :system_announcement,
+  workspace_titles = [
+    "Theme tokens got a quiet refresh",
+    "Sidebar labels were shortened",
+    "Default locale is English again",
+    "Someone turned comments on",
+    "Export format is CSV now",
+    "Guest links expire after 7 days",
+    "Trash empties after 30 days",
+    "New cover images are allowed",
+    "Folder order was shuffled",
+    "Weekly digest moved to Mondays",
+    "Two people joined as editors",
+    "The brand kit was replaced",
+    "Search indexes were rebuilt",
+    "A stale invite was revoked",
+    "Page templates picked up new blocks",
+    "The home page default changed",
+    "Billing contact was updated",
+    "Timezone is Australia/Sydney",
+    "API tokens were rotated",
+    "A webhook endpoint was paused",
+    "Custom domain DNS looks healthy",
+    "Archive rules got stricter",
+    "Slack alerts are off for now",
+    "New cover colors landed"
+  ]
+  comment_titles = [
+    "Jo left a note on Getting Started",
+    "Sam poked a hole in the outline",
+    "Riley asked about the launch date",
+    "Jo wants a shorter intro",
+    "Sam pasted a checklist",
+    "Riley flagged a broken link",
+    "Jo replied to Sam",
+    "Sam added a screenshot",
+    "Riley thinks the tone is stiff",
+    "Jo moved a paragraph down",
+    "Sam asked for an example",
+    "Riley marked a typo",
+    "Jo likes the new heading",
+    "Sam wants a table here",
+    "Riley dropped a question in the margin",
+    "Jo resolved an old thread",
+    "Sam quoted the brand kit",
+    "Riley asked who owns this page",
+    "Jo left a plus-one",
+    "Sam wants the date in the title",
+    "Riley tagged the legal bit",
+    "Jo cleaned up a duplicate",
+    "Sam asked for alt text",
+    "Riley says ship it"
+  ]
+  page_titles = [
+    "New page: Launch checklist",
+    "New page: Pricing FAQ",
+    "New page: Brand voice",
+    "New page: Office hours",
+    "New page: Support macros",
+    "New page: Incident log",
+    "New page: Q3 goals",
+    "New page: Welcome script"
+  ]
+  approval_titles = [
+    "Jo asked you to approve Launch checklist",
+    "Pricing FAQ is waiting on you",
+    "Sam sent Brand voice for review",
+    "Riley needs a yes on Office hours"
+  ]
+
+  inbox_roots.each do |target|
+    workspace_titles.each_with_index do |title, index|
+      seed_notification.call(
+        type: :workspace_change,
+        recipient: user,
+        root_recording: target[:root],
+        recording: target[:root],
+        title: title,
+        body: "A workspace setting changed.",
+        read: index.odd?,
+        key: "seed-#{target[:name]}-workspace-update-#{index + 1}"
+      )
+    end
+
+    comment_titles.each_with_index do |title, index|
+      seed_notification.call(
+        type: :page_comment,
+        recipient: user,
+        actor: index.even? ? commenter : user,
+        root_recording: target[:root],
+        recording: target[:recording],
+        title: title,
+        body: "A comment landed on Getting Started.",
+        url: page_url,
+        read: index.odd?,
+        key: "seed-#{target[:name]}-page-comment-#{index + 1}"
+      )
+    end
+
+    page_titles.each_with_index do |title, index|
+      seed_notification.call(
+        type: :page_created,
+        recipient: user,
+        actor: index.even? ? user : commenter,
+        root_recording: target[:root],
+        recording: target[:recording],
+        title: title,
+        body: "A page showed up in Product Docs.",
+        url: page_url,
+        read: index.odd?,
+        key: "seed-#{target[:name]}-page-created-#{index + 1}"
+      )
+    end
+
+    approval_titles.each_with_index do |title, index|
+      seed_notification.call(
+        type: :approval_requested,
+        recipient: user,
+        actor: index.even? ? commenter : user,
+        root_recording: target[:root],
+        recording: target[:recording],
+        title: title,
+        body: "A page is waiting for a yes.",
+        url: page_url,
+        read: index.odd?,
+        key: "seed-#{target[:name]}-approval-#{index + 1}"
+      )
+    end
+  end
+
+  [
+    "We'll be down tonight",
+    "Password rules got a bit stricter",
+    "Billing period starts Monday",
+    "Two-factor is on for everyone now"
+  ].each_with_index do |title, index|
+    seed_notification.call(
+      type: :system_announcement,
       recipient: user,
-      actor: user,
-      title: "System announcement #{index + 1}",
-      body: "Seeded global system notification #{index + 1} of 50 for inbox pagination and layout testing.",
-      idempotency_key: "seed-system-announcement-#{index + 1}"
+      title: title,
+      body: "A global heads-up for everyone.",
+      read: index.odd?,
+      key: "seed-system-announcement-#{index + 1}"
     )
   end
 
-  100.times do |index|
-    RecordingStudioNotifications::Services::Notify.call(
-      notification_type: :workspace_change,
+  [
+    "Jo mentioned you on Getting Started",
+    "Sam pulled you into the outline",
+    "Riley asked you about launch",
+    "Jo tagged you on the pricing note"
+  ].each_with_index do |title, index|
+    seed_notification.call(
+      type: :mention,
       recipient: user,
-      actor: user,
-      root_recording: root_recording,
-      recording: root_recording,
-      title: "Studio Workspace update #{index + 1}",
-      body: "Seeded notification #{index + 1} of 100 for inbox pagination and layout testing.",
-      idempotency_key: "seed-studio-workspace-update-#{index + 1}"
+      actor: index.even? ? commenter : user,
+      title: title,
+      body: "Someone said your name on a page.",
+      url: page_url,
+      read: index.odd?,
+      key: "seed-mention-#{index + 1}"
     )
   end
 
-  RecordingStudioNotifications::Services::Notify.call(
-    notification_type: :workspace_change,
-    recipient: user,
-    actor: user,
-    root_recording: root_recording,
-    recording: root_recording,
-    title: "Workspace updated",
-    body: "Studio Workspace settings changed.",
-    idempotency_key: "seed-workspace-change-#{root_recording.id}"
-  )
+  # Newest rows: mix types, icons, and read state at the top of the default inbox.
+  [
+    { type: :workspace_change, title: "Client workspace updated", body: "Client Workspace preferences changed.",
+      root_recording: accessible_root_recording, recording: accessible_root_recording, read: false,
+      key: "seed-workspace-change-#{accessible_root_recording.id}" },
+    { type: :workspace_change, title: "Workspace updated", body: "Studio Workspace settings changed.",
+      root_recording: root_recording, recording: root_recording, read: false,
+      key: "seed-workspace-change-#{root_recording.id}" },
+    { type: :page_created, title: "New page: Getting Started", body: "The first page in Product Docs.",
+      root_recording: accessible_root_recording, recording: accessible_root_recording, url: page_url, read: true,
+      key: "seed-page-created-front" },
+    { type: :page_comment, title: "Jo left a fresh note", body: "Latest comment on Getting Started.",
+      actor: commenter, root_recording: accessible_root_recording, recording: accessible_root_recording,
+      url: page_url, read: false, key: "seed-page-comment-front" },
+    { type: :approval_requested, title: "Getting Started needs a yes", body: "Jo sent this page for review.",
+      actor: commenter, root_recording: accessible_root_recording, recording: accessible_root_recording,
+      url: page_url, read: true, key: "seed-approval-front" },
+    { type: :system_announcement, title: "System maintenance", body: "Global announcement: maintenance window tonight.",
+      read: false, key: "seed-system-announcement" },
+    { type: :mention, title: "Riley mentioned you just now", body: "You're wanted on Getting Started.",
+      actor: commenter, url: page_url, read: false, key: "seed-mention-front" }
+  ].each do |attrs|
+    seed_notification.call(attrs.merge(recipient: user))
+  end
+
+  RecordingStudioNotifications::Notification.where(recipient: user)
+                                            .where("idempotency_key LIKE ?", "seed-%")
+                                            .where.not(idempotency_key: seed_keys)
+                                            .find_each(&:destroy!)
 
   # Finalize seeded cadence rollups so grouped in-app notifications are visible immediately.
   if RecordingStudioNotifications.configuration.rollup_delivery_enabled
@@ -214,4 +383,4 @@ puts "Seeded: Workspace '#{workspace.name}' with root recording ##{root_recordin
 puts "Seeded: Workspace '#{accessible_workspace.name}' with root recording ##{accessible_root_recording.id}"
 puts "Seeded: Workspace '#{private_workspace.name}' with root recording ##{private_root_recording.id}"
 puts "Seeded: Folder '#{folder.name}' and page '#{page.title}'"
-puts "Seeded: Sample notifications (root, global, optional-root)"
+puts "Seeded: Mixed notification types (read and unread, distinct icons)"
