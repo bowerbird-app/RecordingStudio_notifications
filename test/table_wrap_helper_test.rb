@@ -33,5 +33,6 @@ class TableWrapHelperTest < Minitest::Test
     assert_includes placeholder, "wrap_recording_studio_notifications_admin_table"
     assert_includes helper, "FlatPack::Grid::Component.new(cols: 2"
     assert_includes helper, "FlatPack::Card::Component.new(style: :outlined)"
+    assert_includes helper, "prepend_recording_studio_notifications_admin_views"
   end
 end

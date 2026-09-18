@@ -2,6 +2,20 @@
 
 module RecordingStudioNotifications
   module Admin
+    module ViewPathPrepend
+      extend ActiveSupport::Concern
+
+      included do
+        prepend_before_action :prepend_recording_studio_notifications_admin_views
+      end
+
+      private
+
+      def prepend_recording_studio_notifications_admin_views
+        prepend_view_path(RecordingStudioNotifications::Engine.root.join("app/views"))
+      end
+    end
+
     module TableWrapHelper
       SCREEN_KEY = "recording_studio_notifications_all_notifications"
 

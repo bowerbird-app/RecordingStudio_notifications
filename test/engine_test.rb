@@ -39,7 +39,7 @@ class EngineTest < Minitest::Test
 
     assert_includes engine, "recording_studio_notifications/admin/table_wrap_helper"
     assert_includes engine, "prepend_admin_table_wrap_views!"
-    assert_includes engine, 'controller.prepend_view_path(view_path)'
+    assert_includes engine, "RecordingStudioNotifications::Admin::ViewPathPrepend"
     assert_includes engine, "RecordingStudioNotifications::Admin::TableWrapHelper"
   end
 

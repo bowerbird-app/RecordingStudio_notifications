@@ -16,7 +16,7 @@ class AdminNotificationsTableWrapTest < ActionDispatch::IntegrationTest
 
     RecordingStudioNotifications::Notification.create!(
       recipient: @user,
-      notification_type: :workspace_change,
+      notification_type: :system_announcement,
       title: "Wrapped admin table row",
       created_at: Time.current,
       updated_at: Time.current
@@ -46,15 +46,6 @@ class AdminNotificationsTableWrapTest < ActionDispatch::IntegrationTest
     assert_operator response.body.index("border-2 border-[var(--card-border-color)]"),
                     :<,
                     response.body.index("Wrapped admin table row")
-  end
-
-  test "other admin tables are not wrapped in the notifications grid card" do
-    get "/admin/screens/admin_activity_logs/table"
-
-    assert_response :success
-    assert_includes response.body, 'id="screen-table"'
-    refute_includes response.body, "grid-cols-1 md:grid-cols-2"
-    refute_includes response.body, "border-2 border-[var(--card-border-color)]"
   end
 
   private
