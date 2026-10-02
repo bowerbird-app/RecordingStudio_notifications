@@ -18,6 +18,7 @@ class DocsController < ApplicationController
 
   def recordings_tree
     recordings = RecordingStudio::Recording.includes(:recordable).reorder(:created_at, :id).to_a
+    recordings.reject! { |recording| docs_hidden_recordable_type?(recording.recordable_type) }
     recordings_by_parent_id = recordings.group_by(&:parent_recording_id)
 
     @recording_tree = recordings_by_parent_id.fetch(nil, []).map do |recording|
@@ -78,6 +79,10 @@ class DocsController < ApplicationController
       recordings_count: RecordingStudio::Recording.where(recordable_type: declaration.type).count,
       recordables_count: count_recordables_for(declaration.type)
     }
+  end
+
+  def docs_hidden_recordable_type?(type_name)
+    type_name.to_s.in?(%w[RecordingStudio::Access RecordingStudioCommentable::Comment])
   end
 
   def count_recordables_for(type_name)

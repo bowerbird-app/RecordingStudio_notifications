@@ -68,7 +68,7 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: "Recordable types"
     assert_includes(
       response.body,
-      "The list below comes from RecordingStudio.recordable_declarations and v3 parent/root introspection."
+      "The list below comes from RecordingStudio.recordable_declarations and parent/root introspection."
     )
     assert_includes response.body, "Workspace"
     assert_includes response.body, "Folder"
@@ -165,24 +165,14 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     record_child(folder, root_recording, root_recording)
 
     {
-      workspace: recordable_type_summary(
-        workspace_recordings_before + 3,
-        workspaces_before + 3,
-        "recordings",
-        "recordables"
-      ),
-      folder: recordable_type_summary(
-        folder_recordings_before + 1,
-        folders_before + 1,
-        "recording",
-        "recordable"
-      )
+      workspace: recordable_type_summary(workspace_recordings_before + 3, workspaces_before + 3),
+      folder: recordable_type_summary(folder_recordings_before + 1, folders_before + 1)
     }
   end
 
-  def recordable_type_summary(recording_count, recordable_count, recording_label, recordable_label)
-    "#{recording_count} #{recording_label} point to this type " \
-      "• #{recordable_count} #{recordable_label} in the database"
+  def recordable_type_summary(recording_count, recordable_count)
+    "#{recording_count} #{"recording".pluralize(recording_count)} point to this type " \
+      "• #{recordable_count} #{"recordable".pluralize(recordable_count)} in the database"
   end
 
   def record_child(recordable, root_recording, parent_recording)
