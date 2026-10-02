@@ -171,8 +171,8 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
   end
 
   def recordable_type_summary(recording_count, recordable_count)
-    "#{recording_count} #{"recording".pluralize(recording_count)} point to this type " \
-      "• #{recordable_count} #{"recordable".pluralize(recordable_count)} in the database"
+    "#{recording_count} #{'recording'.pluralize(recording_count)} point to this type " \
+      "• #{recordable_count} #{'recordable'.pluralize(recordable_count)} in the database"
   end
 
   def record_child(recordable, root_recording, parent_recording)
