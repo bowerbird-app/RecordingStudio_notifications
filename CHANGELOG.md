@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Development and dummy Gemfiles pin Recording Studio to GitHub tag `v4.2.2` (was `recording_studio/v3.0.0`).
+- Gemspec requires `recording_studio`, `~> 4.2`.
+- Companion pins required so Bundler can resolve Recording Studio 4.2: Accessible `v0.10.1`, Admin `v2.0.2`, Commentable `v0.3.1`, Root Switchable `v0.5.1`, notifications email `v0.3.2`, and dummy FlatPack `v0.1.129` (Admin 2.x floor).
+
+### Upgrade notes
+- Point host and dummy Gemfiles at Recording Studio `v4.2.2` and Accessible `v0.10.1` (or newer with `recording_studio ~> 4.2`).
+- Dummy hosts that use Admin 2.x need FlatPack `>= 0.1.129`.
+
 ## [0.3.2] - 2026-09-18
 
 ### Changed

@@ -207,9 +207,9 @@ redirect_to recording_studio_notifications.root_path
 
 The `recording_studio_notifications` helper provides access to all engine routes.
 
-## RecordingStudio v3 Host-App Check
+## RecordingStudio Host-App Check
 
-This template's dummy app uses RecordingStudio `recording_studio/v3.0.0`. Keep
+This template's dummy app uses RecordingStudio `v4.2.2`. Keep
 `config.require_recordable_declarations = true`, declare every configured recordable with
 `recording_studio_recordable(...)`, and create roots with `RecordingStudio.root_recording_for(recordable)`.
 Child recordings must be created with an explicit `parent_recording`.
