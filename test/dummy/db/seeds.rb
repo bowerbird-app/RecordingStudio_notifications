@@ -301,14 +301,14 @@ begin
       RecordingStudioAccessible.access_recordings_for_actor(recording: recording, actor: actor).first
     end
 
-    bootstrap_owner! = lambda do |actor, recording|
+    bootstrap_owner = lambda do |actor, recording|
       next if RecordingStudioAccessible.access_recordings_for(recording).any?
 
       result = RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: actor)
       raise result.error if result.failure?
     end
 
-    grant! = lambda do |actor, role, recording, manager_actor|
+    grant_access = lambda do |actor, role, recording, manager_actor|
       existing = access_recording_for.call(actor, recording)
       next if existing&.recordable&.role.to_s == role.to_s
 
@@ -321,16 +321,16 @@ begin
       raise result.error if result.failure?
     end
 
-    bootstrap_owner!.call(user, root_recording)
-    grant!.call(commenter, :edit, root_recording, user)
-    grant!.call(user, :edit, root_recording, user)
+    bootstrap_owner.call(user, root_recording)
+    grant_access.call(commenter, :edit, root_recording, user)
+    grant_access.call(user, :edit, root_recording, user)
 
-    bootstrap_owner!.call(user, accessible_root_recording)
-    grant!.call(user, :edit, accessible_root_recording, user)
+    bootstrap_owner.call(user, accessible_root_recording)
+    grant_access.call(user, :edit, accessible_root_recording, user)
 
-    bootstrap_owner!.call(user, admin_root_recording)
+    bootstrap_owner.call(user, admin_root_recording)
 
-    bootstrap_owner!.call(private_user, private_root_recording)
+    bootstrap_owner.call(private_user, private_root_recording)
   end
 
 ensure
