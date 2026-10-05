@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** May 5, 2026
+> *   **Last Updated:** October 5, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -65,6 +65,8 @@ Files updated include:
 - Documentation files (`README.md`, `CHANGELOG.md`, etc.)
 - Test files and test helper
 - Dummy app configuration (`test/dummy/Gemfile`, `test/dummy/config/routes.rb`)
+
+Dummy credentials (`test/dummy/config/credentials.yml.enc`) stay as the shared Recording Studio dummy file. After rename, set `RAILS_MASTER_KEY` (or `test/dummy/config/master.key`) to the shared development key. Do not mint a new master key.
 
 ## What Does NOT Get Renamed
 
