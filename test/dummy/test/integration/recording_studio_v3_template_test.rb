@@ -17,11 +17,23 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
 
   test "dummy app schema includes accessible integration tables" do
     connection = ActiveRecord::Base.connection
+    role = connection.columns(:recording_studio_accesses).find { |column| column.name == "role" }
 
     assert connection.column_exists?(:recording_studio_recordings, :root_recording_id)
     assert connection.table_exists?(:recording_studio_accesses)
+    assert connection.table_exists?(:recording_studio_access_invitations)
+    assert connection.column_exists?(:recording_studio_accesses, :depends_on_recording_id)
+    assert_equal :string, role.type
     refute connection.table_exists?(:recording_studio_access_boundaries)
     refute connection.table_exists?(:recording_studio_device_sessions)
+  end
+
+  test "Gemfiles pin Accessible to v0.11.1" do
+    root_gemfile = File.read(Rails.root.join("../../Gemfile"))
+    dummy_gemfile = File.read(Rails.root.join("Gemfile"))
+
+    assert_match(/recording_studio_accessible.*, tag: "v0.11.1"/, root_gemfile)
+    assert_match(/recording_studio_accessible.*, tag: "v0.11.1"/, dummy_gemfile)
   end
 
   test "dummy seeds use v3 hierarchy idempotently and restore current actor" do
@@ -37,6 +49,7 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     root_recording = RecordingStudio::Recording.find_by!(recordable: workspace)
     accessible_root_recording = RecordingStudio::Recording.find_by!(recordable: accessible_workspace)
     private_root_recording = RecordingStudio::Recording.find_by!(recordable: private_workspace)
+    admin_root_recording = RecordingStudio::Recording.find_by!(recordable: AdminRoot.first!)
     folder_recording = RecordingStudio::Recording.find_by!(recordable: folder)
     page_recording = RecordingStudio::Recording.find_by!(recordable: page)
 
@@ -51,6 +64,16 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     assert_equal 3, Workspace.count
 
     admin = User.find_by!(email: "admin@admin.com")
+    commenter = User.find_by!(email: "commenter@commenter.com")
+    private_user = User.find_by!(email: "private@private.com")
+
+    assert_equal "edit", RecordingStudioAccessible.role_for(actor: admin, recording: root_recording).to_s
+    assert_equal "edit", RecordingStudioAccessible.role_for(actor: commenter, recording: root_recording).to_s
+    assert_equal "edit", RecordingStudioAccessible.role_for(actor: admin, recording: accessible_root_recording).to_s
+    assert_equal "admin", RecordingStudioAccessible.role_for(actor: admin, recording: admin_root_recording).to_s
+    assert_equal "admin", RecordingStudioAccessible.role_for(actor: private_user, recording: private_root_recording).to_s
+    assert(RecordingStudio::Access.distinct.pluck(:role).all? { |role| role.is_a?(String) })
+
     seeded = RecordingStudioNotifications::Notification.where(recipient: admin)
     types = seeded.distinct.pluck(:notification_type).sort
 

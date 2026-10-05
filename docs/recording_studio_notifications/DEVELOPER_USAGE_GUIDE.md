@@ -383,7 +383,7 @@ Three common checks exist:
 - managing preferences
 - optional creation authorization per notification type (`creation_action`)
 
-If `RecordingStudioAccessible` is present, authorization uses its action checks.
+If `RecordingStudioAccessible` is present, authorization uses its action checks. Accessible `0.11` stores roles as strings; grant and bootstrap through `RecordingStudioAccessible.grant_access` and `bootstrap_owner_access!`, then migrate with `bin/rails generate recording_studio_accessible:migrations`.
 
 Without it, a safe fallback allows same actor == recipient access.
 

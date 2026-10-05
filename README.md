@@ -22,6 +22,8 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 - `recording_studio`, `recording_studio_accessible`, `flat_pack`, and `view_component`
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus
 
+Development and dummy Gemfiles pin Accessible to GitHub tag `v0.11.1`. That release stores access roles as strings and adds invitation plus dependent-grant columns. The dummy app copies those 0.8–0.11 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
+
 ## Installation
 
 Add the gem to the host application's `Gemfile`:
