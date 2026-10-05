@@ -2,6 +2,10 @@
 
 # Dummy app authorization wiring for RecordingStudio Accessible demonstrations.
 if defined?(RecordingStudioAccessible)
+  RecordingStudioAccessible.configure do |config|
+    config.access_actor_types = ["User"]
+  end
+
   # Compatibility adapter: expose action-based APIs expected by notifications engine.
   unless RecordingStudioAccessible.respond_to?(:authorized_action?)
     RecordingStudioAccessible.singleton_class.class_eval do

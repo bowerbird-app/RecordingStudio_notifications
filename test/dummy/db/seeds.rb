@@ -297,79 +297,40 @@ begin
   end
 
   if defined?(RecordingStudioAccessible) && RecordingStudioAccessible.respond_to?(:grant_access)
-    ensure_access_for = lambda do |parent_recording, role|
-      root_for_parent = RecordingStudio.root_recording_or_self(parent_recording)
-      existing_grant = RecordingStudio::Recording.unscoped
-        .where(
-          root_recording_id: root_for_parent.id,
-          parent_recording_id: parent_recording.id,
-          recordable_type: "RecordingStudio::Access",
-          trashed_at: nil
-        )
-        .order(created_at: :asc, id: :asc)
-        .detect do |recording|
-          access = recording.recordable
-          access&.actor == user && access.role.to_s == role.to_s
-        end
-
-      next if existing_grant
-
-      RecordingStudioAccessible::AccessCreationContext.allow do
-        root_for_parent.record(RecordingStudio::Access, parent_recording: parent_recording) do |access|
-          access.actor = user
-          access.role = role
-        end
-      end
+    access_recording_for = lambda do |actor, recording|
+      RecordingStudioAccessible.access_recordings_for_actor(recording: recording, actor: actor).first
     end
 
-    ensure_access_for.call(root_recording, :edit)
-    ensure_access_for.call(accessible_root_recording, :edit)
-    ensure_access_for.call(admin_root_recording, :admin)
+    bootstrap_owner! = lambda do |actor, recording|
+      next if RecordingStudioAccessible.access_recordings_for(recording).any?
 
-    # Grant commenter edit access to Studio Workspace
-    commenter_access_exists = RecordingStudio::Recording.unscoped
-      .where(
-        root_recording_id: root_recording.id,
-        parent_recording_id: root_recording.id,
-        recordable_type: "RecordingStudio::Access",
-        trashed_at: nil
+      result = RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: actor)
+      raise result.error if result.failure?
+    end
+
+    grant! = lambda do |actor, role, recording, manager_actor|
+      existing = access_recording_for.call(actor, recording)
+      next if existing&.recordable&.role.to_s == role.to_s
+
+      result = RecordingStudioAccessible.grant_access(
+        recording: recording,
+        actor: actor,
+        role: role,
+        manager_actor: manager_actor
       )
-      .order(created_at: :asc, id: :asc)
-      .detect do |recording|
-        access = recording.recordable
-        access&.actor == commenter && access.role.to_s == "edit"
-      end
-
-    unless commenter_access_exists
-      RecordingStudioAccessible::AccessCreationContext.allow do
-        root_recording.record(RecordingStudio::Access, parent_recording: root_recording) do |access|
-          access.actor = commenter
-          access.role = :edit
-        end
-      end
+      raise result.error if result.failure?
     end
 
-    private_admin_exists = RecordingStudio::Recording.unscoped
-      .where(
-        root_recording_id: private_root_recording.id,
-        parent_recording_id: private_root_recording.id,
-        recordable_type: "RecordingStudio::Access",
-        trashed_at: nil
-      )
-      .order(created_at: :asc, id: :asc)
-      .detect do |recording|
-        access = recording.recordable
-        access&.actor == private_user && access.role.to_s == "admin"
-      end
+    bootstrap_owner!.call(user, root_recording)
+    grant!.call(commenter, :edit, root_recording, user)
+    grant!.call(user, :edit, root_recording, user)
 
-    unless private_admin_exists
-      RecordingStudioAccessible::AccessCreationContext.allow do
-        private_root_recording.record(RecordingStudio::Access, parent_recording: private_root_recording) do |access|
-          access.actor = private_user
-          access.role = :admin
-        end
-      end
-    end
+    bootstrap_owner!.call(user, accessible_root_recording)
+    grant!.call(user, :edit, accessible_root_recording, user)
+
+    bootstrap_owner!.call(user, admin_root_recording)
+
+    bootstrap_owner!.call(private_user, private_root_recording)
   end
 
 ensure
