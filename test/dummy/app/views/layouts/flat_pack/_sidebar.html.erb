@@ -46,74 +46,74 @@
   <% sidebar.items do %>
     <nav class="py-4 space-y-1" aria-label="Main navigation">
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Home",
+        text: "Home",
         href: main_app.root_path,
         icon: :home
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Pages",
+        text: "Pages",
         href: main_app.pages_path,
         icon: :document_text
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "System notifications",
+        text: "System notifications",
         href: main_app.system_notifications_path,
         icon: :megaphone
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Install",
+        text: "Install",
         href: main_app.docs_install_path,
         icon: :arrow_down_tray
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Config",
+        text: "Config",
         href: main_app.docs_config_path,
         icon: :settings
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Gem Views",
+        text: "Gem Views",
         href: main_app.docs_gem_views_path,
         icon: :document_magnifying_glass
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Methods",
+        text: "Methods",
         href: main_app.docs_methods_path,
         icon: :code_bracket
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Recordable types",
+        text: "Recordable types",
         href: main_app.docs_recordable_types_path,
         icon: :queue_list
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Recordings tree",
+        text: "Recordings tree",
         href: main_app.docs_recordings_tree_path,
         icon: :folder
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "All Notifications",
+        text: "All Notifications",
         href: recording_studio_notifications.root_path,
         icon: :inbox
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Notification Settings",
+        text: "Notification Settings",
         href: recording_studio_notifications.settings_path,
         icon: :adjustments_horizontal
       ) %>
 
       <% if request.path.start_with?("/admin") %>
         <%= render FlatPack::Sidebar::Item::Component.new(
-          label: "Admin",
+          text: "Admin",
           href: recording_studio_admin.root_path,
           icon: :shield
         ) %>
@@ -124,7 +124,7 @@
   <% sidebar.footer do %>
     <%= render FlatPack::Sidebar::Footer::Component.new(class: "text-sm text-[var(--surface-muted-content-color)]") do %>
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Sign out",
+        text: "Sign out",
         href: main_app.destroy_user_session_path,
         icon: :lock,
         class: "mx-0",

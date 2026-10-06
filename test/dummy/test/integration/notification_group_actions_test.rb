@@ -40,7 +40,7 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "relative inline-flex shrink-0"
     assert_includes response.body, "absolute -right-2 -top-2"
     assert_includes response.body, "inline-flex h-4 min-w-4 shrink-0"
-    assert_includes response.body, "inline-block w-5 h-5"
+    assert_includes response.body, "block shrink-0 w-5 h-5"
     assert_includes response.body, "flex shrink-0 items-center gap-4"
     assert_includes response.body, "data-flat-pack--accordion-target=\"icon\""
     assert_includes response.body, "[&amp;_[data-flat-pack--accordion-target=icon]]:ml-4"
@@ -68,7 +68,7 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Clear all"
     assert_includes response.body, ">Settings</span>"
     assert_operator response.body.index("Clear all"), :<, response.body.index(">Settings</span>")
-    assert_includes response.body, "bg-[var(--button-default-background-color)]"
+    assert_includes response.body, "fp-button-raised"
     assert_includes response.body, "fp-red-dot"
 
     patch "/notifications/notifications/clear_all", as: :turbo_stream
