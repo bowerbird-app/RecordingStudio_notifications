@@ -37,17 +37,30 @@ module RecordingStudioNotifications
 
           case cadence
           when :daily
-            start_date.strftime("%b %-d")
+            Copy.compact_day(start_date)
           when :monthly
-            start_date.strftime("%b %Y")
+            Copy.compact_month(start_date)
           else
-            "#{start_date.strftime('%b %-d')} – #{end_date.strftime('%b %-d')}"
+            Copy.t(
+              "inbox.period_range",
+              start: Copy.compact_day(start_date),
+              end: Copy.compact_day(end_date)
+            )
           end
         end
 
         def heading
-          unread_text = unread_count.positive? ? "#{unread_count} unread" : "All read"
-          "#{period_label} · #{unread_text} · #{notifications.size} notifications"
+          unread_text = if unread_count.positive?
+                          Copy.t("inbox.unread", count: unread_count)
+                        else
+                          Copy.t("inbox.all_read")
+                        end
+          Copy.t(
+            "inbox.heading",
+            period: period_label,
+            unread: unread_text,
+            count: Copy.t("inbox.count", count: notifications.size)
+          )
         end
       end
 

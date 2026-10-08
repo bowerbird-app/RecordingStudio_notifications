@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.3.2", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.4.0", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -25,6 +25,7 @@ class RecordingStudioNotificationsTest < Minitest::Test
 
     spec = Gem::Specification.load(gemspec_path)
     assert(spec.files.none? { |path| path.start_with?(".cursor/") })
+    refute_includes spec.dependencies.map(&:name), "recording_studio_internationalization"
   end
 
   def test_engine_routes_notifications_as_root

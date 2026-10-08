@@ -5,7 +5,7 @@
       icon_only: true,
       style: :ghost,
       size: :md,
-      aria: {label: "Toggle sidebar"},
+      aria: {label: t("dummy.nav.toggle_sidebar")},
       data: {
         "flat-pack--sidebar-layout-target": "mobileToggle",
         action: "click->flat-pack--sidebar-layout#toggleMobile"
@@ -22,6 +22,8 @@
   <% nav.right do %>
     <% if user_signed_in? %>
       <div class="flex items-center gap-3">
+        <%= dummy_language_selector %>
+
         <%= recording_studio_notifications_menu %>
 
         <%= recording_studio_root_switch_dropdown(style: :ghost, size: :md) %>

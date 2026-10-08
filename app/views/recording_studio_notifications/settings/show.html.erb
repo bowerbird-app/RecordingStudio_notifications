@@ -58,19 +58,20 @@
   ) %>
 
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Notification settings",
+    title: notifications_t("settings.title"),
     variant: :h1
   ) %>
 
   <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4 rsn-settings-accordion", data: {
         controller: "recording-studio-notifications--notification-settings",
         action: "change->recording-studio-notifications--notification-settings#syncNoneSelection",
-        recording_studio_notifications__notification_settings_required_channels_value: @required_channels_by_type.to_json
+        recording_studio_notifications__notification_settings_required_channels_value: @required_channels_by_type.to_json,
+        recording_studio_notifications__notification_settings_required_channel_tooltip_value: notifications_t("settings.required_channel_tooltip")
       } do %>
     <% if @notification_type_groups.any? %>
       <%= render FlatPack::Accordion::Component.new(allow_multiple: true) do |accordion| %>
         <% @notification_type_groups.each do |category, types| %>
-          <% accordion.item(id: "settings-category-#{category}", title: category.to_s.titleize, open: true) do %>
+          <% accordion.item(id: "settings-category-#{category}", title: notifications_t("categories.#{category}", default: category.to_s.titleize), open: true) do %>
             <div class="flex flex-col gap-3">
               <% types.each do |type| %>
                 <section class="border-b border-[var(--surface-border-color)] pb-4 last:border-b-0">
@@ -80,8 +81,8 @@
                       <%= render FlatPack::Select::Component.new(
                         name: "preferences[#{type.key}]",
                         options: @channel_select_options.fetch(type.key),
-                        label: "Channel",
-                        placeholder: (type.optional_channels.any? ? "Search and select channels..." : "Required channels only"),
+                        label: notifications_t("settings.channel"),
+                        placeholder: (type.optional_channels.any? ? notifications_t("settings.placeholder_search") : notifications_t("settings.placeholder_required")),
                         help_text: type.description.presence || channel_settings_help_text(type),
                         searchable: true,
                         multiple: true,
@@ -95,8 +96,8 @@
                       <%= render FlatPack::Select::Component.new(
                         name: "cadences[#{type.key}]",
                         options: @cadence_select_options.fetch(type.key),
-                        label: "Frequency",
-                        help_text: "Change notification cadence.",
+                        label: notifications_t("settings.frequency"),
+                        help_text: notifications_t("settings.cadence_help"),
                         searchable: false,
                         value: @selected_cadences.fetch(type.key),
                         class: "w-full"
@@ -104,9 +105,9 @@
                     <% elsif rollup_delivery_enabled? && type.required_cadence.present? %>
                       <%= render FlatPack::Select::Component.new(
                         name: "cadences[#{type.key}]",
-                        options: type.allowed_cadences.map { |cadence| [cadence.to_s.humanize, cadence.to_s] },
-                        label: "Frequency",
-                        help_text: "This cadence is required for #{type.label.downcase}.",
+                        options: type.allowed_cadences.map { |cadence| [cadence_option_label(cadence), cadence.to_s] },
+                        label: notifications_t("settings.frequency"),
+                        help_text: notifications_t("settings.cadence_required", label: type.label.downcase),
                         disabled: true,
                         searchable: false,
                         value: type.required_cadence.to_s,
@@ -122,10 +123,10 @@
       <% end %>
 
       <div class="pt-2">
-        <%= render FlatPack::Button::Component.new(text: "Save settings", style: :primary, size: :md, type: "submit") %>
+        <%= render FlatPack::Button::Component.new(text: notifications_t("settings.save"), style: :primary, size: :md, type: "submit") %>
       </div>
     <% else %>
-      <p class="text-sm text-(--surface-muted-content-color)">No optional notification channels are available.</p>
+      <p class="text-sm text-(--surface-muted-content-color)"><%= notifications_t("settings.empty") %></p>
     <% end %>
   <% end %>
 </div>

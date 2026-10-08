@@ -224,8 +224,8 @@ class NotificationAcceptanceTest < Minitest::Test
     refute_includes index_view, "max-w-3xl"
     assert_includes index_view, "notifications/notifications/title"
     assert_includes title_partial, "FlatPack::Button::Component.new"
-    assert_includes title_partial, 'text: "Settings"'
-    assert_includes title_partial, 'text: "Clear all"'
+    assert_includes title_partial, 'notifications_t("inbox.settings")'
+    assert_includes title_partial, 'notifications_t("inbox.clear_all")'
     assert_includes title_partial, "style: :default"
     assert_includes title_partial, "turbo_stream: true"
     refute_includes title_partial, "link_to \"Settings\""
@@ -254,7 +254,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes notification_partial, "FlatPack::Timestamp::Component.new("
     assert_includes notification_partial, "shorten_timestamp: true"
     assert_includes notifications_helper, "notification_group_badge_text"
-    assert_match(/#\{unread_count\} unread notifications/, notifications_helper)
+    assert_includes notifications_helper, 'notifications_t("inbox.unread_aria", count: unread_count)'
     assert_includes notifications_helper, "bg-red-600"
     assert_includes notifications_helper, "fp-red-dot"
     assert_includes notifications_helper, "def notification_group_next_page_dom_id(group, page)"
@@ -302,31 +302,34 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, "disabled: type.required_channels.include?(channel)"
     assert_includes controller, "channel_settings_help_text"
     assert_includes controller, "required_channels_by_type"
-    assert_includes controller, "%w[None __none__]"
+    assert_includes controller, 'Copy.t("channels.none")'
     refute_includes settings, "(required)"
     assert_includes settings, "rsn-required-channel-chip"
     assert_includes controller_js, "removeRequiredOptions"
     assert_includes settings, "recording-studio-notifications--notification-settings"
     assert_includes settings, "recording_studio_notifications__notification_settings_required_channels_value"
+    assert_includes settings, "recording_studio_notifications__notification_settings_required_channel_tooltip_value"
+    assert_includes controller_js, "requiredChannelTooltipValue"
+    refute_includes controller_js, "This channel can't be removed"
     assert_includes routes, "resource :settings"
-    assert_includes settings, "Notification settings"
+    assert_includes settings, 'notifications_t("settings.title")'
     assert_includes settings, "FlatPack::Accordion::Component.new"
     assert_includes settings, 'accordion.item(id: "settings-category-#{category}"'
     assert_includes settings, "FlatPack::Select::Component.new"
     assert_includes settings, "@notification_type_groups.each do |category, types|"
-    assert_includes settings, "category.to_s.titleize"
-    assert_includes settings, "Required channels only"
+    assert_includes settings, 'notifications_t("categories.#{category}"'
+    assert_includes settings, 'notifications_t("settings.placeholder_required")'
     assert_includes settings, "disabled: type.optional_channels.empty?"
     assert_includes settings, "channel_settings_help_text(type)"
     assert_includes settings, "multiple: true"
     assert_includes settings, "searchable: true"
     assert_includes settings, 'name: "cadences[#{type.key}]"'
-    assert_includes settings, "label: \"Channel\""
-    assert_includes settings, "label: \"Frequency\""
-    assert_includes settings, "Change notification cadence."
+    assert_includes settings, 'notifications_t("settings.channel")'
+    assert_includes settings, 'notifications_t("settings.frequency")'
+    assert_includes settings, 'notifications_t("settings.cadence_help")'
     assert_includes settings, "mt-3 grid gap-4 md:grid-cols-2"
     assert_includes settings, "class: \"w-full\""
-    assert_includes settings, "This cadence is required for"
+    assert_includes settings, 'notifications_t("settings.cadence_required"'
     assert_includes views, "FlatPack::"
     refute_includes views, "notification_bell"
     refute_includes settings, "check_box_tag"
@@ -361,7 +364,9 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes polling_controller, "setInterval"
     assert_includes polling_controller, "polling_interval_seconds"
     assert_includes controllers_index, 'lazyLoadControllersFrom("controllers/recording_studio_notifications", application)'
+    assert_includes top_nav, "dummy_language_selector"
     assert_includes top_nav, "recording_studio_notifications_menu"
+    assert_operator top_nav.index("dummy_language_selector"), :<, top_nav.index("recording_studio_notifications_menu")
     assert_includes sidebar, "RecordingStudioNotifications::VERSION"
     refute_includes sidebar, "FlatPack::VERSION"
     assert_includes tailwind, '[id^="flat-pack-notification-"][id$="-popover"] .max-h-96'

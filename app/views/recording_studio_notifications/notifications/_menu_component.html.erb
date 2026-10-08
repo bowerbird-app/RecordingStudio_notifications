@@ -1,11 +1,21 @@
+<% bell_label = RecordingStudioNotifications::Copy.value(
+     local_assigns.fetch(:bell_label, RecordingStudioNotifications::Copy::UNSET),
+     "menu.title"
+   ) %>
+<% empty_text = RecordingStudioNotifications::Copy.value(
+     local_assigns.fetch(:empty_text, RecordingStudioNotifications::Copy::UNSET),
+     "menu.empty"
+   ) %>
 <% if defined?(FlatPack::Notification::Component) %>
   <%= render FlatPack::Notification::Component.new(
     unread_count: unread_count,
     see_all_href: see_all_href,
-    notifications: notifications
+    notifications: notifications,
+    bell_label: bell_label,
+    empty_text: empty_text
   ) %>
 <% else %>
-  <% label = unread_count.to_i.positive? ? "Notifications (#{unread_count})" : "Notifications" %>
+  <% label = unread_count.to_i.positive? ? RecordingStudioNotifications::Copy.t("menu.title_with_count", count: unread_count) : bell_label %>
 
   <%= render FlatPack::Button::Component.new(
     text: label,

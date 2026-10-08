@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "recording_studio_notifications/version"
+require "recording_studio_notifications/copy"
 require "recording_studio_notifications/engine"
 require "recording_studio_notifications/configuration"
 require "recording_studio_notifications/notification_type_registry"

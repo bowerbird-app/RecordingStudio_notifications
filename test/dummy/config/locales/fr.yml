@@ -1,0 +1,171 @@
+# Dummy-only host translations. The engine ships English defaults; other
+# languages belong to the host. This file covers every engine
+# recording_studio.notifications key plus dummy chrome.
+fr:
+  date:
+    abbr_month_names:
+      - ~
+      - janv.
+      - févr.
+      - mars
+      - avr.
+      - mai
+      - juin
+      - juil.
+      - août
+      - sept.
+      - oct.
+      - nov.
+      - déc.
+    month_names:
+      - ~
+      - janvier
+      - février
+      - mars
+      - avril
+      - mai
+      - juin
+      - juillet
+      - août
+      - septembre
+      - octobre
+      - novembre
+      - décembre
+  recording_studio:
+    internationalization:
+      selector:
+        label: Langue
+        submit: Changer de langue
+    notifications:
+      layout:
+        title: Notifications
+      menu:
+        title: Notifications
+        title_with_count: "Notifications (%{count})"
+        empty: Aucune notification récente
+        see_all: Voir toutes les notifications
+      inbox:
+        title: Notifications
+        clear_all: Tout effacer
+        settings: Réglages
+        empty: Pas encore de notifications.
+        loading: Chargement des notifications…
+        unread_aria: "%{count} notifications non lues"
+        unread: "%{count} non lue"
+        all_read: Tout lu
+        count: "%{count} notifications"
+        heading: "%{period} · %{unread} · %{count}"
+        period_range: "%{start} – %{end}"
+      show:
+        open_related: Ouvrir l’élément
+        mark_read: Marquer lu
+        mark_unread: Marquer non lu
+        archive: Archiver
+        unarchive: Désarchiver
+      settings:
+        title: Réglages des notifications
+        channel: Canal
+        frequency: Fréquence
+        placeholder_search: Chercher et choisir des canaux…
+        placeholder_required: Canaux obligatoires seulement
+        cadence_help: Changer la fréquence des notifications.
+        cadence_required: Cette fréquence est obligatoire pour %{label}.
+        save: Enregistrer
+        empty: Aucun canal optionnel n’est disponible.
+        help_required_and_optional: Les canaux obligatoires restent activés. Vous pouvez ajouter ou retirer les autres.
+        help_required_only: Ce type n’a que des canaux obligatoires.
+        help_optional: Choisissez les canaux où recevoir les notifications.
+        required_channel_tooltip: Ce canal ne peut pas être retiré
+      flashes:
+        marked_read: Notification marquée comme lue.
+        marked_unread: Notification marquée comme non lue.
+        cleared: Notifications non lues effacées.
+        archived: Notification archivée.
+        unarchived: Notification désarchivée.
+        preferences_updated: Préférences de notification enregistrées.
+        preferences_failed: Les préférences n’ont pas pu être enregistrées.
+      channels:
+        none: Aucun
+        in_app: Dans l’app
+        email: E-mail
+      cadences:
+        individual: Individuelle
+        daily: Quotidienne
+        every_other_day: Tous les deux jours
+        weekly: Hebdomadaire
+        biweekly: Toutes les deux semaines
+        monthly: Mensuelle
+      categories:
+        general: Général
+        page: Page
+        workspace: Espace
+        system: Système
+  dummy:
+    nav:
+      toggle_sidebar: Ouvrir le menu
+    sidebar:
+      brand: Notifications
+      subtitle: Recording Studio
+      nav: Navigation principale
+      open: Ouvrir le menu
+      collapse: Refermer le menu
+      home: Accueil
+      pages: Pages
+      system_notifications: Annonces système
+      install: Installation
+      config: Config
+      gem_views: Vues du gem
+      methods: Méthodes
+      recordable_types: Types d’éléments
+      recordings_tree: Arbre
+      all_notifications: Toutes les notifications
+      notification_settings: Réglages des notifications
+      sign_out: Se déconnecter
+    home:
+      title: Démo notifications
+      subtitle: Cette app dummy est la démo navigateur des notifications Recording Studio.
+  flatpack:
+    notification:
+      bell: Notifications
+      empty: Aucune notification récente
+      fallback: Notification
+      see_all: Voir toutes les notifications
+      overflow: 9+
+    timestamp:
+      fallback: "-"
+      in: Dans %{distance}
+      ago: "il y a %{distance}"
+      just_now: À l’instant
+      a_min_ago: il y a 1 min
+      minutes_ago: "il y a %{count} minutes"
+      hours_ago: "il y a %{count} heures"
+      yesterday: Hier
+      days_ago: "il y a %{count} jours"
+      weeks_ago: "il y a %{count} semaines"
+      months_ago: "il y a %{count} mois"
+      short_a_min_ago: il y a 1 min
+      short_min_ago: "il y a %{count} min"
+      short_hr_ago: "il y a %{count} h"
+      short_yesterday: il y a 1 j
+      short_d_ago: "il y a %{count} j"
+      short_wk_ago: "il y a %{count} sem"
+      short_mo_ago: "il y a %{count} mois"
+    page_nav:
+      back: Retour
+      close: Fermer
+      previous: Page précédente
+      label: Navigation de page
+    select:
+      placeholder: Choisir
+      search: Rechercher…
+      remove: Retirer %{label}
+      type_to_search: Tapez au moins %{count} caractères
+      searching: Recherche…
+      empty: Aucune option
+    common:
+      close: Fermer
+      search: Rechercher
+      previous: Préc.
+      next: Suiv.
+      back: Retour
+      save: Enregistrer

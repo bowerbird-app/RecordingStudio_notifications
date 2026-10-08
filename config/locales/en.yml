@@ -1,0 +1,63 @@
+en:
+  recording_studio:
+    notifications:
+      layout:
+        title: Notifications
+      menu:
+        title: Notifications
+        title_with_count: "Notifications (%{count})"
+        empty: No recent notifications
+        see_all: See all notifications
+      inbox:
+        title: Notifications
+        clear_all: Clear all
+        settings: Settings
+        empty: No notifications yet.
+        loading: Loading more notifications...
+        unread_aria: "%{count} unread notifications"
+        unread: "%{count} unread"
+        all_read: All read
+        count: "%{count} notifications"
+        heading: "%{period} · %{unread} · %{count}"
+        period_range: "%{start} – %{end}"
+      show:
+        open_related: Open related item
+        mark_read: Mark read
+        mark_unread: Mark unread
+        archive: Archive
+        unarchive: Unarchive
+      settings:
+        title: Notification settings
+        channel: Channel
+        frequency: Frequency
+        placeholder_search: Search and select channels...
+        placeholder_required: Required channels only
+        cadence_help: Change notification cadence.
+        cadence_required: This cadence is required for %{label}.
+        save: Save settings
+        empty: No optional notification channels are available.
+        help_required_and_optional: Required channels stay enabled and optional channels can be added or removed.
+        help_required_only: This notification type has required channels only.
+        help_optional: Choose which channels to receive notifications on.
+        required_channel_tooltip: This channel can't be removed
+      flashes:
+        marked_read: Notification marked read.
+        marked_unread: Notification marked unread.
+        cleared: Unread notifications cleared.
+        archived: Notification archived.
+        unarchived: Notification unarchived.
+        preferences_updated: Notification preferences updated.
+        preferences_failed: Notification preferences could not be updated.
+      channels:
+        none: None
+        in_app: In app
+        email: Email
+      cadences:
+        individual: Individual
+        daily: Daily
+        every_other_day: Every other day
+        weekly: Weekly
+        biweekly: Biweekly
+        monthly: Monthly
+      categories:
+        general: General

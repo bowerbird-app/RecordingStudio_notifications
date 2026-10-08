@@ -34,6 +34,15 @@ class EngineTest < Minitest::Test
                     "isolate_namespace RecordingStudioNotifications"
   end
 
+  def test_engine_loads_only_english_locale_files
+    locale_dir = RecordingStudioNotifications::Engine.root.join("config/locales")
+    loaded = I18n.load_path.select { |path| path.to_s.start_with?(locale_dir.to_s) }
+
+    assert(loaded.any? { |path| path.end_with?("en.yml") })
+    refute(loaded.any? { |path| path.end_with?("fr.yml") })
+    assert_equal ["en.yml"], Dir.children(locale_dir).sort
+  end
+
   private
 
   def find_initializer(name)

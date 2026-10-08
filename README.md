@@ -168,6 +168,18 @@ lazyLoadControllersFrom("controllers/recording_studio_notifications", applicatio
 
 The host layout must include its normal `javascript_importmap_tags` and a Stimulus application. The engine registers its importmap pins and JavaScript asset path automatically.
 
+## Internationalization
+
+The engine ships English defaults in `config/locales/en.yml` under `recording_studio.notifications.*` and adds that file to the host I18n load path. Menu chrome, inbox, settings, flashes, channel/cadence labels, and relative-time period labels resolve those keys at request time.
+
+Other languages are the host's job. Copy the same keys into `config/locales/<locale>.yml` and list that locale in `config.i18n.available_locales`. A host key with the same name overrides the English default. The dummy app's `test/dummy/config/locales/fr.yml` is a complete French override you can copy.
+
+`RecordingStudio_Internationalization` is optional and a host dependency. This gem does not declare it. Hosts that want a language selector add that gem themselves.
+
+Notification titles and bodies stored in the database are written by other gems or people. This gem leaves that data untranslated.
+
+Menu arguments that already accept custom text (`bell_label`, `empty_text`) still override the locale default, including `nil`.
+
 ## Channels, preferences, and delivery
 
 The bundled `:in_app` adapter marks deliveries as delivered. Register an external adapter with:

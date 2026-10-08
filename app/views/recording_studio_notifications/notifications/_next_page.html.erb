@@ -2,6 +2,6 @@
 
 <%= turbo_frame_tag "notifications_next_page", src: (has_next_page ? notifications_path(next_page_params) : nil), loading: (has_next_page ? :lazy : nil) do %>
   <% if has_next_page %>
-    <div class="py-3 text-center text-xs text-(--surface-muted-content-color)">Loading more notifications...</div>
+    <div class="py-3 text-center text-xs text-(--surface-muted-content-color)"><%= notifications_t("inbox.loading") %></div>
   <% end %>
 <% end %>

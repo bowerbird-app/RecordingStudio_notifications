@@ -7,6 +7,10 @@ module RecordingStudioNotifications
       "rounded-full bg-red-600 px-1 text-[10px] font-semibold leading-none text-white"
     ].join(" ").freeze
 
+    def notifications_t(key, **)
+      Copy.t(key, **)
+    end
+
     def notification_icon_for(notification)
       key = notification.respond_to?(:notification_type) ? notification.notification_type : nil
       notification_type_icon_for(key)
@@ -37,7 +41,7 @@ module RecordingStudioNotifications
                       :span,
                       notification_group_badge_text(unread_count),
                       class: UNREAD_BADGE_CLASSES,
-                      aria: { label: "#{unread_count} unread notifications" }
+                      aria: { label: notifications_t("inbox.unread_aria", count: unread_count) }
                     )
                   ])
       end

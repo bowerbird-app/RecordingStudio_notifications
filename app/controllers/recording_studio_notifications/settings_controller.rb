@@ -4,7 +4,8 @@ module RecordingStudioNotifications
   class SettingsController < ApplicationController
     layout "recording_studio_notifications/blank"
 
-    helper_method :channel_configurable?, :cadence_selectable?, :rollup_delivery_enabled?, :channel_settings_help_text
+    helper_method :channel_configurable?, :cadence_selectable?, :rollup_delivery_enabled?, :channel_settings_help_text,
+                  :cadence_option_label
 
     before_action :set_recipient
     before_action :authorize_settings
@@ -35,10 +36,10 @@ module RecordingStudioNotifications
         end
       end
 
-      redirect_to settings_path, notice: "Notification preferences updated."
+      redirect_to settings_path, notice: Copy.t("flashes.preferences_updated")
     rescue ActiveRecord::RecordInvalid, ArgumentError
       prepare_settings_view
-      flash.now[:alert] = "Notification preferences could not be updated."
+      flash.now[:alert] = Copy.t("flashes.preferences_failed")
       render :show, status: :unprocessable_entity
     end
 
@@ -98,7 +99,7 @@ module RecordingStudioNotifications
           }
         end
 
-        options.unshift(%w[None __none__]) if type.required_channels.empty?
+        options.unshift([Copy.t("channels.none"), "__none__"]) if type.required_channels.empty?
 
         map[type.key] = options
       end
@@ -118,7 +119,7 @@ module RecordingStudioNotifications
       flat_notification_types.each_with_object({}) do |type, map|
         next unless cadence_selectable?(type)
 
-        map[type.key] = type.allowed_cadences.map { |cadence| [cadence.to_s.humanize, cadence.to_s] }
+        map[type.key] = type.allowed_cadences.map { |cadence| [cadence_option_label(cadence), cadence.to_s] }
       end
     end
 
@@ -139,16 +140,20 @@ module RecordingStudioNotifications
     end
 
     def channel_option_label(_type, channel)
-      channel.to_s.humanize
+      Copy.t("channels.#{channel}", default: channel.to_s.humanize)
+    end
+
+    def cadence_option_label(cadence)
+      Copy.t("cadences.#{cadence}", default: cadence.to_s.humanize)
     end
 
     def channel_settings_help_text(type)
       if type.required_channels.any? && type.optional_channels.any?
-        "Required channels stay enabled and optional channels can be added or removed."
+        Copy.t("settings.help_required_and_optional")
       elsif type.required_channels.any?
-        "This notification type has required channels only."
+        Copy.t("settings.help_required_only")
       else
-        "Choose which channels to receive notifications on."
+        Copy.t("settings.help_optional")
       end
     end
 

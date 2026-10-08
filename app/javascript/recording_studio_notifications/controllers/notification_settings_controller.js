@@ -1,11 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
 import { application } from "controllers/application"
 
-const REQUIRED_CHANNEL_TOOLTIP = "This channel can't be removed"
-
 export default class extends Controller {
   static values = {
-    requiredChannels: { type: Object, default: {} }
+    requiredChannels: { type: Object, default: {} },
+    requiredChannelTooltip: { type: String, default: "" }
   }
 
   connect() {
@@ -72,8 +71,8 @@ export default class extends Controller {
 
         const chipVisual = chip.querySelector(".inline-flex.items-center")
         if (chipVisual) {
-          chipVisual.dataset.tooltip = REQUIRED_CHANNEL_TOOLTIP
-          chipVisual.setAttribute("aria-label", REQUIRED_CHANNEL_TOOLTIP)
+          chipVisual.dataset.tooltip = this.requiredChannelTooltipValue
+          chipVisual.setAttribute("aria-label", this.requiredChannelTooltipValue)
           chipVisual.setAttribute("tabindex", "0")
           chipVisual.classList.add("rsn-required-channel-chip")
         }

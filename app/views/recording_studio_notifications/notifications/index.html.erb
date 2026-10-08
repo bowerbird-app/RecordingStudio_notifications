@@ -28,7 +28,7 @@
             <%= render partial: "recording_studio_notifications/notifications/next_page", locals: { page: @page, has_next_page: @has_next_page } %>
           </div>
         <% else %>
-          <p class="text-sm text-(--surface-muted-content-color)">No notifications yet.</p>
+          <p class="text-sm text-(--surface-muted-content-color)"><%= notifications_t("inbox.empty") %></p>
         <% end %>
       <% end %>
     <% end %>
