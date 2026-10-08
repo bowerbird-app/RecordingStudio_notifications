@@ -44,6 +44,7 @@ class CustomerI18nTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Channel</label>"
     assert_includes response.body, ">Frequency</label>"
     assert_includes response.body, "Save settings"
+    assert_select "html[lang='en']"
   end
 
   test "dummy French locale renders the notifications list and settings" do

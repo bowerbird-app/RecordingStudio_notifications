@@ -1,5 +1,12 @@
+<%
+  html_attributes = { lang: I18n.locale.to_s, "data-theme" => "rounded", class: "h-full" }
+  html_attributes.merge!(recording_studio_locale_attributes) if respond_to?(:recording_studio_locale_attributes)
+  if respond_to?(:flat_pack_copy_data)
+    html_attributes[:data] = (html_attributes[:data] || {}).merge(flat_pack_copy_data)
+  end
+%>
 <!DOCTYPE html>
-<html data-theme="rounded" class="h-full">
+<html <%= tag.attributes(html_attributes) %>>
   <head>
     <title><%= content_for(:title) || notifications_t("layout.title") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
