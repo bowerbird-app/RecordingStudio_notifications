@@ -44,5 +44,9 @@ module Dummy
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # Host-owned locale list. Dummy demos English and French.
+    config.i18n.available_locales = %i[en fr]
+    config.i18n.default_locale = :en
   end
 end

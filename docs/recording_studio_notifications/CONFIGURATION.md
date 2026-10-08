@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** July 13, 2026
+> *   **Last Updated:** October 8, 2026
 >
 > *Maintainers: Update the date above when modifying this file.*
 
@@ -293,10 +293,16 @@ RecordingStudioNotifications.configuration.to_h
 
 ---
 
+## Internationalization
+
+Customer-facing chrome lives under `recording_studio.notifications.*` in `config/locales/en.yml`. The engine does not ship other languages and does not depend on Recording Studio Internationalization. Hosts copy those keys into their own locale files.
+
 ## File Reference
 
 - `lib/recording_studio_notifications/configuration.rb`
+- `lib/recording_studio_notifications/copy.rb`
 - `lib/recording_studio_notifications/engine.rb`
+- `config/locales/en.yml`
 - `lib/generators/recording_studio_notifications/install/templates/recording_studio_notifications_initializer.rb`
 
 ---

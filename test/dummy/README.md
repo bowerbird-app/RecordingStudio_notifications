@@ -9,6 +9,7 @@ This Rails app exists to validate Recording Studio Notifications in a real host 
 - Root workspace plus seeded folder and page recordables
 - Seeded inbox mix: mentions, approvals, comments, new pages, workspace changes, and system announcements, read and unread, with different icons
 - FlatPack layout integration and Tailwind source scanning
+- Dummy-only English and French via Recording Studio Internationalization, with a compact language selector in the top nav
 - Mounted `RecordingStudio::Engine` route behavior inside a host app
 - A starter sidebar menu and companion docs pages for gem-specific onboarding
 
@@ -37,6 +38,7 @@ Then open the app and sign in with:
 - `/users/sign_in` - Devise sign-in page
 - `/docs/install`, `/docs/config`, `/docs/recordable_types`, `/docs/recordings_tree`, `/docs/gem_views`, `/docs/methods` - starter sidebar pages to adapt for the gem
 - `/up` - Rails health check
+- Language selector in the top nav switches dummy between English and French (`/recording_studio_internationalization/locale`). French copy lives in dummy `config/locales/fr.yml`, not the engine.
 
 ## Why This App Exists
 

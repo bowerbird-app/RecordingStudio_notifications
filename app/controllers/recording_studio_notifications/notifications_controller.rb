@@ -47,7 +47,9 @@ module RecordingStudioNotifications
           locals: {
             unread_count: unread_count,
             notifications: payload,
-            see_all_href: notifications_path
+            see_all_href: notifications_path,
+            bell_label: Copy.t("menu.title"),
+            empty_text: Copy.t("menu.empty")
           }
         )
       }
@@ -94,7 +96,7 @@ module RecordingStudioNotifications
       return head :forbidden unless visible_notification?(@notification)
 
       @notification.mark_read!
-      redirect_back fallback_location: notification_path(@notification), notice: "Notification marked read."
+      redirect_back fallback_location: notification_path(@notification), notice: Copy.t("flashes.marked_read")
     end
 
     def mark_unread
@@ -102,7 +104,7 @@ module RecordingStudioNotifications
       return head :forbidden unless visible_notification?(@notification)
 
       @notification.mark_unread!
-      redirect_back fallback_location: notification_path(@notification), notice: "Notification marked unread."
+      redirect_back fallback_location: notification_path(@notification), notice: Copy.t("flashes.marked_unread")
     end
 
     def clear_all
@@ -117,7 +119,7 @@ module RecordingStudioNotifications
       respond_to do |format|
         format.html do
           redirect_back fallback_location: notifications_path,
-                        notice: "Unread notifications cleared.",
+                        notice: Copy.t("flashes.cleared"),
                         status: :see_other
         end
         format.turbo_stream do
@@ -131,7 +133,7 @@ module RecordingStudioNotifications
       return head :forbidden unless visible_notification?(@notification)
 
       @notification.archive!
-      redirect_back fallback_location: notification_path(@notification), notice: "Notification archived."
+      redirect_back fallback_location: notification_path(@notification), notice: Copy.t("flashes.archived")
     end
 
     def unarchive
@@ -139,7 +141,7 @@ module RecordingStudioNotifications
       return head :forbidden unless visible_notification?(@notification)
 
       @notification.unarchive!
-      redirect_back fallback_location: notification_path(@notification), notice: "Notification unarchived."
+      redirect_back fallback_location: notification_path(@notification), notice: Copy.t("flashes.unarchived")
     end
 
     private

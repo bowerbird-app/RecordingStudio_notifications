@@ -1,12 +1,12 @@
 <div id="notifications-title">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Notifications",
+    title: notifications_t("inbox.title"),
     variant: :h1
   ) do |page_title| %>
     <% page_title.slot do %>
       <% if @has_unread_notifications %>
         <%= render FlatPack::Button::Component.new(
-          text: "Clear all",
+          text: notifications_t("inbox.clear_all"),
           url: clear_all_notifications_path,
           style: :default,
           size: :md,
@@ -14,7 +14,7 @@
         ) %>
       <% end %>
       <%= render FlatPack::Button::Component.new(
-        text: "Settings",
+        text: notifications_t("inbox.settings"),
         url: settings_path,
         style: :default,
         size: :md

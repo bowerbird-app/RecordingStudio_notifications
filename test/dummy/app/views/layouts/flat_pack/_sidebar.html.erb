@@ -2,14 +2,14 @@
   <% sidebar.header do %>
     <%= render FlatPack::Sidebar::Header::Component.new(
       brand_abbr: "RS",
-      title: "Notifications",
-      subtitle: "Recording Studio"
+      title: t("dummy.sidebar.brand"),
+      subtitle: t("dummy.sidebar.subtitle")
     ) do %>
       <div class="flex items-center gap-3" data-flat-pack--sidebar-layout-target="headerRow">
         <div class="flex items-center gap-3" data-flat-pack--sidebar-layout-target="headerBrand">
           <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold bg-[var(--sidebar-header-badge-background-color)] text-[var(--sidebar-header-badge-text-color)]">RS</div>
           <div class="flex items-center h-8" data-flat-pack--sidebar-layout-target="headerLabel">
-            <div class="font-semibold text-sm text-[var(--sidebar-header-text-color)]">Notifications</div>
+            <div class="font-semibold text-sm text-[var(--sidebar-header-text-color)]"><%= t("dummy.sidebar.brand") %></div>
             <span class="ml-2 inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] leading-none font-medium bg-[var(--badge-default-background-color)] text-[var(--badge-default-text-color)] border-[var(--badge-default-border-color)]">
               v<%= RecordingStudioNotifications::VERSION %>
             </span>
@@ -21,7 +21,7 @@
           class="hidden items-center justify-center p-2 rounded-lg text-[var(--sidebar-header-icon-color)] hover:bg-[var(--sidebar-header-icon-hover-background-color)] hover:text-[var(--sidebar-header-icon-hover-color)] transition-colors"
           data-flat-pack--sidebar-layout-target="collapsedToggle"
           data-action="click->flat-pack--sidebar-layout#toggleDesktop"
-          aria-label="Open sidebar"
+          aria-label="<%= t("dummy.sidebar.open") %>"
           aria-expanded="false"
         >
           <%= render FlatPack::Shared::IconComponent.new(name: :menu, size: :md) %>
@@ -32,7 +32,7 @@
           class="hidden ml-auto p-2 rounded-lg text-[var(--sidebar-header-icon-color)] hover:bg-[var(--sidebar-header-icon-hover-background-color)] hover:text-[var(--sidebar-header-icon-hover-color)] transition-colors"
           data-flat-pack--sidebar-layout-target="desktopToggle"
           data-action="click->flat-pack--sidebar-layout#toggleDesktop click->flat-pack--sidebar-layout#toggleMobile"
-          aria-label="Collapse sidebar"
+          aria-label="<%= t("dummy.sidebar.collapse") %>"
           aria-expanded="true"
         >
           <span class="flex-shrink-0 transition-transform duration-300" data-flat-pack--sidebar-layout-target="chevron">
@@ -44,69 +44,69 @@
   <% end %>
 
   <% sidebar.items do %>
-    <nav class="py-4 space-y-1" aria-label="Main navigation">
+    <nav class="py-4 space-y-1" aria-label="<%= t("dummy.sidebar.nav") %>">
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "Home",
+        text: t("dummy.sidebar.home"),
         href: main_app.root_path,
         icon: :home
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "Pages",
+        text: t("dummy.sidebar.pages"),
         href: main_app.pages_path,
         icon: :document_text
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "System notifications",
+        text: t("dummy.sidebar.system_notifications"),
         href: main_app.system_notifications_path,
         icon: :megaphone
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "Install",
+        text: t("dummy.sidebar.install"),
         href: main_app.docs_install_path,
         icon: :arrow_down_tray
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "Config",
+        text: t("dummy.sidebar.config"),
         href: main_app.docs_config_path,
         icon: :settings
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "Gem Views",
+        text: t("dummy.sidebar.gem_views"),
         href: main_app.docs_gem_views_path,
         icon: :document_magnifying_glass
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "Methods",
+        text: t("dummy.sidebar.methods"),
         href: main_app.docs_methods_path,
         icon: :code_bracket
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "Recordable types",
+        text: t("dummy.sidebar.recordable_types"),
         href: main_app.docs_recordable_types_path,
         icon: :queue_list
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "Recordings tree",
+        text: t("dummy.sidebar.recordings_tree"),
         href: main_app.docs_recordings_tree_path,
         icon: :folder
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "All Notifications",
+        text: t("dummy.sidebar.all_notifications"),
         href: recording_studio_notifications.root_path,
         icon: :inbox
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "Notification Settings",
+        text: t("dummy.sidebar.notification_settings"),
         href: recording_studio_notifications.settings_path,
         icon: :adjustments_horizontal
       ) %>
@@ -124,7 +124,7 @@
   <% sidebar.footer do %>
     <%= render FlatPack::Sidebar::Footer::Component.new(class: "text-sm text-[var(--surface-muted-content-color)]") do %>
       <%= render FlatPack::Sidebar::Item::Component.new(
-        text: "Sign out",
+        text: t("dummy.sidebar.sign_out"),
         href: main_app.destroy_user_session_path,
         icon: :lock,
         class: "mx-0",
