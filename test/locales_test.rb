@@ -42,6 +42,10 @@ class LocalesTest < Minitest::Test
   end
 
   def test_host_translation_overrides_english
+    # Init translations before store: reload! leaves the backend cold, and the
+    # next lookup would reload YAML over an early store_translations.
+    Copy.t("menu.title")
+
     I18n.backend.store_translations(:en, acme_title)
     assert_equal "Acme alerts", Copy.t("menu.title")
   ensure
