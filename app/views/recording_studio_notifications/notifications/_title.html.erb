@@ -7,7 +7,7 @@
       <% if @has_unread_notifications %>
         <%= render FlatPack::Button::Component.new(
           text: notifications_t("inbox.clear_all"),
-          url: clear_all_notifications_path,
+          href: clear_all_notifications_path,
           style: :default,
           size: :md,
           data: { turbo_method: :patch, turbo_stream: true }
@@ -15,7 +15,7 @@
       <% end %>
       <%= render FlatPack::Button::Component.new(
         text: notifications_t("inbox.settings"),
-        url: settings_path,
+        href: settings_path,
         style: :default,
         size: :md
       ) %>
