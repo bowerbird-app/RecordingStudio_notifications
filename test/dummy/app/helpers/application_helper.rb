@@ -26,7 +26,7 @@ module ApplicationHelper
 
 		render FlatPack::Button::Component.new(
 			text: label,
-			url: recording_studio_accessible.recording_accesses_path(recording),
+			href: recording_studio_accessible.recording_accesses_path(recording),
 			style: button_style,
 			size: button_size
 		)
