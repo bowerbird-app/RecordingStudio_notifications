@@ -14,6 +14,7 @@ require "recording_studio_notifications/services/inbox_grouping"
 require "recording_studio_notifications/services/root_resolver"
 require "recording_studio_notifications/services/notification_authorization"
 require "recording_studio_notifications/delivery_payload_registry"
+require "recording_studio_notifications/metrics"
 
 if defined?(RecordingStudioAdmin)
   require "recording_studio_notifications/admin/all_notifications_screen"

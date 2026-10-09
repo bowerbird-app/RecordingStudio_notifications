@@ -145,6 +145,10 @@ module RecordingStudioNotifications
       end
     end
 
+    initializer "recording_studio_notifications.metrics" do
+      config.to_prepare { RecordingStudioNotifications::Metrics.register! }
+    end
+
     initializer "recording_studio_notifications.register_admin_capabilities",
                 after: "recording_studio_notifications.load_config" do |_app|
       next unless defined?(RecordingStudioAdmin)

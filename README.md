@@ -20,6 +20,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 - Ruby 3.3 or newer
 - Rails 8.1
 - `recording_studio`, `recording_studio_accessible`, `flat_pack`, and `view_component`
+- `recording_studio_metrics` for operations metrics registration
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus
 
 Development and dummy Gemfiles pin Accessible to GitHub tag `v0.13.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.13` move Accessible view copy to Rails I18n (English shipped in the gem). The dummy app copies those 0.8–0.11 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
@@ -424,6 +425,10 @@ Webhook delivery is intentionally deferred: host apps may register a custom adap
 ## Authorization
 
 The engine registers Accessible actions for viewing notifications and managing preferences when `RecordingStudioAccessible` is available. Root-scoped inbox visibility checks Accessible `:view` on the root recording. Preference pages use `:"recording_studio_notifications.manage_preferences"`. Types with `creation_action:` require that Accessible action before creation.
+
+## Operations metrics
+
+The engine registers site-wide notification metrics with Recording Studio Metrics (`notifications.sent_over_time`, `notifications.by_type`, `notifications.read_vs_unread`, `notification_deliveries.by_status`, `notification_deliveries.by_channel`). Staff with AdminRoot `:view` can read them via `Api::Access.can_view?`. `read_vs_unread` uses `Notification.read` / `Notification.unread`. This gem does not call `RecordingStudioMetrics::Api.register!`.
 
 ## UI
 

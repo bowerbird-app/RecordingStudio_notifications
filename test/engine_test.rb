@@ -34,6 +34,14 @@ class EngineTest < Minitest::Test
                     "isolate_namespace RecordingStudioNotifications"
   end
 
+  def test_engine_registers_metrics_and_does_not_expose_api
+    engine = File.read(File.expand_path("../lib/recording_studio_notifications/engine.rb", __dir__))
+
+    assert_includes engine, 'initializer "recording_studio_notifications.metrics"'
+    assert_includes engine, "RecordingStudioNotifications::Metrics.register!"
+    refute_includes engine, "RecordingStudioMetrics::Api.register!"
+  end
+
   def test_engine_loads_only_english_locale_files
     locale_dir = RecordingStudioNotifications::Engine.root.join("config/locales")
     loaded = I18n.load_path.select { |path| path.to_s.start_with?(locale_dir.to_s) }

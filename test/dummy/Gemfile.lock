@@ -44,6 +44,15 @@ GIT
       recording_studio (~> 4.2)
 
 GIT
+  remote: https://github.com/bowerbird-app/RecordingStudio_metrics.git
+  revision: 6e02b6b75a8a9dad2bd80c6ba2d30f7444e67b9e
+  tag: v0.2.0
+  specs:
+    recording_studio_metrics (0.2.0)
+      rails (~> 8.1.0)
+      recording_studio (~> 4.2)
+
+GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_notifications_email.git
   revision: 57519306b0e6a9fd5be3c57ec08662683b37f55f
   tag: v0.3.2
@@ -78,11 +87,12 @@ GIT
 PATH
   remote: ../..
   specs:
-    recording_studio_notifications (0.5.0)
+    recording_studio_notifications (0.6.0)
       flat_pack
       rails (~> 8.1.0)
       recording_studio (~> 4.2)
       recording_studio_accessible
+      recording_studio_metrics (~> 0.2)
       view_component
 
 GEM
@@ -510,6 +520,7 @@ DEPENDENCIES
   recording_studio_admin!
   recording_studio_commentable!
   recording_studio_internationalization!
+  recording_studio_metrics!
   recording_studio_notifications!
   recording_studio_notifications_email!
   recording_studio_root_switchable!
@@ -642,7 +653,8 @@ CHECKSUMS
   recording_studio_admin (2.1.0)
   recording_studio_commentable (0.4.1)
   recording_studio_internationalization (0.1.2)
-  recording_studio_notifications (0.5.0)
+  recording_studio_metrics (0.2.0)
+  recording_studio_notifications (0.6.0)
   recording_studio_notifications_email (0.3.1)
   recording_studio_root_switchable (0.6.0)
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4
