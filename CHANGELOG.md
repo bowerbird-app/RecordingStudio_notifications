@@ -33,6 +33,38 @@ Site-wide Notifications metrics register with Recording Studio Metrics for the o
 RecordingStudioMetrics::Api.register!(api: :operations)
 ```
 
+## [0.5.0] - 2026-10-09
+
+Staff Admin chrome for All notifications joins the customer screens under
+`recording_studio.notifications.*` so hosts can translate it.
+
+### Added
+
+* English Rails I18n keys for Admin All notifications screen and section
+  (`recording_studio.notifications.admin.all_notifications.*` in
+  `config/locales/en.yml`)
+
+### Changed
+
+* Admin screen/section title, subtitle, summary label, open-table link, and
+  scope/status/empty-actor cell labels resolve through `Copy.t` (English
+  output unchanged)
+* Admin table column headers stay literal English (Admin DSL stores them as
+  strings at class load; matching keys ship in `en.yml` for host overrides via
+  a custom screen)
+
+### Upgrade notes
+
+* Bump to **0.5.0** (minor: hosts can translate Admin All notifications chrome).
+  No migration
+* English screens stay the same. Copy `recording_studio.notifications.admin.*`
+  into the host locale file to override or add another language
+* Customer menu/inbox/settings keys from **0.4.0** are unchanged
+* Accessible action labels (`View notifications`, `Manage notification
+  preferences`) stay English
+* Do not add `RecordingStudio_Internationalization` as a dependency of this
+  engine
+
 ## [0.4.0] - 2026-10-08
 
 Customer-facing notifications copy now lives under `recording_studio.notifications.*` so hosts can translate the menu, inbox, settings, and flashes.
@@ -192,6 +224,7 @@ fetch at Build.
 
 [Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.5.1...HEAD
 [0.5.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.6...v0.4.0
 [0.3.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.0...v0.3.1

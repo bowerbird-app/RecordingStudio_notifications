@@ -23,7 +23,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 - `recording_studio_metrics` for operations metrics registration
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus
 
-Development and dummy Gemfiles pin Accessible to GitHub tag `v0.11.1`. That release stores access roles as strings and adds invitation plus dependent-grant columns. The dummy app copies those 0.8–0.11 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
+Development and dummy Gemfiles pin Accessible to GitHub tag `v0.13.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.13` move Accessible view copy to Rails I18n (English shipped in the gem). The dummy app copies those 0.8–0.11 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
 
 ## Installation
 
@@ -171,13 +171,13 @@ The host layout must include its normal `javascript_importmap_tags` and a Stimul
 
 ## Internationalization
 
-The engine ships English defaults in `config/locales/en.yml` under `recording_studio.notifications.*` and adds that file to the host I18n load path. Menu chrome, inbox, settings, flashes, channel/cadence labels, and relative-time period labels resolve those keys at request time.
+The engine ships English defaults in `config/locales/en.yml` under `recording_studio.notifications.*`. Rails engines load `config/locales` automatically; this gem does not append to `I18n.load_path` in an initializer (that would re-add English after the host and wipe host overrides). Menu chrome, inbox, settings, flashes, channel/cadence labels, relative-time period labels, and Admin All notifications chrome resolve those keys at request time (Admin column headers stay literal English).
 
 Other languages are the host's job. Copy the same keys into `config/locales/<locale>.yml` and list that locale in `config.i18n.available_locales`. A host key with the same name overrides the English default. The dummy app's `test/dummy/config/locales/fr.yml` is a complete French override you can copy.
 
 `RecordingStudio_Internationalization` is optional and a host dependency. This gem does not declare it. Hosts that want a language selector add that gem themselves.
 
-Notification titles and bodies stored in the database are written by other gems or people. This gem leaves that data untranslated.
+Notification titles and bodies stored in the database are written by other gems or people. This gem leaves that data untranslated. Host-registered type labels and Accessible action labels stay caller-owned English.
 
 Menu arguments that already accept custom text (`bell_label`, `empty_text`) still override the locale default, including `nil`.
 

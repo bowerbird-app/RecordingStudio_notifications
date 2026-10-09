@@ -6,10 +6,23 @@ require "yaml"
 class LocalesTest < Minitest::Test
   Copy = RecordingStudioNotifications::Copy
 
+  ADMIN_KEYS = {
+    "title" => "All notifications",
+    "subtitle" => "Root-scoped and global notification overview",
+    "summary" => "Notifications",
+    "open_table" => "Open notifications table"
+  }.freeze
+
   def test_engine_ships_only_english_locale_files
     files = Dir[File.join(engine_locales_dir, "*")].map { |path| File.basename(path) }
 
     assert_equal ["en.yml"], files.sort
+  end
+
+  def test_rails_i18n_load_path_includes_the_gem_english_locale_file
+    locale_path = File.join(engine_locales_dir, "en.yml")
+
+    assert_includes I18n.load_path.map { |path| File.expand_path(path) }, File.expand_path(locale_path)
   end
 
   def test_dummy_french_covers_every_engine_english_key
@@ -32,6 +45,35 @@ class LocalesTest < Minitest::Test
       assert_equal "Notification preferences updated.", Copy.t("flashes.preferences_updated")
       assert_equal "This channel can't be removed", Copy.t("settings.required_channel_tooltip")
       assert_equal "Jul 3", Copy.compact_day(Date.new(2026, 7, 3))
+      ADMIN_KEYS.each do |key, english|
+        assert_equal english, Copy.t("admin.all_notifications.#{key}")
+      end
+      assert_equal "Type", Copy.t("admin.all_notifications.columns.type")
+      assert_equal "Root", Copy.t("admin.all_notifications.scope.root")
+      assert_equal "Unread", Copy.t("admin.all_notifications.status.unread")
+    end
+  end
+
+  def test_english_keys_resolve_without_missing_translations
+    I18n.with_locale(:en) do
+      flatten_keys(locale_tree(File.join(engine_locales_dir, "en.yml"), "en")).each do |key|
+        full_key = "recording_studio.notifications.#{key}"
+        translation = I18n.t(full_key, default: nil)
+
+        refute_nil translation, "#{full_key} should resolve"
+        assert_equal translation, I18n.t(full_key, raise: true)
+        refute_match(/translation missing/i, translation.to_s)
+      end
+    end
+  end
+
+  def test_en_yml_nests_admin_keys_under_recording_studio_notifications
+    tree = locale_tree(File.join(engine_locales_dir, "en.yml"), "en")
+           .fetch("admin")
+           .fetch("all_notifications")
+
+    ADMIN_KEYS.each do |key, english|
+      assert_equal english, tree.fetch(key)
     end
   end
 

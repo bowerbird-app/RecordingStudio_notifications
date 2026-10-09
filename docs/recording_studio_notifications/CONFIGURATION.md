@@ -295,7 +295,10 @@ RecordingStudioNotifications.configuration.to_h
 
 ## Internationalization
 
-Customer-facing chrome lives under `recording_studio.notifications.*` in `config/locales/en.yml`. The engine does not ship other languages and does not depend on Recording Studio Internationalization. Hosts copy those keys into their own locale files.
+Customer and Admin All notifications chrome lives under
+`recording_studio.notifications.*` in `config/locales/en.yml`. The engine does
+not ship other languages and does not depend on Recording Studio
+Internationalization. Hosts copy those keys into their own locale files.
 
 ## File Reference
 

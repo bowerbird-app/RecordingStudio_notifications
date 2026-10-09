@@ -72,7 +72,11 @@ Note: the final full URL depends on your mount path.
 
 ## 3a. Internationalization
 
-Customer-facing chrome uses Rails I18n under `recording_studio.notifications.*`. The gem ships English only. Hosts add other languages in their own locale files. Do not add `RecordingStudio_Internationalization` to this gem; install it in the host if you want a language selector.
+Customer and Admin All notifications chrome uses Rails I18n under
+`recording_studio.notifications.*`. The gem ships English only. Hosts add other
+languages in their own locale files. Do not add
+`RecordingStudio_Internationalization` to this gem; install it in the host if
+you want a language selector.
 
 Stored notification titles and bodies stay as written. Staff Admin screens stay English.
 
