@@ -61,10 +61,10 @@ class NotificationMetricsApiTest < ActionDispatch::IntegrationTest
         as: :json
     assert_response :success
     sent = timeseries_counts(response.parsed_body)
-    assert_equal notifications_created_between(Time.utc(2026, 2, 10), Time.utc(2026, 2, 11)), sent["2026-02-10"]
-    assert_equal notifications_created_between(Time.utc(2026, 2, 11), Time.utc(2026, 2, 12)), sent["2026-02-11"]
-    assert_operator sent["2026-02-10"], :>=, 1
-    assert_operator sent["2026-02-11"], :>=, 2
+    assert_equal notifications_created_between(Time.utc(2026, 10, 7), Time.utc(2026, 10, 8)), sent["2026-10-07"]
+    assert_equal notifications_created_between(Time.utc(2026, 10, 8), Time.utc(2026, 10, 9)), sent["2026-10-08"]
+    assert_operator sent["2026-10-07"], :>=, 1
+    assert_operator sent["2026-10-08"], :>=, 2
 
     get "#{OPERATIONS_ROOT}/metrics/notifications/by_type",
         headers: auth(@staff_operations_token),
@@ -157,18 +157,18 @@ class NotificationMetricsApiTest < ActionDispatch::IntegrationTest
   private
 
   def seed_notifications!
-    travel_to Time.utc(2026, 2, 10, 12) do
+    travel_to Time.utc(2026, 10, 7, 12) do
       create_notification(
         type: :page_comment,
-        title: "February comment #{SecureRandom.hex(4)}",
+        title: "October comment #{SecureRandom.hex(4)}",
         read_at: Time.current,
         deliveries: [{ channel: :in_app, status: "delivered" }]
       )
     end
-    travel_to Time.utc(2026, 2, 11, 12) do
+    travel_to Time.utc(2026, 10, 8, 12) do
       create_notification(
         type: :mention,
-        title: "March mention #{SecureRandom.hex(4)}",
+        title: "October mention #{SecureRandom.hex(4)}",
         read_at: nil,
         deliveries: [
           { channel: :in_app, status: "pending" },
@@ -177,7 +177,7 @@ class NotificationMetricsApiTest < ActionDispatch::IntegrationTest
       )
       create_notification(
         type: :mention,
-        title: "March mention two #{SecureRandom.hex(4)}",
+        title: "October mention two #{SecureRandom.hex(4)}",
         read_at: Time.current,
         deliveries: [{ channel: :email, status: "processing" }]
       )
