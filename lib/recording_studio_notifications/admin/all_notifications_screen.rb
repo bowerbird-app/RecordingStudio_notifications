@@ -5,8 +5,8 @@ module RecordingStudioNotifications
     class AllNotificationsScreen < RecordingStudioAdmin::Screen
       key "recording_studio_notifications_all_notifications"
       icon :bell
-      title "All notifications"
-      subtitle "Root-scoped and global notification overview"
+      title { Copy.t("admin.all_notifications.title") }
+      subtitle { Copy.t("admin.all_notifications.subtitle") }
 
       query do |_context|
         RecordingStudioNotifications::Notification
@@ -15,7 +15,7 @@ module RecordingStudioNotifications
       end
 
       summary do
-        label "Notifications"
+        label ->(_context) { Copy.t("admin.all_notifications.summary") }
       end
 
       table do
@@ -31,11 +31,16 @@ module RecordingStudioNotifications
           end
         }
 
+        # Column header titles stay literal English: the Admin DSL stores them as
+        # strings at class load, before I18n is ready. Keys for the same English
+        # live in en.yml for hosts that override via a custom screen.
         column :notification_type, title: "Type"
         column :scope,
                title: "Scope",
                sortable: false,
-               value: ->(row, _context) { row.root_recording_id.present? ? "Root" : "Global" }
+               value: ->(row, _context) {
+                 row.root_recording_id.present? ? Copy.t("admin.all_notifications.scope.root") : Copy.t("admin.all_notifications.scope.global")
+               }
         column :title, title: "Title"
         column :recipient,
                title: "Recipient",
@@ -44,11 +49,13 @@ module RecordingStudioNotifications
         column :actor,
                title: "Actor",
                sortable: false,
-               value: ->(row, _context) { row.actor_type.presence || "-" }
+               value: ->(row, _context) { row.actor_type.presence || Copy.t("admin.all_notifications.actor.none") }
         column :status,
                title: "Status",
                sortable: false,
-               value: ->(row, _context) { row.read? ? "Read" : "Unread" }
+               value: ->(row, _context) {
+                 row.read? ? Copy.t("admin.all_notifications.status.read") : Copy.t("admin.all_notifications.status.unread")
+               }
         column :created_at, title: "Created"
 
         default_sort :created_at, direction: :desc

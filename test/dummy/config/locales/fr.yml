@@ -100,6 +100,28 @@ fr:
         page: Page
         workspace: Espace
         system: Système
+      admin:
+        all_notifications:
+          title: Toutes les notifications
+          subtitle: Vue d’ensemble des notifications racine et globales
+          summary: Notifications
+          open_table: Ouvrir le tableau des notifications
+          columns:
+            type: Type
+            scope: Portée
+            title: Titre
+            recipient: Destinataire
+            actor: Acteur
+            status: Statut
+            created: Créé
+          scope:
+            root: Racine
+            global: Global
+          status:
+            read: Lu
+            unread: Non lu
+          actor:
+            none: "-"
   dummy:
     nav:
       toggle_sidebar: Ouvrir le menu
