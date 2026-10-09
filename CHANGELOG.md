@@ -21,6 +21,9 @@ Site-wide Notifications metrics register with Recording Studio Metrics for the o
   Each metric is exposed on `:operations` only.
   `api_authorize` uses `RecordingStudioNotifications::Api::Access.can_view?`
   (AdminRoot `:view`, the same Accessible check Admin screens use).
+  The admin root comes from `site_admin_recording_resolver`, then
+  `access_recording_resolver`. If that resolver raises or returns nothing,
+  the request is denied.
 - Runtime dependency `recording_studio_metrics` `~> 0.2` (GitHub tag `v0.2.0`).
 
 ### Upgrade notes

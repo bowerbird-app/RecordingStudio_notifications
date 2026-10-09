@@ -86,7 +86,64 @@ class NotificationMetricsTest < ActiveSupport::TestCase
     refute authorize.call(GrantContext.new(Grant.new(nil)))
   end
 
+  test "site resolver is preferred when it is set" do
+    access_called = false
+    with_admin_resolvers(
+      site_resolver: ->(_context) { @admin_root },
+      access_resolver: ->(_context) {
+        access_called = true
+        nil
+      }
+    ) do
+      assert_equal @admin_root, RecordingStudioNotifications::Api::Access.admin_root_recording
+      assert RecordingStudioNotifications::Api::Access.can_view?(GrantContext.new(Grant.new(@staff)))
+      refute access_called
+    end
+  end
+
+  test "access resolver is used when the site resolver is unset" do
+    with_admin_resolvers(
+      site_resolver: nil,
+      access_resolver: ->(_context) { @admin_root }
+    ) do
+      assert_equal @admin_root, RecordingStudioNotifications::Api::Access.admin_root_recording
+      assert RecordingStudioNotifications::Api::Access.can_view?(GrantContext.new(Grant.new(@staff)))
+    end
+  end
+
+  test "a raising resolver denies the request" do
+    with_admin_resolvers(
+      site_resolver: ->(_context) { raise NoMethodError, "controller is nil" },
+      access_resolver: ->(_context) { @admin_root }
+    ) do
+      assert_nothing_raised do
+        refute RecordingStudioNotifications::Api::Access.can_view?(GrantContext.new(Grant.new(@staff)))
+      end
+    end
+  end
+
+  test "a resolver that returns nothing denies the request" do
+    with_admin_resolvers(
+      site_resolver: ->(_context) { nil },
+      access_resolver: ->(_context) { @admin_root }
+    ) do
+      refute RecordingStudioNotifications::Api::Access.can_view?(GrantContext.new(Grant.new(@staff)))
+    end
+  end
+
   private
+
+  def with_admin_resolvers(site_resolver:, access_resolver:)
+    config = RecordingStudioAdmin.configuration
+    original_site_resolver = config.site_admin_recording_resolver
+    original_access_resolver = config.access_recording_resolver
+    config.site_admin_recording_resolver = site_resolver
+    config.access_recording_resolver = access_resolver
+    yield
+  ensure
+    config.site_admin_recording_resolver = original_site_resolver
+    config.access_recording_resolver = original_access_resolver
+  end
 
   def execute(identifier, **params)
     RecordingStudioMetrics.execute(
