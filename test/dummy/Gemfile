@@ -6,7 +6,7 @@ gem "recording_studio_notifications_email",
     github: "bowerbird-app/RecordingStudio_notifications_email", tag: "v0.3.2"
 
 # RecordingStudio engine
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v4.3.0"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v4.4.0"
 gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.11.1"
 gem "recording_studio_commentable", github: "bowerbird-app/RecordingStudio_commentable", tag: "v0.3.1"
 
