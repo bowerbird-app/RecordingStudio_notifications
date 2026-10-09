@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-09
+
+Site-wide Notifications metrics register with Recording Studio Metrics for the operations API.
+
+### Added
+- `RecordingStudioNotifications::Metrics.register!` registers `:notifications` and
+  `:notification_deliveries` (`blast_radius: :site`) with RecordingStudioMetrics.
+  Notifications: `notifications.sent_over_time` (`created_at`),
+  `notifications.by_type` (`notification_type`), `notifications.read_vs_unread`
+  (custom breakdown via `Notification.read` / `Notification.unread`).
+  Deliveries: `notification_deliveries.by_status`, `notification_deliveries.by_channel`.
+  Each metric is exposed on `:operations` only.
+  `api_authorize` uses `RecordingStudioNotifications::Api::Access.can_view?`
+  (AdminRoot `:view`, the same Accessible check Admin screens use).
+- Runtime dependency `recording_studio_metrics` `~> 0.2` (GitHub tag `v0.2.0`).
+
+### Upgrade notes
+- Bump to `0.5.0`. No migration.
+- Add `recording_studio_metrics` at tag `v0.2.0`.
+- This gem does not call `RecordingStudioMetrics::Api.register!`. The host
+  registers Metrics endpoints once:
+
+```ruby
+RecordingStudioMetrics::Api.register!(api: :operations)
+```
+
 ## [0.4.0] - 2026-10-08
 
 Customer-facing notifications copy now lives under `recording_studio.notifications.*` so hosts can translate the menu, inbox, settings, and flashes.
@@ -164,7 +190,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.4.2...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.6...v0.4.0
 [0.3.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.0...v0.3.1

@@ -35,12 +35,32 @@ GIT
       recording_studio_accessible (~> 0.6)
 
 GIT
+  remote: https://github.com/bowerbird-app/RecordingStudio_api.git
+  revision: 297673a375b71751d6fffe43ffbe71a6769f69f1
+  tag: v0.6.11
+  specs:
+    recording_studio_api (0.6.11)
+      rails (~> 8.1.0)
+      recording_studio (~> 4.2)
+      recording_studio_accessible (~> 0.11)
+      redis (~> 5.3)
+
+GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_commentable.git
   revision: 72f063d626d4d93e95a79edbebf08c9539d3aeb0
   tag: v0.3.1
   specs:
     recording_studio_commentable (0.3.1)
       rails (>= 7.0.0)
+      recording_studio (~> 4.2)
+
+GIT
+  remote: https://github.com/bowerbird-app/RecordingStudio_metrics.git
+  revision: 6e02b6b75a8a9dad2bd80c6ba2d30f7444e67b9e
+  tag: v0.2.0
+  specs:
+    recording_studio_metrics (0.2.0)
+      rails (~> 8.1.0)
       recording_studio (~> 4.2)
 
 GIT
@@ -78,11 +98,12 @@ GIT
 PATH
   remote: ../..
   specs:
-    recording_studio_notifications (0.4.0)
+    recording_studio_notifications (0.5.0)
       flat_pack
       rails (~> 8.1.0)
       recording_studio (~> 4.2)
       recording_studio_accessible
+      recording_studio_metrics (~> 0.2)
       view_component
 
 GEM
@@ -367,6 +388,10 @@ GEM
       prism (>= 1.6.0)
       rbs (>= 4.0.0)
       tsort
+    redis (5.4.1)
+      redis-client (>= 0.22.0)
+    redis-client (0.31.0)
+      connection_pool
     regexp_parser (2.11.3)
     reline (0.6.3)
       io-console (~> 0.5)
@@ -508,8 +533,10 @@ DEPENDENCIES
   recording_studio!
   recording_studio_accessible!
   recording_studio_admin!
+  recording_studio_api!
   recording_studio_commentable!
   recording_studio_internationalization!
+  recording_studio_metrics!
   recording_studio_notifications!
   recording_studio_notifications_email!
   recording_studio_root_switchable!
@@ -640,11 +667,15 @@ CHECKSUMS
   recording_studio (4.3.0)
   recording_studio_accessible (0.11.0)
   recording_studio_admin (2.0.7)
+  recording_studio_api (0.6.11)
   recording_studio_commentable (0.3.1)
   recording_studio_internationalization (0.1.2)
-  recording_studio_notifications (0.4.0)
+  recording_studio_metrics (0.2.0)
+  recording_studio_notifications (0.5.0)
   recording_studio_notifications_email (0.3.1)
   recording_studio_root_switchable (0.5.1)
+  redis (5.4.1) sha256=b5e675b57ad22b15c9bcc765d5ac26f60b675408af916d31527af9bd5a81faae
+  redis-client (0.31.0) sha256=6820cb2a21e6795a823141f50fd25e655de2b8dc8ff833b43509a27b0263fd75
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4
   reline (0.6.3) sha256=1198b04973565b36ec0f11542ab3f5cfeeec34823f4e54cebde90968092b1835
   responders (3.2.0) sha256=89c2d6ac0ae16f6458a11524cae4a8efdceba1a3baea164d28ee9046bd3df55a

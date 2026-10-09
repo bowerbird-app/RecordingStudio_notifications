@@ -30,8 +30,12 @@ class EngineTest < Minitest::Test
 
   def test_engine_is_isolated
     assert_kind_of Class, RecordingStudioNotifications::Engine
-    assert_includes File.read(File.expand_path("../lib/recording_studio_notifications/engine.rb", __dir__)),
-                    "isolate_namespace RecordingStudioNotifications"
+    engine = File.read(File.expand_path("../lib/recording_studio_notifications/engine.rb", __dir__))
+
+    assert_includes engine, "isolate_namespace RecordingStudioNotifications"
+    assert_includes engine, 'initializer "recording_studio_notifications.metrics"'
+    assert_includes engine, "RecordingStudioNotifications::Metrics.register!"
+    refute_includes engine, "RecordingStudioMetrics::Api.register!"
   end
 
   def test_engine_loads_only_english_locale_files

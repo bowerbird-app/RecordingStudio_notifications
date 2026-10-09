@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.4.0", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.5.0", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -26,6 +26,8 @@ class RecordingStudioNotificationsTest < Minitest::Test
     spec = Gem::Specification.load(gemspec_path)
     assert(spec.files.none? { |path| path.start_with?(".cursor/") })
     refute_includes spec.dependencies.map(&:name), "recording_studio_internationalization"
+    assert_includes spec.dependencies.map(&:name), "recording_studio_metrics"
+    refute_includes spec.dependencies.map(&:name), "recording_studio_api"
   end
 
   def test_engine_routes_notifications_as_root
@@ -58,6 +60,11 @@ class RecordingStudioNotificationsTest < Minitest::Test
                                    ))
     engine_importmap = File.read(File.expand_path("../config/importmap.rb", __dir__))
 
+    dummy_gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
+
+    assert_includes dummy_gemfile, 'github: "bowerbird-app/RecordingStudio_api", tag: "v0.6.11"'
+    assert_includes dummy_gemfile, 'github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.2.0"'
+    assert_includes routes, "mount RecordingStudioApi::Engine"
     assert_includes routes, "mount RecordingStudioNotifications::Engine"
     assert_includes initializer, "config.notification_types.register"
     assert_includes initializer, ":page_comment"

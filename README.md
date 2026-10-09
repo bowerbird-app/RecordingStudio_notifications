@@ -19,7 +19,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 
 - Ruby 3.3 or newer
 - Rails 8.1
-- `recording_studio`, `recording_studio_accessible`, `flat_pack`, and `view_component`
+- `recording_studio`, `recording_studio_accessible`, `recording_studio_metrics`, `flat_pack`, and `view_component`
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus
 
 Development and dummy Gemfiles pin Accessible to GitHub tag `v0.11.1`. That release stores access roles as strings and adds invitation plus dependent-grant columns. The dummy app copies those 0.8–0.11 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
@@ -424,6 +424,25 @@ Webhook delivery is intentionally deferred: host apps may register a custom adap
 ## Authorization
 
 The engine registers Accessible actions for viewing notifications and managing preferences when `RecordingStudioAccessible` is available. Root-scoped inbox visibility checks Accessible `:view` on the root recording. Preference pages use `:"recording_studio_notifications.manage_preferences"`. Types with `creation_action:` require that Accessible action before creation.
+
+## Operations metrics
+
+The engine registers site-wide notification metrics with Recording Studio Metrics. The host exposes them once:
+
+```ruby
+RecordingStudioMetrics::Api.register!(api: :operations)
+```
+
+| Method | Path |
+| --- | --- |
+| `GET` | `/recording_studio_api/apis/operations/v1/metrics` |
+| `GET` | `/recording_studio_api/apis/operations/v1/metrics/notifications/sent_over_time` |
+| `GET` | `/recording_studio_api/apis/operations/v1/metrics/notifications/by_type` |
+| `GET` | `/recording_studio_api/apis/operations/v1/metrics/notifications/read_vs_unread` |
+| `GET` | `/recording_studio_api/apis/operations/v1/metrics/notification_deliveries/by_status` |
+| `GET` | `/recording_studio_api/apis/operations/v1/metrics/notification_deliveries/by_channel` |
+
+Staff with AdminRoot `:view` can read them. A public token or a non-admin operations token is denied. `read_vs_unread` uses `Notification.read` / `Notification.unread`. This gem does not call `RecordingStudioMetrics::Api.register!`.
 
 ## UI
 
