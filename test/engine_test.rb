@@ -43,6 +43,21 @@ class EngineTest < Minitest::Test
     assert_equal ["en.yml"], Dir.children(locale_dir).sort
   end
 
+  def test_engine_does_not_append_to_i18n_load_path
+    engine_files = Dir[File.expand_path("../lib/**/engine.rb", __dir__)]
+
+    assert_operator engine_files.length, :>=, 1
+
+    engine_files.each do |path|
+      source = File.read(path)
+
+      refute_includes source, "i18n.load_path",
+                      "#{path} must not touch config.i18n.load_path (Rails engines load config/locales automatically)"
+      refute_includes source, "I18n.load_path",
+                      "#{path} must not append to I18n.load_path (that re-adds gem English after host overrides)"
+    end
+  end
+
   private
 
   def find_initializer(name)

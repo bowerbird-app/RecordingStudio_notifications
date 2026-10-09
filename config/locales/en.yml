@@ -61,3 +61,25 @@ en:
         monthly: Monthly
       categories:
         general: General
+      admin:
+        all_notifications:
+          title: All notifications
+          subtitle: Root-scoped and global notification overview
+          summary: Notifications
+          open_table: Open notifications table
+          columns:
+            type: Type
+            scope: Scope
+            title: Title
+            recipient: Recipient
+            actor: Actor
+            status: Status
+            created: Created
+          scope:
+            root: Root
+            global: Global
+          status:
+            read: Read
+            unread: Unread
+          actor:
+            none: "-"

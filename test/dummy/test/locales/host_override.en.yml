@@ -1,0 +1,7 @@
+# Test-only host override. Not under config/locales, so the dummy app's normal
+# English UI keeps the gem defaults. Loaded inside HostLocaleOverrideTest only.
+en:
+  recording_studio:
+    notifications:
+      inbox:
+        empty: Host says the inbox is empty
