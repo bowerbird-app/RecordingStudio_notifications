@@ -1,4 +1,3 @@
 # frozen_string_literal: true
 
-# Host-owned. Notifications registers metric definitions; it does not expose endpoints.
-RecordingStudioMetrics::Api.register!(api: :operations)
+# Host-owned. Notifications registers metric definitions only.

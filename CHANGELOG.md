@@ -26,8 +26,8 @@ Site-wide Notifications metrics register with Recording Studio Metrics for the o
 ### Upgrade notes
 - Bump to `0.5.1`. No migration.
 - Add `recording_studio_metrics` at tag `v0.2.0`.
-- This gem does not call `RecordingStudioMetrics::Api.register!`. The host
-  registers Metrics endpoints once:
+- This gem does not call `RecordingStudioMetrics::Api.register!`. When
+  RecordingStudio API is present, the host registers Metrics endpoints once:
 
 ```ruby
 RecordingStudioMetrics::Api.register!(api: :operations)

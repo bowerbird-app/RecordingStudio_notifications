@@ -45,10 +45,7 @@ gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.207"
 # Admin panel for Recording Studio
 gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "v2.0.7"
 
-# Optional JSON API. Host-owned. This gem does not gemspec-depend on it.
-gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "v0.6.11"
-
-# Host registers Metrics endpoints. This gem only registers metric definitions.
+# Host registers Metrics definitions. Notifications does not depend on RecordingStudio API.
 gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.2.0"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
