@@ -28,13 +28,13 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     refute connection.table_exists?(:recording_studio_device_sessions)
   end
 
-  test "Gemfiles pin Accessible to v0.13.0 and Commentable to v0.4.0" do
+  test "Gemfiles pin Accessible to v0.13.0 and Commentable to v0.4.1" do
     root_gemfile = File.read(Rails.root.join("../../Gemfile"))
     dummy_gemfile = File.read(Rails.root.join("Gemfile"))
 
     assert_match(/recording_studio_accessible.*, tag: "v0.13.0"/, root_gemfile)
     assert_match(/recording_studio_accessible.*, tag: "v0.13.0"/, dummy_gemfile)
-    assert_match(/recording_studio_commentable.*, tag: "v0.4.0"/, dummy_gemfile)
+    assert_match(/recording_studio_commentable.*, tag: "v0.4.1"/, dummy_gemfile)
   end
 
   test "dummy seeds use v3 hierarchy idempotently and restore current actor" do
