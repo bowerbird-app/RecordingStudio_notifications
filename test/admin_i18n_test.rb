@@ -36,4 +36,3 @@ class AdminI18nTest < Minitest::Test
     refute_includes section, 'text: "Open notifications table"'
   end
 end
-

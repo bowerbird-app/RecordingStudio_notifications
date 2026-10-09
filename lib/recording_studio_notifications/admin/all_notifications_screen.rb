@@ -19,16 +19,8 @@ module RecordingStudioNotifications
       end
 
       table do
-        filter :search, apply: lambda { |relation, value, _context|
-          if value.present?
-            q = "%#{value.to_s.downcase}%"
-            relation.where(
-              "LOWER(notification_type) LIKE :q OR LOWER(title) LIKE :q OR LOWER(COALESCE(actor_type, '')) LIKE :q OR LOWER(recipient_type) LIKE :q",
-              q: q
-            )
-          else
-            relation
-          end
+        filter :search, apply: lambda { |relation, value, context|
+          AllNotificationsScreen.filter_search(relation, value, context)
         }
 
         # Column header titles stay literal English: the Admin DSL stores them as
@@ -38,9 +30,7 @@ module RecordingStudioNotifications
         column :scope,
                title: "Scope",
                sortable: false,
-               value: ->(row, _context) {
-                 row.root_recording_id.present? ? Copy.t("admin.all_notifications.scope.root") : Copy.t("admin.all_notifications.scope.global")
-               }
+               value: ->(row, _context) { AllNotificationsScreen.scope_label_for(row) }
         column :title, title: "Title"
         column :recipient,
                title: "Recipient",
@@ -49,17 +39,47 @@ module RecordingStudioNotifications
         column :actor,
                title: "Actor",
                sortable: false,
-               value: ->(row, _context) { row.actor_type.presence || Copy.t("admin.all_notifications.actor.none") }
+               value: ->(row, _context) { AllNotificationsScreen.actor_label_for(row) }
         column :status,
                title: "Status",
                sortable: false,
-               value: ->(row, _context) {
-                 row.read? ? Copy.t("admin.all_notifications.status.read") : Copy.t("admin.all_notifications.status.unread")
-               }
+               value: ->(row, _context) { AllNotificationsScreen.status_label_for(row) }
         column :created_at, title: "Created"
 
         default_sort :created_at, direction: :desc
         paginate per_page: 50
+      end
+
+      class << self
+        def filter_search(relation, value, _context)
+          return relation if value.blank?
+
+          q = "%#{value.to_s.downcase}%"
+          relation.where(
+            "LOWER(notification_type) LIKE :q OR LOWER(title) LIKE :q OR LOWER(COALESCE(actor_type, '')) LIKE :q OR LOWER(recipient_type) LIKE :q",
+            q: q
+          )
+        end
+
+        def scope_label_for(row)
+          if row.root_recording_id.present?
+            Copy.t("admin.all_notifications.scope.root")
+          else
+            Copy.t("admin.all_notifications.scope.global")
+          end
+        end
+
+        def actor_label_for(row)
+          row.actor_type.presence || Copy.t("admin.all_notifications.actor.none")
+        end
+
+        def status_label_for(row)
+          if row.read?
+            Copy.t("admin.all_notifications.status.read")
+          else
+            Copy.t("admin.all_notifications.status.unread")
+          end
+        end
       end
     end
   end

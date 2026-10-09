@@ -1,0 +1,7 @@
+# Host override for one engine key. Rails loads app config/locales after the
+# engine, so this English string must win over the gem default.
+en:
+  recording_studio:
+    notifications:
+      inbox:
+        empty: Host says the inbox is empty
