@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.5.0] - 2026-10-09
+## [0.5.1] - 2026-10-09
 
 Site-wide Notifications metrics register with Recording Studio Metrics for the operations API.
 
@@ -24,7 +24,7 @@ Site-wide Notifications metrics register with Recording Studio Metrics for the o
 - Runtime dependency `recording_studio_metrics` `~> 0.2` (GitHub tag `v0.2.0`).
 
 ### Upgrade notes
-- Bump to `0.5.0`. No migration.
+- Bump to `0.5.1`. No migration.
 - Add `recording_studio_metrics` at tag `v0.2.0`.
 - This gem does not call `RecordingStudioMetrics::Api.register!`. The host
   registers Metrics endpoints once:
@@ -190,8 +190,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.5.0...HEAD
-[0.5.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.4.2...v0.5.0
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.5.0...v0.5.1
 [0.4.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.6...v0.4.0
 [0.3.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.0...v0.3.1
