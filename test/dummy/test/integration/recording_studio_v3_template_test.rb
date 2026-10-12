@@ -22,18 +22,20 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     assert connection.column_exists?(:recording_studio_recordings, :root_recording_id)
     assert connection.table_exists?(:recording_studio_accesses)
     assert connection.table_exists?(:recording_studio_access_invitations)
+    assert connection.table_exists?(:recording_studio_access_constraints)
+    assert connection.table_exists?(:recording_studio_access_rules)
     assert connection.column_exists?(:recording_studio_accesses, :depends_on_recording_id)
     assert_equal :string, role.type
     refute connection.table_exists?(:recording_studio_access_boundaries)
     refute connection.table_exists?(:recording_studio_device_sessions)
   end
 
-  test "Gemfiles pin Accessible to v0.13.0 and Commentable to v0.4.1" do
+  test "Gemfiles pin Accessible to v0.15.0 and Commentable to v0.4.1" do
     root_gemfile = File.read(Rails.root.join("../../Gemfile"))
     dummy_gemfile = File.read(Rails.root.join("Gemfile"))
 
-    assert_match(/recording_studio_accessible.*, tag: "v0.13.0"/, root_gemfile)
-    assert_match(/recording_studio_accessible.*, tag: "v0.13.0"/, dummy_gemfile)
+    assert_match(/recording_studio_accessible.*, tag: "v0.15.0"/, root_gemfile)
+    assert_match(/recording_studio_accessible.*, tag: "v0.15.0"/, dummy_gemfile)
     assert_match(/recording_studio_commentable.*, tag: "v0.4.1"/, dummy_gemfile)
   end
 
