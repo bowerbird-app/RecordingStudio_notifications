@@ -36,10 +36,10 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_commentable.git
-  revision: 4c77133f2f8e741bed1d025c90d583f75b618844
-  tag: v0.4.1
+  revision: d3260102f63f5ba07203f09ae4010050b705a8ad
+  tag: v0.5.0
   specs:
-    recording_studio_commentable (0.4.1)
+    recording_studio_commentable (0.5.0)
       rails (>= 7.0.0)
       recording_studio (~> 4.2)
 
@@ -652,7 +652,7 @@ CHECKSUMS
   recording_studio (4.5.0)
   recording_studio_accessible (0.15.0)
   recording_studio_admin (2.1.0)
-  recording_studio_commentable (0.4.1)
+  recording_studio_commentable (0.5.0)
   recording_studio_internationalization (0.1.2)
   recording_studio_metrics (0.2.0)
   recording_studio_notifications (0.6.0)
