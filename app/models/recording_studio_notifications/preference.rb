@@ -144,4 +144,3 @@ module RecordingStudioNotifications
     end
   end
 end
-

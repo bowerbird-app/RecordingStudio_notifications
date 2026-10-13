@@ -42,11 +42,13 @@ module RecordingStudioNotifications
                       notification_group_badge_text(unread_count),
                       class: UNREAD_BADGE_CLASSES,
                       aria: {
+                        # rubocop:disable Style/FormatStringToken -- I18n uses %{name} tokens
                         label: notifications_t(
                           "inbox.unread_aria",
                           count: unread_count,
                           default: "%{count} unread notifications"
                         )
+                        # rubocop:enable Style/FormatStringToken
                       }
                     )
                   ])

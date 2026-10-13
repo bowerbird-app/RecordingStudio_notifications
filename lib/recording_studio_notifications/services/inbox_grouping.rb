@@ -41,16 +41,19 @@ module RecordingStudioNotifications
           when :monthly
             Copy.compact_month(start_date)
           else
+            # rubocop:disable Style/FormatStringToken -- I18n uses %{name} tokens
             Copy.t(
               "inbox.period_range",
               start: Copy.compact_day(start_date),
               end: Copy.compact_day(end_date),
               default: "%{start} – %{end}"
             )
+            # rubocop:enable Style/FormatStringToken
           end
         end
 
         def heading
+          # rubocop:disable Style/FormatStringToken -- I18n uses %{name} tokens
           unread_text = if unread_count.positive?
                           Copy.t("inbox.unread", count: unread_count, default: "%{count} unread")
                         else
@@ -63,6 +66,7 @@ module RecordingStudioNotifications
             count: Copy.t("inbox.count", count: notifications.size, default: "%{count} notifications"),
             default: "%{period} · %{unread} · %{count}"
           )
+          # rubocop:enable Style/FormatStringToken
         end
       end
 

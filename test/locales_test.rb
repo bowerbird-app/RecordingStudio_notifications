@@ -200,4 +200,3 @@ class LocalesTest < Minitest::Test
     { recording_studio: { notifications: { menu: { title: "Notifications" } } } }
   end
 end
-
