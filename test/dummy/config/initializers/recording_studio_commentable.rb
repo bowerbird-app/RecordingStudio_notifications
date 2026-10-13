@@ -36,10 +36,10 @@ RecordingStudioCommentable.configuration.hooks.after_service(priority: 10) do |s
   # These represent users who can see this workspace.
   workspace_viewers = RecordingStudio::Recording.unscoped
     # Restrict to access records directly under the root and not trashed.
+    .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
     .where(
       parent_recording_id: root_recording.id,
-      recordable_type: "RecordingStudio::Access",
-      trashed_at: nil
+      recordable_type: "RecordingStudio::Access"
     )
     # Map each access recording to its actor (for example, a User).
     .map { |r| r.recordable&.actor }
