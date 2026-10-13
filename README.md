@@ -25,6 +25,8 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 
 Development and dummy Gemfiles pin Accessible to GitHub tag `v0.15.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
 
+The dummy Gemfile also pins Admin to GitHub tag `v2.3.0` with Trashable `v0.10.0` (`require: false`, query helpers only) and Metrics `v0.2.0`.
+
 ## Installation
 
 Add the gem to the host application's `Gemfile`:
