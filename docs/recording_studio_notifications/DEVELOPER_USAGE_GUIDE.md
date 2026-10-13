@@ -79,9 +79,12 @@ languages in their own locale files. Do not add
 `RecordingStudio_Internationalization` to this gem; install it in the host if
 you want a language selector.
 
-Stored notification titles and bodies stay as written. Admin table column
-headers stay literal English (the Admin DSL stores them as strings at class
-load). Accessible action labels and Metrics titles stay English at registration.
+Stored notification titles and bodies stay as written. Delivery channel
+validation stays the English literal `is not registered` so `mark_failed!`
+persists that exact English in `error_message` regardless of locale. Admin
+table column headers stay literal English (the Admin DSL stores them as
+strings at class load). Accessible action labels and Metrics titles stay
+English at registration.
 
 ## 3. Configure The Engine
 

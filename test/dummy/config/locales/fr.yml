@@ -113,8 +113,6 @@ fr:
           channel_not_optional: doit être un canal optionnel disponible
           invalid_shape: doit être une préférence de canal ou une fréquence
           cadence_not_allowed: n’est pas autorisée pour ce type de notification
-        delivery:
-          channel_not_registered: n’est pas enregistré
       admin:
         all_notifications:
           title: Toutes les notifications

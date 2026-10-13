@@ -23,7 +23,6 @@ class LocalesTest < Minitest::Test
     "errors.preference.channel_not_optional" => "must be an available optional channel",
     "errors.preference.invalid_shape" => "must be either a channel preference or a cadence override",
     "errors.preference.cadence_not_allowed" => "is not allowed for this notification type",
-    "errors.delivery.channel_not_registered" => "is not registered",
     "inbox.overflow" => "9+"
   }.freeze
 

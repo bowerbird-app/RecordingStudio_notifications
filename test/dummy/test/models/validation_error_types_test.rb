@@ -63,6 +63,103 @@ class ValidationErrorTypesTest < ActiveSupport::TestCase
     assert_equal [{ error: "is not registered" }], delivery.errors.details[:channel]
   end
 
+  test "mark_failed! persists main english for channel validation under fr" do
+    notification = RecordingStudioNotifications::Notification.create!(
+      notification_type: "generic",
+      title: "Title",
+      recipient: @user
+    )
+    delivery = notification.deliveries.create!(channel: "in_app", status: "pending")
+
+    previous_locales = I18n.available_locales
+    I18n.available_locales = Array(I18n.available_locales) | %i[en fr]
+    I18n.backend.store_translations(
+      :fr,
+      {
+        recording_studio: {
+          notifications: {
+            errors: {
+              delivery: {
+                channel_not_registered: "n’est pas enregistré"
+              }
+            }
+          }
+        }
+      }
+    )
+
+    I18n.with_locale(:fr) do
+      invalid = RecordingStudioNotifications::Delivery.new(
+        notification: notification,
+        channel: "not_a_real_channel",
+        status: "pending"
+      )
+      refute invalid.valid?
+      assert_equal [{ error: "is not registered" }], invalid.errors.details[:channel]
+      assert_equal ["is not registered"], invalid.errors[:channel]
+
+      delivery.mark_failed!(StandardError.new(invalid.errors[:channel].first))
+    end
+
+    assert_equal "is not registered", delivery.reload.error_message
+  ensure
+    I18n.available_locales = previous_locales if previous_locales
+  end
+
+  test "mark_failed! persists main english when host overrides delivery channel key" do
+    notification = RecordingStudioNotifications::Notification.create!(
+      notification_type: "generic",
+      title: "Title",
+      recipient: @user
+    )
+    delivery = notification.deliveries.create!(channel: "in_app", status: "pending")
+
+    I18n.backend.store_translations(
+      :en,
+      {
+        recording_studio: {
+          notifications: {
+            errors: {
+              delivery: {
+                channel_not_registered: "HOST is not registered"
+              }
+            }
+          }
+        }
+      }
+    )
+
+    I18n.with_locale(:en) do
+      invalid = RecordingStudioNotifications::Delivery.new(
+        notification: notification,
+        channel: "not_a_real_channel",
+        status: "pending"
+      )
+      refute invalid.valid?
+      assert_equal [{ error: "is not registered" }], invalid.errors.details[:channel]
+      assert_equal ["is not registered"], invalid.errors[:channel]
+
+      delivery.mark_failed!(StandardError.new(invalid.errors[:channel].first))
+    end
+
+    assert_equal "is not registered", delivery.reload.error_message
+  ensure
+    I18n.backend.store_translations(
+      :en,
+      {
+        recording_studio: {
+          notifications: {
+            errors: {
+              delivery: {
+                channel_not_registered: "is not registered"
+              }
+            }
+          }
+        }
+      }
+    )
+  end
+
   test "french full messages use translated string types" do
     previous_locales = I18n.available_locales
     I18n.available_locales = Array(I18n.available_locales) | %i[en fr]

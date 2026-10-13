@@ -74,8 +74,6 @@ en:
           channel_not_optional: must be an available optional channel
           invalid_shape: must be either a channel preference or a cadence override
           cadence_not_allowed: is not allowed for this notification type
-        delivery:
-          channel_not_registered: is not registered
       admin:
         all_notifications:
           title: All notifications

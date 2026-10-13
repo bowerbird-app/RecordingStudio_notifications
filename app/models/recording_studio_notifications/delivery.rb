@@ -68,12 +68,10 @@ module RecordingStudioNotifications
       return if channel.blank?
       return if RecordingStudioNotifications.channels.registered?(channel.to_sym)
 
-      # ActiveModel 8.1 ignores message: when the type is a String, so pass the
-      # translated string (default: main's English) as the type/message.
-      errors.add(
-        :channel,
-        Copy.t("errors.delivery.channel_not_registered", default: "is not registered")
-      )
+      # Keep main's English literal. mark_failed! persists error.message into
+      # error_message; a translated String type would store French (or a host
+      # English override) instead of the byte-identical English main wrote.
+      errors.add(:channel, "is not registered")
     end
   end
 end

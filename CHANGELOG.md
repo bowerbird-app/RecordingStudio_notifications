@@ -15,8 +15,9 @@ flashes, and badge overflow. English output stays the same as 0.6.0.
 
 ### Added
 
-* English Rails I18n keys for model validation messages
-  (`recording_studio.notifications.errors.*`) and inbox badge overflow
+* English Rails I18n keys for Notification and Preference validation messages
+  (`recording_studio.notifications.errors.notification.*` /
+  `errors.preference.*`) and inbox badge overflow
   (`recording_studio.notifications.inbox.overflow`)
 * Always-loaded dummy host override for the rarely shown
   `settings.required_channel_tooltip` key (boot-order guard)
@@ -25,10 +26,13 @@ flashes, and badge overflow. English output stays the same as 0.6.0.
 
 ### Changed
 
-* Notification, Preference, and Delivery validation `errors.add` for former
-  English-string types passes the translated string as the String type
-  (ActiveModel 8.1 ignores `message:` for Strings). In non-English locales,
-  `errors.details` carries the translated string for those former String types
+* Notification and Preference validation `errors.add` for former English-string
+  types passes the translated string as the String type (ActiveModel 8.1
+  ignores `message:` for Strings). In non-English locales, `errors.details`
+  carries the translated string for those former String types
+* Delivery channel validation keeps main’s English literal (`is not registered`)
+  so `mark_failed!` still persists that exact English in `error_message` under
+  any locale and when a host overrides English keys
 * Group unread badge overflow (`9+`) resolves through `Copy.t` with English
   `default:`
 * Controller flashes, settings help text, Admin chrome, and inbox grouping
@@ -39,8 +43,9 @@ flashes, and badge overflow. English output stays the same as 0.6.0.
 ### Upgrade notes
 
 * Bump to `0.7.0`. No migration
-* English hosts need no change. Copy new `recording_studio.notifications.errors.*`
-  and `inbox.overflow` into the host locale file when translating
+* English hosts need no change. Copy new Notification/Preference
+  `recording_studio.notifications.errors.*` keys and `inbox.overflow` into the
+  host locale file when translating. There is no Delivery channel validation key
 * Hosts override by defining the same nested keys in their own `config/locales`
 * Admin table column headers stay literal English. Dead
   `admin.all_notifications.columns.*` keys remain for host custom screens
