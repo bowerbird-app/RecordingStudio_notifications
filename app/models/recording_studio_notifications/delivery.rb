@@ -68,6 +68,9 @@ module RecordingStudioNotifications
       return if channel.blank?
       return if RecordingStudioNotifications.channels.registered?(channel.to_sym)
 
+      # Keep main's English literal. DeliveryJob / RollupDeliveryJob rescue
+      # paths persist error.message via mark_failed!; translated String types
+      # would store French (or a host English override) instead of main's English.
       errors.add(:channel, "is not registered")
     end
   end

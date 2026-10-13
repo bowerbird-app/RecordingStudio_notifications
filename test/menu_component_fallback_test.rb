@@ -12,7 +12,7 @@ class MenuComponentFallbackTest < Minitest::Test
     )
 
     assert_includes partial, "defined?(FlatPack::Notification::Component)"
-    assert_includes partial, 'Copy.t("menu.title_with_count", count: unread_count)'
+    assert_includes partial, 'Copy.t("menu.title_with_count", count: unread_count'
     assert_includes partial, '"menu.title"'
     assert_includes partial, '"menu.empty"'
   end

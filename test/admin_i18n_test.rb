@@ -25,12 +25,12 @@ class AdminI18nTest < Minitest::Test
     source = File.read(File.expand_path("../lib/recording_studio_notifications/admin/all_notifications_screen.rb", __dir__))
     section = File.read(File.expand_path("../lib/recording_studio_notifications/admin/all_notifications_section.rb", __dir__))
 
-    assert_includes source, 'Copy.t("admin.all_notifications.title")'
-    assert_includes source, 'Copy.t("admin.all_notifications.subtitle")'
-    assert_includes source, 'Copy.t("admin.all_notifications.summary")'
-    assert_includes source, 'Copy.t("admin.all_notifications.scope.root")'
-    assert_includes source, 'Copy.t("admin.all_notifications.status.read")'
-    assert_includes section, 'Copy.t("admin.all_notifications.open_table")'
+    assert_includes source, 'Copy.t("admin.all_notifications.title"'
+    assert_includes source, 'Copy.t("admin.all_notifications.subtitle"'
+    assert_includes source, 'Copy.t("admin.all_notifications.summary"'
+    assert_includes source, 'Copy.t("admin.all_notifications.scope.root"'
+    assert_includes source, 'Copy.t("admin.all_notifications.status.read"'
+    assert_includes section, 'Copy.t("admin.all_notifications.open_table"'
     assert_includes source, 'title: "Type"'
     refute_includes source, 'title "All notifications"'
     refute_includes section, 'text: "Open notifications table"'

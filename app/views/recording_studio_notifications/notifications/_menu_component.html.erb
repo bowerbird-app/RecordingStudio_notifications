@@ -15,7 +15,7 @@
     empty_text: empty_text
   ) %>
 <% else %>
-  <% label = unread_count.to_i.positive? ? RecordingStudioNotifications::Copy.t("menu.title_with_count", count: unread_count) : bell_label %>
+  <% label = unread_count.to_i.positive? ? RecordingStudioNotifications::Copy.t("menu.title_with_count", count: unread_count, default: "Notifications (%{count})") : bell_label %>
 
   <%= render FlatPack::Button::Component.new(
     text: label,

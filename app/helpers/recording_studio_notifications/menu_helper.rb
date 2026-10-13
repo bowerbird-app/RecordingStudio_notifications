@@ -27,8 +27,8 @@ module RecordingStudioNotifications
               unread_count: 0,
               notifications: [],
               see_all_href: recording_studio_notifications.notifications_path,
-              bell_label: Copy.t("menu.title"),
-              empty_text: Copy.t("menu.empty")
+              bell_label: Copy.t("menu.title", default: "Notifications"),
+              empty_text: Copy.t("menu.empty", default: "No recent notifications")
             }
           )
         end

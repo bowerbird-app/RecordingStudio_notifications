@@ -44,19 +44,17 @@ class EngineTest < Minitest::Test
 
   def test_engine_loads_only_english_locale_files
     locale_dir = RecordingStudioNotifications::Engine.root.join("config/locales")
-    loaded = I18n.load_path.select { |path| path.to_s.start_with?(locale_dir.to_s) }
 
-    assert(loaded.any? { |path| path.end_with?("en.yml") })
-    refute(loaded.any? { |path| path.end_with?("fr.yml") })
     assert_equal ["en.yml"], Dir.children(locale_dir).sort
+    refute(Dir.children(locale_dir).any? { |name| name.end_with?("fr.yml") })
   end
 
-  def test_engine_does_not_append_to_i18n_load_path
-    engine_files = Dir[File.expand_path("../lib/**/engine.rb", __dir__)]
+  def test_lib_sources_do_not_append_to_i18n_load_path
+    ruby_files = Dir[File.expand_path("../lib/**/*.rb", __dir__)]
 
-    assert_operator engine_files.length, :>=, 1
+    refute_empty ruby_files, "expected lib/**/*.rb files to scan"
 
-    engine_files.each do |path|
+    ruby_files.each do |path|
       source = File.read(path)
 
       refute_includes source, "i18n.load_path",

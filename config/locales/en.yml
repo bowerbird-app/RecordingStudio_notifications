@@ -20,6 +20,7 @@ en:
         count: "%{count} notifications"
         heading: "%{period} · %{unread} · %{count}"
         period_range: "%{start} – %{end}"
+        overflow: "9+"
       show:
         open_related: Open related item
         mark_read: Mark read

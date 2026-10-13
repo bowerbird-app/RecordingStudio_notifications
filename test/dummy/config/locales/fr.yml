@@ -56,6 +56,7 @@ fr:
         count: "%{count} notifications"
         heading: "%{period} · %{unread} · %{count}"
         period_range: "%{start} – %{end}"
+        overflow: "9+"
       show:
         open_related: Ouvrir l’élément
         mark_read: Marquer lu

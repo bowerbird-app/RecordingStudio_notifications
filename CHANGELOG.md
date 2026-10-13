@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-13
+
+Non-view Notifications copy joins customer and Admin chrome under
+`recording_studio.notifications.*` so hosts can translate flashes, badge
+overflow, and Admin chrome. English output stays the same as 0.6.0.
+
+### Added
+
+* English Rails I18n key for inbox badge overflow
+  (`recording_studio.notifications.inbox.overflow`)
+* Always-loaded dummy host override for the rarely shown
+  `settings.required_channel_tooltip` key (boot-order guard)
+* Locale regression: every `lib/**/*.rb` file must not mention
+  `i18n.load_path` / `I18n.load_path`
+
+### Changed
+
+* Notification, Preference, and Delivery validation `errors.add` sites keep
+  main’s English literals so DeliveryJob / RollupDeliveryJob `mark_failed!`
+  still persists that exact English in `error_message` under any locale and
+  when a host overrides English keys
+* Group unread badge overflow (`9+`) resolves through `Copy.t` with English
+  `default:`
+* Controller flashes, settings help text, Admin chrome, and inbox grouping
+  headings pass English `default:` on every `Copy.t` lookup
+* Unit tests seed gem English via `store_translations` instead of appending
+  `config/locales/en.yml` to `I18n.load_path`
+
+### Upgrade notes
+
+* Bump to `0.7.0`. No migration
+* English hosts need no change. Copy new `inbox.overflow` into the host locale
+  file when translating. Model validation messages are not I18n keys
+* Hosts override by defining the same nested keys in their own `config/locales`
+* Admin table column headers stay literal English. Dead
+  `admin.all_notifications.columns.*` keys remain for host custom screens
+* Accessible action labels and Metrics titles stay English at registration
+* Do not add `RecordingStudio_Internationalization` as a dependency of this
+  engine
+
 ## [0.6.0] - 2026-10-09
 
 Site-wide Notifications metrics register with Recording Studio Metrics for the operations API.
@@ -225,7 +265,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.3.6...v0.4.0
