@@ -37,7 +37,9 @@ class PagesController < ApplicationController
 
   def comment
     @page = Page.find(params[:id])
-    @page_recording = RecordingStudio::Recording.find_by(recordable: @page, trashed_at: nil)
+    @page_recording = RecordingStudio::Recording.where(
+      RecordingStudio::Recording.recording_studio_trashable_kept_sql
+    ).find_by(recordable: @page)
 
     unless @page_recording
       redirect_to page_path(@page), alert: "Page is not recorded in a workspace."
@@ -68,7 +70,8 @@ class PagesController < ApplicationController
     return Page.all if current_root.blank?
 
     recording_ids = RecordingStudio::Recording
-      .where(root_recording: current_root, recordable_type: "Page", trashed_at: nil)
+      .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+      .where(root_recording: current_root, recordable_type: "Page")
       .pluck(:recordable_id)
 
     Page.where(id: recording_ids)
@@ -79,19 +82,19 @@ class PagesController < ApplicationController
   end
 
   def find_page_recording
-    RecordingStudio::Recording.find_by(
-      recordable: @page,
-      trashed_at: nil
-    )
+    RecordingStudio::Recording.where(
+      RecordingStudio::Recording.recording_studio_trashable_kept_sql
+    ).find_by(recordable: @page)
   end
 
   def ensure_page_recording!(page, current_root:)
     return if current_root.blank?
 
-    existing = RecordingStudio::Recording.find_by(
+    existing = RecordingStudio::Recording.where(
+      RecordingStudio::Recording.recording_studio_trashable_kept_sql
+    ).find_by(
       root_recording: current_root,
-      recordable: page,
-      trashed_at: nil
+      recordable: page
     )
     return existing if existing
 
@@ -131,10 +134,10 @@ class PagesController < ApplicationController
 
   def workspace_recipients_for(root_recording)
     RecordingStudio::Recording.unscoped
+      .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
       .where(
         parent_recording_id: root_recording.id,
-        recordable_type: "RecordingStudio::Access",
-        trashed_at: nil
+        recordable_type: "RecordingStudio::Access"
       )
       .map { |recording| recording.recordable&.actor }
       .compact

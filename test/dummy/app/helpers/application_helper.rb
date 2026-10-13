@@ -19,7 +19,8 @@ module ApplicationHelper
 		return unless respond_to?(:recording_studio_accessible)
 
 		access_count = RecordingStudio::Recording.unscoped
-			.where(parent_recording_id: recording.id, recordable_type: "RecordingStudio::Access", trashed_at: nil)
+			.where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+			.where(parent_recording_id: recording.id, recordable_type: "RecordingStudio::Access")
 			.count
 
 		label = access_count.positive? ? "Access (#{access_count})" : "Manage access"
