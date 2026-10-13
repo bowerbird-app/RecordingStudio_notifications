@@ -20,6 +20,7 @@ en:
         count: "%{count} notifications"
         heading: "%{period} · %{unread} · %{count}"
         period_range: "%{start} – %{end}"
+        overflow: "9+"
       show:
         open_related: Open related item
         mark_read: Mark read
@@ -61,6 +62,20 @@ en:
         monthly: Monthly
       categories:
         general: General
+      errors:
+        notification:
+          type_not_registered: is not registered
+          root_required: is required
+          root_must_be_blank: must be blank for global notifications
+          root_must_match: must match recording and notifiable root
+          url_not_safe: is not safe
+        preference:
+          type_not_registered: is not registered
+          channel_not_optional: must be an available optional channel
+          invalid_shape: must be either a channel preference or a cadence override
+          cadence_not_allowed: is not allowed for this notification type
+        delivery:
+          channel_not_registered: is not registered
       admin:
         all_notifications:
           title: All notifications

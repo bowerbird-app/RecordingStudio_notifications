@@ -68,7 +68,13 @@ module RecordingStudioNotifications
       return if channel.blank?
       return if RecordingStudioNotifications.channels.registered?(channel.to_sym)
 
-      errors.add(:channel, "is not registered")
+      # ActiveModel 8.1 ignores message: when the type is a String, so pass the
+      # translated string (default: main's English) as the type/message.
+      errors.add(
+        :channel,
+        Copy.t("errors.delivery.channel_not_registered", default: "is not registered")
+      )
     end
   end
 end
+

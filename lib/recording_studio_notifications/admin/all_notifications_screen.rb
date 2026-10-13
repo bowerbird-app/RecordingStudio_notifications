@@ -5,8 +5,8 @@ module RecordingStudioNotifications
     class AllNotificationsScreen < RecordingStudioAdmin::Screen
       key "recording_studio_notifications_all_notifications"
       icon :bell
-      title { Copy.t("admin.all_notifications.title") }
-      subtitle { Copy.t("admin.all_notifications.subtitle") }
+      title { Copy.t("admin.all_notifications.title", default: "All notifications") }
+      subtitle { Copy.t("admin.all_notifications.subtitle", default: "Root-scoped and global notification overview") }
 
       query do |_context|
         RecordingStudioNotifications::Notification
@@ -15,7 +15,7 @@ module RecordingStudioNotifications
       end
 
       summary do
-        label ->(_context) { Copy.t("admin.all_notifications.summary") }
+        label ->(_context) { Copy.t("admin.all_notifications.summary", default: "Notifications") }
       end
 
       table do
@@ -23,9 +23,9 @@ module RecordingStudioNotifications
           AllNotificationsScreen.filter_search(relation, value, context)
         }
 
-        # Column header titles stay literal English: the Admin DSL stores them as
-        # strings at class load, before I18n is ready. Keys for the same English
-        # live in en.yml for hosts that override via a custom screen.
+        # Column header titles stay literal English. Matching keys ship in en.yml
+        # for hosts that override via a custom screen. Wiring Copy.t here needs the
+        # Admin gem to evaluate callable column titles (see needs Marco).
         column :notification_type, title: "Type"
         column :scope,
                title: "Scope",
@@ -63,24 +63,25 @@ module RecordingStudioNotifications
 
         def scope_label_for(row)
           if row.root_recording_id.present?
-            Copy.t("admin.all_notifications.scope.root")
+            Copy.t("admin.all_notifications.scope.root", default: "Root")
           else
-            Copy.t("admin.all_notifications.scope.global")
+            Copy.t("admin.all_notifications.scope.global", default: "Global")
           end
         end
 
         def actor_label_for(row)
-          row.actor_type.presence || Copy.t("admin.all_notifications.actor.none")
+          row.actor_type.presence || Copy.t("admin.all_notifications.actor.none", default: "-")
         end
 
         def status_label_for(row)
           if row.read?
-            Copy.t("admin.all_notifications.status.read")
+            Copy.t("admin.all_notifications.status.read", default: "Read")
           else
-            Copy.t("admin.all_notifications.status.unread")
+            Copy.t("admin.all_notifications.status.unread", default: "Unread")
           end
         end
       end
     end
   end
 end
+

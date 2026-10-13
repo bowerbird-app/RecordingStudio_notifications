@@ -41,7 +41,13 @@ module RecordingStudioNotifications
                       :span,
                       notification_group_badge_text(unread_count),
                       class: UNREAD_BADGE_CLASSES,
-                      aria: { label: notifications_t("inbox.unread_aria", count: unread_count) }
+                      aria: {
+                        label: notifications_t(
+                          "inbox.unread_aria",
+                          count: unread_count,
+                          default: "%{count} unread notifications"
+                        )
+                      }
                     )
                   ])
       end
@@ -75,7 +81,7 @@ module RecordingStudioNotifications
     end
 
     def notification_group_badge_text(count)
-      count > 9 ? "9+" : count.to_s
+      count > 9 ? notifications_t("inbox.overflow", default: "9+") : count.to_s
     end
   end
 end

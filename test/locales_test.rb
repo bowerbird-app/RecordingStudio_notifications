@@ -13,6 +13,20 @@ class LocalesTest < Minitest::Test
     "open_table" => "Open notifications table"
   }.freeze
 
+  ERROR_KEYS = {
+    "errors.notification.type_not_registered" => "is not registered",
+    "errors.notification.root_required" => "is required",
+    "errors.notification.root_must_be_blank" => "must be blank for global notifications",
+    "errors.notification.root_must_match" => "must match recording and notifiable root",
+    "errors.notification.url_not_safe" => "is not safe",
+    "errors.preference.type_not_registered" => "is not registered",
+    "errors.preference.channel_not_optional" => "must be an available optional channel",
+    "errors.preference.invalid_shape" => "must be either a channel preference or a cadence override",
+    "errors.preference.cadence_not_allowed" => "is not allowed for this notification type",
+    "errors.delivery.channel_not_registered" => "is not registered",
+    "inbox.overflow" => "9+"
+  }.freeze
+
   def test_engine_ships_only_english_locale_files
     files = Dir[File.join(engine_locales_dir, "*")].map { |path| File.basename(path) }
 
@@ -20,9 +34,28 @@ class LocalesTest < Minitest::Test
   end
 
   def test_rails_i18n_load_path_includes_the_gem_english_locale_file
-    locale_path = File.join(engine_locales_dir, "en.yml")
+    # with_gem_english_locale_only puts only en.yml on the path and reloads.
+    # Assert that file actually drives lookups (not merely that the path we set is present).
+    with_gem_english_locale_only do
+      locale_path = File.expand_path(File.join(engine_locales_dir, "en.yml"))
+      assert_equal([locale_path], I18n.load_path.map { |path| File.expand_path(path) })
+      assert_equal "Notifications", I18n.t("recording_studio.notifications.inbox.title")
+      assert_equal "Notification marked read.", I18n.t("recording_studio.notifications.flashes.marked_read")
+    end
+  end
 
-    assert_includes I18n.load_path.map { |path| File.expand_path(path) }, File.expand_path(locale_path)
+  def test_lib_sources_do_not_append_i18n_load_path
+    lib_dir = File.expand_path("../lib", __dir__)
+    ruby_files = Dir[File.join(lib_dir, "**", "*.rb")]
+
+    refute_empty ruby_files, "expected lib/**/*.rb files to scan"
+
+    ruby_files.each do |path|
+      source = File.read(path)
+
+      refute_includes source, "i18n.load_path", "#{path} must not touch i18n.load_path"
+      refute_includes source, "I18n.load_path", "#{path} must not touch I18n.load_path"
+    end
   end
 
   def test_dummy_french_covers_every_engine_english_key
@@ -34,35 +67,46 @@ class LocalesTest < Minitest::Test
   end
 
   def test_english_default_copy_is_unchanged
-    I18n.with_locale(:en) do
-      assert_equal "Notifications", Copy.t("inbox.title")
-      assert_equal "Clear all", Copy.t("inbox.clear_all")
-      assert_equal "Settings", Copy.t("inbox.settings")
-      assert_equal "No notifications yet.", Copy.t("inbox.empty")
-      assert_equal "Notification settings", Copy.t("settings.title")
-      assert_equal "Save settings", Copy.t("settings.save")
-      assert_equal "Notification marked read.", Copy.t("flashes.marked_read")
-      assert_equal "Notification preferences updated.", Copy.t("flashes.preferences_updated")
-      assert_equal "This channel can't be removed", Copy.t("settings.required_channel_tooltip")
-      assert_equal "Jul 3", Copy.compact_day(Date.new(2026, 7, 3))
-      ADMIN_KEYS.each do |key, english|
-        assert_equal english, Copy.t("admin.all_notifications.#{key}")
+    with_gem_english_locale_only do
+      I18n.with_locale(:en) do
+        assert_equal "Notifications", Copy.t("inbox.title")
+        assert_equal "Clear all", Copy.t("inbox.clear_all")
+        assert_equal "Settings", Copy.t("inbox.settings")
+        assert_equal "No notifications yet.", Copy.t("inbox.empty")
+        assert_equal "Notification settings", Copy.t("settings.title")
+        assert_equal "Save settings", Copy.t("settings.save")
+        assert_equal "Notification marked read.", Copy.t("flashes.marked_read")
+        assert_equal "Notification preferences updated.", Copy.t("flashes.preferences_updated")
+        assert_equal "This channel can't be removed", Copy.t("settings.required_channel_tooltip")
+        assert_equal "9+", Copy.t("inbox.overflow")
+        ADMIN_KEYS.each do |key, english|
+          assert_equal english, Copy.t("admin.all_notifications.#{key}")
+        end
+        assert_equal "Type", Copy.t("admin.all_notifications.columns.type")
+        assert_equal "Root", Copy.t("admin.all_notifications.scope.root")
+        assert_equal "Unread", Copy.t("admin.all_notifications.status.unread")
+        ERROR_KEYS.each do |key, english|
+          assert_equal english, Copy.t(key)
+        end
       end
-      assert_equal "Type", Copy.t("admin.all_notifications.columns.type")
-      assert_equal "Root", Copy.t("admin.all_notifications.scope.root")
-      assert_equal "Unread", Copy.t("admin.all_notifications.status.unread")
+    end
+
+    I18n.with_locale(:en) do
+      assert_equal "Jul 3", Copy.compact_day(Date.new(2026, 7, 3))
     end
   end
 
   def test_english_keys_resolve_without_missing_translations
-    I18n.with_locale(:en) do
-      flatten_keys(locale_tree(File.join(engine_locales_dir, "en.yml"), "en")).each do |key|
-        full_key = "recording_studio.notifications.#{key}"
-        translation = I18n.t(full_key, default: nil)
+    with_gem_english_locale_only do
+      I18n.with_locale(:en) do
+        flatten_keys(locale_tree(File.join(engine_locales_dir, "en.yml"), "en")).each do |key|
+          full_key = "recording_studio.notifications.#{key}"
+          translation = I18n.t(full_key, default: nil)
 
-        refute_nil translation, "#{full_key} should resolve"
-        assert_equal translation, I18n.t(full_key, raise: true)
-        refute_match(/translation missing/i, translation.to_s)
+          refute_nil translation, "#{full_key} should resolve"
+          assert_equal translation, I18n.t(full_key, raise: true)
+          refute_match(/translation missing/i, translation.to_s)
+        end
       end
     end
   end
@@ -94,7 +138,39 @@ class LocalesTest < Minitest::Test
     I18n.backend.store_translations(:en, default_title)
   end
 
+  def test_yes_no_on_off_yaml_keys_resolve_without_default
+    # Psych loads bare yes/no/on/off as booleans; quoted keys must resolve.
+    with_gem_english_locale_only do
+      I18n.with_locale(:en) do
+        tree = locale_tree(File.join(engine_locales_dir, "en.yml"), "en")
+        booleanish = flatten_keys(tree).select do |key|
+          key.split(".").any? { |segment| %w[yes no on off true false null].include?(segment.downcase) }
+        end
+
+        booleanish.each do |key|
+          assert_equal I18n.t("recording_studio.notifications.#{key}", raise: true),
+                       Copy.t(key)
+        end
+      end
+    end
+  end
+
   private
+
+  def with_gem_english_locale_only
+    previous = I18n.load_path.dup
+    I18n.load_path = [File.join(engine_locales_dir, "en.yml")]
+    I18n.backend.load_translations
+    yield
+  ensure
+    I18n.load_path = previous
+    I18n.backend.load_translations
+    I18n.backend.store_translations(:en, gem_english_tree)
+  end
+
+  def gem_english_tree
+    YAML.safe_load_file(File.join(engine_locales_dir, "en.yml"), aliases: true).fetch("en")
+  end
 
   def engine_locales_dir
     File.expand_path("../config/locales", __dir__)
@@ -124,3 +200,4 @@ class LocalesTest < Minitest::Test
     { recording_studio: { notifications: { menu: { title: "Notifications" } } } }
   end
 end
+

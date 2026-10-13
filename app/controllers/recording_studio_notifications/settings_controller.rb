@@ -36,10 +36,14 @@ module RecordingStudioNotifications
         end
       end
 
-      redirect_to settings_path, notice: Copy.t("flashes.preferences_updated")
+      redirect_to settings_path,
+                  notice: Copy.t("flashes.preferences_updated", default: "Notification preferences updated.")
     rescue ActiveRecord::RecordInvalid, ArgumentError
       prepare_settings_view
-      flash.now[:alert] = Copy.t("flashes.preferences_failed")
+      flash.now[:alert] = Copy.t(
+        "flashes.preferences_failed",
+        default: "Notification preferences could not be updated."
+      )
       render :show, status: :unprocessable_entity
     end
 
@@ -99,7 +103,7 @@ module RecordingStudioNotifications
           }
         end
 
-        options.unshift([Copy.t("channels.none"), "__none__"]) if type.required_channels.empty?
+        options.unshift([Copy.t("channels.none", default: "None"), "__none__"]) if type.required_channels.empty?
 
         map[type.key] = options
       end
@@ -149,11 +153,20 @@ module RecordingStudioNotifications
 
     def channel_settings_help_text(type)
       if type.required_channels.any? && type.optional_channels.any?
-        Copy.t("settings.help_required_and_optional")
+        Copy.t(
+          "settings.help_required_and_optional",
+          default: "Required channels stay enabled and optional channels can be added or removed."
+        )
       elsif type.required_channels.any?
-        Copy.t("settings.help_required_only")
+        Copy.t(
+          "settings.help_required_only",
+          default: "This notification type has required channels only."
+        )
       else
-        Copy.t("settings.help_optional")
+        Copy.t(
+          "settings.help_optional",
+          default: "Choose which channels to receive notifications on."
+        )
       end
     end
 

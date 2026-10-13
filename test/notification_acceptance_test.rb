@@ -261,7 +261,8 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes notification_partial, "FlatPack::Timestamp::Component.new("
     assert_includes notification_partial, "shorten_timestamp: true"
     assert_includes notifications_helper, "notification_group_badge_text"
-    assert_includes notifications_helper, 'notifications_t("inbox.unread_aria", count: unread_count)'
+    assert_includes notifications_helper, 'notifications_t('
+    assert_includes notifications_helper, '"inbox.unread_aria"'
     assert_includes notifications_helper, "bg-red-600"
     assert_includes notifications_helper, "fp-red-dot"
     assert_includes notifications_helper, "def notification_group_next_page_dom_id(group, page)"
@@ -309,7 +310,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, "disabled: type.required_channels.include?(channel)"
     assert_includes controller, "channel_settings_help_text"
     assert_includes controller, "required_channels_by_type"
-    assert_includes controller, 'Copy.t("channels.none")'
+    assert_includes controller, 'Copy.t("channels.none"'
     refute_includes settings, "(required)"
     assert_includes settings, "rsn-required-channel-chip"
     assert_includes controller_js, "removeRequiredOptions"

@@ -1,0 +1,7 @@
+# Host override for a rarely shown Notifications tooltip key (required-channel hover).
+# Kept out of the default happy-path reading UI so other dummy tests still see gem English.
+en:
+  recording_studio:
+    notifications:
+      settings:
+        required_channel_tooltip: "HOST This channel can't be removed"
