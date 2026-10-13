@@ -13,18 +13,8 @@ class LocalesTest < Minitest::Test
     "open_table" => "Open notifications table"
   }.freeze
 
-  ERROR_KEYS = {
-    "errors.notification.type_not_registered" => "is not registered",
-    "errors.notification.root_required" => "is required",
-    "errors.notification.root_must_be_blank" => "must be blank for global notifications",
-    "errors.notification.root_must_match" => "must match recording and notifiable root",
-    "errors.notification.url_not_safe" => "is not safe",
-    "errors.preference.type_not_registered" => "is not registered",
-    "errors.preference.channel_not_optional" => "must be an available optional channel",
-    "errors.preference.invalid_shape" => "must be either a channel preference or a cadence override",
-    "errors.preference.cadence_not_allowed" => "is not allowed for this notification type",
-    "inbox.overflow" => "9+"
-  }.freeze
+  OVERFLOW_KEY = "inbox.overflow"
+  OVERFLOW_ENGLISH = "9+"
 
   def test_engine_ships_only_english_locale_files
     files = Dir[File.join(engine_locales_dir, "*")].map { |path| File.basename(path) }
@@ -77,16 +67,13 @@ class LocalesTest < Minitest::Test
         assert_equal "Notification marked read.", Copy.t("flashes.marked_read")
         assert_equal "Notification preferences updated.", Copy.t("flashes.preferences_updated")
         assert_equal "This channel can't be removed", Copy.t("settings.required_channel_tooltip")
-        assert_equal "9+", Copy.t("inbox.overflow")
+        assert_equal OVERFLOW_ENGLISH, Copy.t(OVERFLOW_KEY)
         ADMIN_KEYS.each do |key, english|
           assert_equal english, Copy.t("admin.all_notifications.#{key}")
         end
         assert_equal "Type", Copy.t("admin.all_notifications.columns.type")
         assert_equal "Root", Copy.t("admin.all_notifications.scope.root")
         assert_equal "Unread", Copy.t("admin.all_notifications.status.unread")
-        ERROR_KEYS.each do |key, english|
-          assert_equal english, Copy.t(key)
-        end
       end
     end
 

@@ -89,12 +89,7 @@ module RecordingStudioNotifications
       return if notification_type.blank?
       return if RecordingStudioNotifications.notification_types.registered?(notification_type_key)
 
-      # ActiveModel 8.1 ignores message: when the type is a String, so pass the
-      # translated string (default: main's English) as the type/message.
-      errors.add(
-        :notification_type,
-        Copy.t("errors.notification.type_not_registered", default: "is not registered")
-      )
+      errors.add(:notification_type, "is not registered")
     end
 
     def root_recording_matches_type_scope
@@ -104,40 +99,22 @@ module RecordingStudioNotifications
       return unless type
 
       if type.scope == :root && root_recording.blank?
-        errors.add(
-          :root_recording,
-          Copy.t("errors.notification.root_required", default: "is required")
-        )
+        errors.add(:root_recording, "is required")
       elsif type.scope == :global && root_recording.present?
-        errors.add(
-          :root_recording,
-          Copy.t(
-            "errors.notification.root_must_be_blank",
-            default: "must be blank for global notifications"
-          )
-        )
+        errors.add(:root_recording, "must be blank for global notifications")
       elsif type.scope != :global && !Services::RootResolver.consistent?(
         root_recording: root_recording,
         recording: recording,
         recordable: notifiable
       )
-        errors.add(
-          :root_recording,
-          Copy.t(
-            "errors.notification.root_must_match",
-            default: "must match recording and notifiable root"
-          )
-        )
+        errors.add(:root_recording, "must match recording and notifiable root")
       end
     end
 
     def safe_url
       return if RecordingStudioNotifications::UrlSafety.safe?(url)
 
-      errors.add(
-        :url,
-        Copy.t("errors.notification.url_not_safe", default: "is not safe")
-      )
+      errors.add(:url, "is not safe")
     end
   end
 end

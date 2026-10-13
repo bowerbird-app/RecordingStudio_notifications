@@ -3,6 +3,9 @@
 require "test_helper"
 
 class ValidationErrorTypesTest < ActiveSupport::TestCase
+  HOST_DELIVERY_CHANNEL_KEY = "recording_studio.notifications.errors.delivery.channel_not_registered"
+  HOST_DELIVERY_CHANNEL_MESSAGE = "HOST is not registered"
+
   setup do
     @user = User.find_or_create_by!(email: "validation-errors@example.com") do |user|
       user.password = "Password"
@@ -73,6 +76,7 @@ class ValidationErrorTypesTest < ActiveSupport::TestCase
 
     previous_locales = I18n.available_locales
     I18n.available_locales = Array(I18n.available_locales) | %i[en fr]
+    I18n.t("recording_studio.notifications.inbox.title")
     I18n.backend.store_translations(
       :fr,
       {
@@ -114,6 +118,9 @@ class ValidationErrorTypesTest < ActiveSupport::TestCase
     )
     delivery = notification.deliveries.create!(channel: "in_app", status: "pending")
 
+    # Init translations before store: an early store_translations is dropped when
+    # Rails lazy-loads YAML on the first lookup.
+    I18n.t("recording_studio.notifications.inbox.title")
     I18n.backend.store_translations(
       :en,
       {
@@ -121,13 +128,14 @@ class ValidationErrorTypesTest < ActiveSupport::TestCase
           notifications: {
             errors: {
               delivery: {
-                channel_not_registered: "HOST is not registered"
+                channel_not_registered: HOST_DELIVERY_CHANNEL_MESSAGE
               }
             }
           }
         }
       }
     )
+    assert_equal HOST_DELIVERY_CHANNEL_MESSAGE, I18n.t(HOST_DELIVERY_CHANNEL_KEY)
 
     I18n.with_locale(:en) do
       invalid = RecordingStudioNotifications::Delivery.new(
@@ -143,91 +151,5 @@ class ValidationErrorTypesTest < ActiveSupport::TestCase
     end
 
     assert_equal "is not registered", delivery.reload.error_message
-  ensure
-    I18n.backend.store_translations(
-      :en,
-      {
-        recording_studio: {
-          notifications: {
-            errors: {
-              delivery: {
-                channel_not_registered: "is not registered"
-              }
-            }
-          }
-        }
-      }
-    )
-  end
-
-  test "french full messages use translated string types" do
-    previous_locales = I18n.available_locales
-    I18n.available_locales = Array(I18n.available_locales) | %i[en fr]
-
-    shape = RecordingStudioNotifications::Preference.new(
-      recipient: @user,
-      notification_type: "generic",
-      channel: nil,
-      enabled: true,
-      cadence: nil
-    )
-
-    I18n.with_locale(:fr) do
-      refute shape.valid?
-      assert_equal(
-        [{ error: "doit être une préférence de canal ou une fréquence" }],
-        shape.errors.details[:base]
-      )
-      assert_includes shape.errors.full_messages.join(" "), "doit être une préférence de canal ou une fréquence"
-    end
-  ensure
-    I18n.available_locales = previous_locales if previous_locales
-  end
-
-  test "host override wins for validation string type" do
-    I18n.backend.store_translations(
-      :en,
-      {
-        recording_studio: {
-          notifications: {
-            errors: {
-              preference: {
-                invalid_shape: "HOST must be either a channel preference or a cadence override"
-              }
-            }
-          }
-        }
-      }
-    )
-
-    shape = RecordingStudioNotifications::Preference.new(
-      recipient: @user,
-      notification_type: "generic",
-      channel: nil,
-      enabled: true,
-      cadence: nil
-    )
-
-    refute shape.valid?
-    assert_equal(
-      [{ error: "HOST must be either a channel preference or a cadence override" }],
-      shape.errors.details[:base]
-    )
-  ensure
-    I18n.backend.store_translations(
-      :en,
-      {
-        recording_studio: {
-          notifications: {
-            errors: {
-              preference: {
-                invalid_shape: "must be either a channel preference or a cadence override"
-              }
-            }
-          }
-        }
-      }
-    )
   end
 end
-

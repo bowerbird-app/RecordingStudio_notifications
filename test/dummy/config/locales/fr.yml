@@ -101,18 +101,6 @@ fr:
         page: Page
         workspace: Espace
         system: Système
-      errors:
-        notification:
-          type_not_registered: n’est pas enregistré
-          root_required: est obligatoire
-          root_must_be_blank: doit être vide pour les notifications globales
-          root_must_match: doit correspondre à la racine de l’enregistrement et du notifiable
-          url_not_safe: n’est pas sûre
-        preference:
-          type_not_registered: n’est pas enregistré
-          channel_not_optional: doit être un canal optionnel disponible
-          invalid_shape: doit être une préférence de canal ou une fréquence
-          cadence_not_allowed: n’est pas autorisée pour ce type de notification
       admin:
         all_notifications:
           title: Toutes les notifications

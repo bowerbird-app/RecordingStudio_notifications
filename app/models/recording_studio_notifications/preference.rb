@@ -92,12 +92,7 @@ module RecordingStudioNotifications
       return if notification_type.blank?
       return if type_definition
 
-      # ActiveModel 8.1 ignores message: when the type is a String, so pass the
-      # translated string (default: main's English) as the type/message.
-      errors.add(
-        :notification_type,
-        Copy.t("errors.preference.type_not_registered", default: "is not registered")
-      )
+      errors.add(:notification_type, "is not registered")
     end
 
     def available_optional_channel
@@ -106,26 +101,14 @@ module RecordingStudioNotifications
       channel_key = channel.to_s.to_sym
       return if type_definition.optional_channels.include?(channel_key)
 
-      errors.add(
-        :channel,
-        Copy.t(
-          "errors.preference.channel_not_optional",
-          default: "must be an available optional channel"
-        )
-      )
+      errors.add(:channel, "must be an available optional channel")
     end
 
     def valid_preference_shape
       return if channel_preference? && enabled.in?([true, false]) && cadence.nil?
       return if channel.nil? && enabled.nil? && cadence.present?
 
-      errors.add(
-        :base,
-        Copy.t(
-          "errors.preference.invalid_shape",
-          default: "must be either a channel preference or a cadence override"
-        )
-      )
+      errors.add(:base, "must be either a channel preference or a cadence override")
     end
 
     def allowed_cadence
@@ -134,13 +117,7 @@ module RecordingStudioNotifications
       cadence_key = cadence.to_s.to_sym
       return if type_definition.allowed_cadences.include?(cadence_key)
 
-      errors.add(
-        :cadence,
-        Copy.t(
-          "errors.preference.cadence_not_allowed",
-          default: "is not allowed for this notification type"
-        )
-      )
+      errors.add(:cadence, "is not allowed for this notification type")
     end
   end
 end
