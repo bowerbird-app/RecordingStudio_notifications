@@ -77,6 +77,29 @@ class NotificationMetricsTest < ActiveSupport::TestCase
     end
   end
 
+  test "failed deliveries over time bucket failed rows by updated_at and group by channel" do
+    window = { interval: "day", start_at: Time.utc(2026, 10, 6), end_at: Time.utc(2026, 10, 10) }
+    counts = timeseries_counts(execute("notification_deliveries.failed_by_channel_over_time", **window))
+    expected = RecordingStudioNotifications::Delivery.failed
+                                                      .where(updated_at: Time.utc(2026, 10, 8)...Time.utc(2026, 10, 9)).count
+    assert_operator expected, :>=, 1
+    assert_equal expected, counts["2026-10-08"]
+    assert_equal 0, counts["2026-10-07"].to_i
+
+    grouped = execute("notification_deliveries.failed_by_channel_over_time", **window, group_by: "channel")
+    assert_equal "channel", grouped.group_by.to_s if grouped.respond_to?(:group_by)
+    assert_raises(RecordingStudioMetrics::Errors::InvalidGroupBy) do
+      execute("notification_deliveries.failed_by_channel_over_time", **window, group_by: "notification_id")
+    end
+
+    metadata = RecordingStudioMetrics.find("notification_deliveries.failed_by_channel_over_time").catalog_metadata
+    assert_equal "count", metadata[:unit]
+    assert_equal "Failed deliveries over time", metadata[:title]
+    assert metadata[:description].present?
+    assert_equal [:channel], metadata[:group_by]
+    assert_equal 5, metadata[:min_group_size]
+  end
+
   test "api_authorize allows AdminRoot staff and denies non-admins" do
     authorize = RecordingStudioMetrics.registry.api_authorize_for(:notifications)
     assert_equal RecordingStudioNotifications::Metrics::AUTHORIZE, authorize

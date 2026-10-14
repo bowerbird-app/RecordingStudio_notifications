@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [0.8.0] - 2026-10-14
+
+### Added
+- `notification_deliveries.failed_by_channel_over_time` (timeseries, unit `count`): failed deliveries by `updated_at`, with `from` / `to` / `interval` and `group_by=channel`. Same site scope, `:operations` exposure and AdminRoot `:view` check as the other delivery metrics. No migration.
+
+### Changed
+- Requires `recording_studio_metrics` `~> 0.3`; development and dummy Gemfiles pin tag `v0.3.1`.
 ## [Unreleased]
 
 ## [0.7.0] - 2026-10-13
