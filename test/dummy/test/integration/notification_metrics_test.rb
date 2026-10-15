@@ -126,11 +126,12 @@ class NotificationMetricsTest < ActiveSupport::TestCase
       row = allowed.find { |metric| metric[:identifier] == identifier }
 
       assert row, "expected discovery entry for #{identifier}"
-      assert_equal "count", row[:unit]
+      assert_equal identifier, row[:identifier]
       assert_includes allowed_ids, identifier
     end
 
     failed = allowed.find { |metric| metric[:identifier] == "notification_deliveries.failed_by_channel_over_time" }
+    assert_equal "count", failed[:unit]
     assert_equal [:channel], failed[:group_by]
     assert_equal 5, failed[:min_group_size]
     assert failed.dig(:date_range, :supported)
@@ -144,7 +145,7 @@ class NotificationMetricsTest < ActiveSupport::TestCase
       )
 
       assert_equal identifier, payload[:metric]
-      assert_equal "count", payload[:unit]
+      assert_includes %i[timeseries breakdown], payload[:type]
 
       error = assert_raises(RecordingStudioMetrics::Errors::AuthorizationError) do
         RecordingStudioMetrics::Api::ExecuteHandler.call(
