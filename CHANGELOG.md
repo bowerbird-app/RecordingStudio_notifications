@@ -6,14 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+
+### Changed
+- Pin `recording_studio_metrics` to `>= 0.3.0, < 0.4` so Metrics 0.3 discovery (`catalog_metadata`, `DiscoveryHandler`) stays on this major. This gem still does not call `RecordingStudioMetrics::Api.register!`. The host registers those endpoints once.
+
 ## [0.8.0] - 2026-10-14
 
 ### Added
 - `notification_deliveries.failed_by_channel_over_time` (timeseries, unit `count`): failed deliveries by `updated_at`, with `from` / `to` / `interval` and `group_by=channel`. Same site scope, `:operations` exposure and AdminRoot `:view` check as the other delivery metrics. No migration.
 
 ### Changed
-- Requires `recording_studio_metrics` `~> 0.3`; development and dummy Gemfiles pin tag `v0.3.1`.
-## [Unreleased]
+- Requires `recording_studio_metrics` `>= 0.3.0, < 0.4`; development and dummy Gemfiles pin tag `v0.3.1`.
 
 ## [0.7.0] - 2026-10-13
 

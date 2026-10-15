@@ -116,7 +116,7 @@ PATH
       rails (~> 8.1.0)
       recording_studio (~> 4.2)
       recording_studio_accessible
-      recording_studio_metrics (~> 0.3)
+      recording_studio_metrics (>= 0.3.0, < 0.4)
       view_component
 
 GEM
