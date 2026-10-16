@@ -5,6 +5,15 @@ require "test_helper"
 class NotificationMetricsTest < ActiveSupport::TestCase
   GrantContext = Struct.new(:access_grant)
   Grant = Struct.new(:actor)
+  METRIC_IDENTIFIERS = %w[
+    notifications.sent_over_time
+    notifications.by_type
+    notifications.read_vs_unread
+    notification_deliveries.by_status
+    notification_deliveries.by_channel
+    notification_deliveries.failed_by_channel_over_time
+  ].freeze
+  WINDOW = { interval: "day", from: Time.utc(2026, 10, 6), to: Time.utc(2026, 10, 10) }.freeze
 
   setup do
     @staff = User.create!(
@@ -33,13 +42,7 @@ class NotificationMetricsTest < ActiveSupport::TestCase
 
   test "registered notification metrics return seeded type, read, and delivery values" do
     identifiers = RecordingStudioMetrics.definitions.map(&:identifier)
-    %w[
-      notifications.sent_over_time
-      notifications.by_type
-      notifications.read_vs_unread
-      notification_deliveries.by_status
-      notification_deliveries.by_channel
-    ].each { |identifier| assert_includes identifiers, identifier }
+    METRIC_IDENTIFIERS.each { |identifier| assert_includes identifiers, identifier }
 
     sent = timeseries_counts(
       execute(
@@ -77,13 +80,80 @@ class NotificationMetricsTest < ActiveSupport::TestCase
     end
   end
 
-  test "api_authorize allows AdminRoot staff and denies non-admins" do
-    authorize = RecordingStudioMetrics.registry.api_authorize_for(:notifications)
-    assert_equal RecordingStudioNotifications::Metrics::AUTHORIZE, authorize
+  test "failed deliveries over time bucket failed rows by updated_at and group by channel" do
+    window = { interval: "day", start_at: Time.utc(2026, 10, 6), end_at: Time.utc(2026, 10, 10) }
+    counts = timeseries_counts(execute("notification_deliveries.failed_by_channel_over_time", **window))
+    expected = RecordingStudioNotifications::Delivery.failed
+                                                      .where(updated_at: Time.utc(2026, 10, 8)...Time.utc(2026, 10, 9)).count
+    assert_operator expected, :>=, 1
+    assert_equal expected, counts["2026-10-08"]
+    assert_equal 0, counts["2026-10-07"].to_i
 
-    assert authorize.call(GrantContext.new(Grant.new(@staff)))
-    refute authorize.call(GrantContext.new(Grant.new(@outsider)))
-    refute authorize.call(GrantContext.new(Grant.new(nil)))
+    grouped = execute("notification_deliveries.failed_by_channel_over_time", **window, group_by: "channel")
+    assert_equal "channel", grouped.group_by.to_s if grouped.respond_to?(:group_by)
+    assert_raises(RecordingStudioMetrics::Errors::InvalidGroupBy) do
+      execute("notification_deliveries.failed_by_channel_over_time", **window, group_by: "notification_id")
+    end
+
+    metadata = RecordingStudioMetrics.find("notification_deliveries.failed_by_channel_over_time").catalog_metadata
+    assert_equal "count", metadata[:unit]
+    assert_equal "Failed deliveries over time", metadata[:title]
+    assert metadata[:description].present?
+    assert_equal [:channel], metadata[:group_by]
+    assert_equal 5, metadata[:min_group_size]
+    assert metadata.dig(:date_range, :supported)
+    assert_equal "UTC", metadata[:timezone]
+  end
+
+  test "api_authorize allows AdminRoot staff and denies non-admins" do
+    %i[notifications notification_deliveries].each do |resource|
+      authorize = RecordingStudioMetrics.registry.api_authorize_for(resource)
+      assert_equal RecordingStudioNotifications::Metrics::AUTHORIZE, authorize
+
+      assert authorize.call(GrantContext.new(Grant.new(@staff)))
+      refute authorize.call(GrantContext.new(Grant.new(@outsider)))
+      refute authorize.call(GrantContext.new(Grant.new(nil)))
+    end
+  end
+
+  test "discovery lists each metric for AdminRoot staff and hides them from outsiders" do
+    denied_ids = discover(@outsider).map { |row| row[:identifier] }
+    allowed = discover(@staff)
+    allowed_ids = allowed.map { |row| row[:identifier] }
+
+    METRIC_IDENTIFIERS.each do |identifier|
+      refute_includes denied_ids, identifier
+      row = allowed.find { |metric| metric[:identifier] == identifier }
+
+      assert row, "expected discovery entry for #{identifier}"
+      assert_equal identifier, row[:identifier]
+      assert_includes allowed_ids, identifier
+    end
+
+    failed = allowed.find { |metric| metric[:identifier] == "notification_deliveries.failed_by_channel_over_time" }
+    assert_equal "count", failed[:unit]
+    assert_equal [:channel], failed[:group_by]
+    assert_equal 5, failed[:min_group_size]
+    assert failed.dig(:date_range, :supported)
+  end
+
+  test "execute handler authorizes each metric for AdminRoot staff and denies outsiders" do
+    METRIC_IDENTIFIERS.each do |identifier|
+      resource, name = identifier.split(".", 2)
+      payload = RecordingStudioMetrics::Api::ExecuteHandler.call(
+        build_api_context(@staff, resource: resource, name: name)
+      )
+
+      assert_equal identifier, payload[:metric]
+      assert_includes %i[timeseries breakdown], payload[:type]
+
+      error = assert_raises(RecordingStudioMetrics::Errors::AuthorizationError) do
+        RecordingStudioMetrics::Api::ExecuteHandler.call(
+          build_api_context(@outsider, resource: resource, name: name)
+        )
+      end
+      assert_equal "Not authorized to run this metric", error.public_message
+    end
   end
 
   test "site resolver is preferred when it is set" do
@@ -152,6 +222,32 @@ class NotificationMetricsTest < ActiveSupport::TestCase
       cache: false,
       **params
     )
+  end
+
+  def discover(actor)
+    RecordingStudioMetrics::Api::DiscoveryHandler.call(build_api_context(actor)).fetch(:metrics)
+  end
+
+  def build_api_context(actor, resource: nil, name: nil)
+    grant = Grant.new(actor)
+    params = WINDOW.merge(
+      resource: resource,
+      name: name,
+      start: nil,
+      start_at: nil,
+      end: nil,
+      end_at: nil,
+      timezone: "UTC",
+      filters: {}
+    )
+    context = Object.new
+    context.define_singleton_method(:access_grant) { grant }
+    context.define_singleton_method(:api_client) { actor }
+    context.define_singleton_method(:access_recording) { nil }
+    context.define_singleton_method(:root_recording) { nil }
+    context.define_singleton_method(:api_key) { :operations }
+    context.define_singleton_method(:params) { params }
+    context
   end
 
   def site_context

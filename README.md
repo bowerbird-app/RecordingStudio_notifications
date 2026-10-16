@@ -25,7 +25,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 
 Development and dummy Gemfiles pin Recording Studio to GitHub tag `v4.6.0` and Accessible to `v0.18.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
 
-Root and dummy Gemfiles pin Trashable `v0.10.0` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.3.0` and Metrics `v0.2.0`.
+Root and dummy Gemfiles pin Trashable `v0.10.0` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.3.0` and Metrics `v0.3.1`.
 
 ## Installation
 
@@ -430,7 +430,7 @@ The engine registers Accessible actions for viewing notifications and managing p
 
 ## Operations metrics
 
-The engine registers site-wide notification metrics with Recording Studio Metrics (`notifications.sent_over_time`, `notifications.by_type`, `notifications.read_vs_unread`, `notification_deliveries.by_status`, `notification_deliveries.by_channel`). Staff with AdminRoot `:view` can read them via `Api::Access.can_view?`. `read_vs_unread` uses `Notification.read` / `Notification.unread`. This gem does not call `RecordingStudioMetrics::Api.register!`.
+The engine registers site-wide notification metrics with Recording Studio Metrics (`notifications.sent_over_time`, `notifications.by_type`, `notifications.read_vs_unread`, `notification_deliveries.by_status`, `notification_deliveries.by_channel`). Staff with AdminRoot `:view` can read them via `Api::Access.can_view?`. `read_vs_unread` uses `Notification.read` / `Notification.unread`. `notification_deliveries.failed_by_channel_over_time` (Metrics `>= 0.3.0, < 0.4`, unit `count`) counts deliveries in the `failed` state bucketed by `updated_at` (set by `mark_failed!`; there is no separate failed_at column), with `from` / `to` / `interval` and `group_by=channel` (groups under `min_group_size` 5 fold into `other`). A delivery retried successfully since then is no longer counted. No filters (no delivery list exists). No grouping by notification, recipient or error message. This gem does not call `RecordingStudioMetrics::Api.register!`.
 
 ## UI
 

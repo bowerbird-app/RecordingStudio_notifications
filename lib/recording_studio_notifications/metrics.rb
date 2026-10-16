@@ -11,6 +11,11 @@ module RecordingStudioNotifications
     EXPOSE = { api: [API] }.freeze
     AUTHORIZE = ->(context) { RecordingStudioNotifications::Api::Access.can_view?(context) }
 
+    FAILED = ->(relation) { relation.where(status: "failed") }
+    FAILED_GROUPS = %i[channel].freeze
+    FAILED_DESCRIPTION = "Deliveries in the failed state, bucketed by updated_at (when mark_failed! last ran). " \
+                         "A delivery retried successfully since then is not counted."
+
     module_function
 
     def register!
@@ -49,6 +54,9 @@ module RecordingStudioNotifications
     def define_deliveries(dsl)
       dsl.breakdown :by_status, title: "Deliveries by status", field: :status, expose: EXPOSE
       dsl.breakdown :by_channel, title: "Deliveries by channel", field: :channel, expose: EXPOSE
+      dsl.timeseries :failed_by_channel_over_time, title: "Failed deliveries over time", unit: "count",
+                                                   description: FAILED_DESCRIPTION, field: :updated_at,
+                                                   scope: FAILED, group_by: FAILED_GROUPS, expose: EXPOSE
     end
 
     def read_vs_unread_calculator
