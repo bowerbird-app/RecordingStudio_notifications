@@ -50,6 +50,11 @@ class NotificationCadenceSettingsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "border border-[var(--surface-border-color)]"
     assert_includes response.body, "cadences[settings_cadence_test]"
     assert_includes response.body, 'name="cadences[required_settings_cadence_test]"'
+    settings_section = response.body[/Settings cadence test.*?<\/section>/m, 0]
+    assert settings_section
+    assert_includes settings_section, 'value="__none__"'
+    refute_includes settings_section, 'disabled="disabled" data-action="flat-pack--select#toggle"'
+    refute_includes settings_section, 'name="preferences[settings_cadence_test][]" value="in_app" disabled'
     assert_includes response.body, 'value="daily" selected="selected">Daily</option>'
     required_section = response.body[/Required settings cadence test.*?<\/section>/m, 0]
     assert required_section
@@ -63,6 +68,30 @@ class NotificationCadenceSettingsTest < ActionDispatch::IntegrationTest
     assert_includes system_section, 'role="option"'
     assert_includes system_section, 'data-value="email"'
     refute_includes system_section, 'disabled="disabled" data-action="flat-pack--select#toggle"'
+  end
+
+  test "settings persist none when no channel is required" do
+    patch "/notifications/settings", params: {
+      preferences: { settings_cadence_test: ["__none__"] }
+    }
+
+    assert_redirected_to "/notifications/settings"
+    refute RecordingStudioNotifications::Preference.enabled_for?(
+      recipient: @user,
+      notification_type: :settings_cadence_test,
+      channel: :in_app,
+      default: true
+    )
+
+    assert_no_difference -> { RecordingStudioNotifications::Notification.where(recipient: @user).count } do
+      result = RecordingStudioNotifications.notify(
+        notification_type: :settings_cadence_test,
+        recipient: @user,
+        title: "None selected",
+        idempotency_key: "settings-none-#{SecureRandom.uuid}"
+      )
+      assert_nil result
+    end
   end
 
   test "settings persist an allowed cadence override independently of channels" do

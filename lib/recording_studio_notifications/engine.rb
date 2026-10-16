@@ -127,6 +127,13 @@ module RecordingStudioNotifications
         source: "recording_studio_notifications",
         recording_required: false
       )
+      RecordingStudioAccessible.register_action(
+        :view,
+        label: "View",
+        description: "View a recording. Root-scoped notifications stay visible when this passes.",
+        source: "recording_studio_notifications",
+        recording_required: true
+      )
 
       RecordingStudioNotifications::Engine.send(:define_default_accessible_action,
                                                 :view_notifications) do |actor:, context: {}, **|
@@ -142,6 +149,14 @@ module RecordingStudioNotifications
         actor.present? && recipient.present? &&
           actor.instance_of?(recipient.class) &&
           actor.id.to_s == recipient.id.to_s
+      end
+
+      RecordingStudioNotifications::Engine.send(:define_default_accessible_action,
+                                                :view) do |actor:, recording:, **|
+        next false unless actor && recording
+        next false unless RecordingStudioAccessible.respond_to?(:authorized?)
+
+        RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :view)
       end
     end
 

@@ -8,8 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-16
+
+### Added
+- Optional `visible_to:` on `NotificationTypeRegistry.register`. Pass a proc that receives the settings recipient, or omit it (`nil`) so every recipient sees the type. The settings page and preference writes use the same filter.
+- Default Accessible `:view` action. When the host has not defined `:view`, the engine registers it and checks `RecordingStudioAccessible.authorized?(actor:, recording:, role: :view)`. Host-defined `:view` is left alone.
+
 ### Changed
 - Pin `recording_studio_metrics` to `>= 0.3.0, < 0.4` so Metrics 0.3 discovery (`catalog_metadata`, `DiscoveryHandler`) stays on this major. This gem still does not call `RecordingStudioMetrics::Api.register!`. The host registers those endpoints once.
+- `notify` with no selected channels returns `nil` and does not raise. A type with `required_channels: []` can be saved with None. Delivery then sends nothing.
+
+### Upgrade notes
+- Bump to `0.9.0`. No migration.
+- Hosts that already define Accessible `:view` keep that policy.
+- Hosts that never defined `:view` now show root-scoped notifications when the recipient has a view role on that root.
+- Rescue of `ArgumentError` for an empty channel list is no longer needed. `notify` returns `nil`.
+- Register staff-only kinds with `visible_to:` if members should not see them on settings.
 
 ## [0.8.0] - 2026-10-14
 

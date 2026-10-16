@@ -403,7 +403,7 @@ If `RecordingStudioAccessible` is present, authorization uses its action checks.
 
 Without it, a safe fallback allows same actor == recipient access.
 
-For root-scoped visibility, a notification can still be hidden if actor lacks view rights on that root.
+For root-scoped visibility, a notification can still be hidden if actor lacks view rights on that root. When the host has not defined Accessible `:view`, the engine supplies a default that calls `authorized?(actor:, recording:, role: :view)`.
 
 ## 14. Background Jobs And Delivery Pipeline
 
@@ -450,6 +450,8 @@ Common `ArgumentError` causes:
 - unregistered or unavailable channel
 - unsafe URL
 - inconsistent root/recording/notifiable scope
+
+An empty selected-channel list is not an error. `notify` returns `nil` and writes no notification.
 
 Recommended handling pattern:
 

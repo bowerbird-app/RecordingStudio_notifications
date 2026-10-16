@@ -42,6 +42,15 @@ class EngineTest < Minitest::Test
     refute_includes engine, "RecordingStudioMetrics::Api.register!"
   end
 
+  def test_engine_defines_default_view_action_without_overriding_a_host
+    engine = File.read(File.expand_path("../lib/recording_studio_notifications/engine.rb", __dir__))
+
+    assert_includes engine, "register_action(\n        :view,"
+    assert_includes engine, "define_default_accessible_action,\n                                                :view)"
+    assert_includes engine, "authorized?(actor: actor, recording: recording, role: :view)"
+    assert_includes engine, "return if RecordingStudioAccessible.respond_to?(:action_defined?) &&"
+  end
+
   def test_engine_loads_only_english_locale_files
     locale_dir = RecordingStudioNotifications::Engine.root.join("config/locales")
 

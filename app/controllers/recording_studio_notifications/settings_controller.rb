@@ -61,6 +61,7 @@ module RecordingStudioNotifications
     def configurable_notification_types
       RecordingStudioNotifications.notification_types.values.select do |type|
         next false if type.key == :generic
+        next false unless type.visible_to?(@recipient)
 
         channel_configurable?(type) || (rollup_delivery_enabled? && (cadence_selectable?(type) || type.required_cadence.present?))
       end

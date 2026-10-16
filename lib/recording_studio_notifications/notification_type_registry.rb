@@ -15,10 +15,17 @@ module RecordingStudioNotifications
     :required_cadence,
     :scope,
     :creation_action,
+    :visible_to,
     keyword_init: true
   ) do
     def optional_channels
       Array(available_channels) - required_channels
+    end
+
+    def visible_to?(recipient)
+      return true if visible_to.nil?
+
+      visible_to.call(recipient)
     end
   end
 
@@ -34,7 +41,7 @@ module RecordingStudioNotifications
     def register(key, label:, description: nil, icon: nil, default_channels: nil, required_channels: [],
                  available_channels: nil, scope: :optional_root, category: :general,
                  creation_action: nil, allowed_cadences: [:individual], default_cadence: :individual,
-                 required_cadence: nil)
+                 required_cadence: nil, visible_to: nil)
       normalized_key = normalize_key!(key)
       normalized_icon = normalize_icon(icon)
       normalized_required = normalize_channels(required_channels)
@@ -52,6 +59,7 @@ module RecordingStudioNotifications
       normalized_allowed_cadences = normalize_cadences!(allowed_cadences)
       normalized_default_cadence = normalize_cadence!(default_cadence)
       normalized_required_cadence = required_cadence.nil? ? nil : normalize_cadence!(required_cadence)
+      normalized_visible_to = normalize_visible_to!(visible_to)
 
       unless normalized_allowed_cadences.include?(normalized_default_cadence)
         raise ArgumentError, "default cadence #{normalized_default_cadence.inspect} must be allowed"
@@ -78,7 +86,8 @@ module RecordingStudioNotifications
         default_cadence: normalized_default_cadence,
         required_cadence: normalized_required_cadence,
         scope: normalized_scope,
-        creation_action: creation_action&.to_sym
+        creation_action: creation_action&.to_sym,
+        visible_to: normalized_visible_to
       ).freeze
 
       @mutex.synchronize { @types[normalized_key] = metadata }
@@ -157,6 +166,13 @@ module RecordingStudioNotifications
       raise ArgumentError, "notification type is required" if normalized.blank?
 
       normalized.to_sym
+    end
+
+    def normalize_visible_to!(visible_to)
+      return nil if visible_to.nil?
+      return visible_to if visible_to.respond_to?(:call)
+
+      raise ArgumentError, "visible_to must be a proc"
     end
   end
 end

@@ -32,6 +32,8 @@ module RecordingStudioNotifications
 
       def call
         validate_inputs!
+        return nil if channel_keys.empty?
+
         authorize_creation!
 
         hooks.run(:before_service, self.class, service_payload)
@@ -72,7 +74,6 @@ module RecordingStudioNotifications
         raise ArgumentError, "notification_type is not registered" unless type_definition
         raise ArgumentError, "root_recording is required" if type_definition.scope == :root && resolved_root_recording.blank?
         raise ArgumentError, "root_recording does not match recording or notifiable" unless consistent_root_scope?
-        raise ArgumentError, "at least one channel is required" if channel_keys.empty?
 
         validate_required_channels_available!(channel_keys)
 

@@ -16,6 +16,8 @@ class ConfigurationTest < Minitest::Test
     assert_equal [:individual], generic_type.allowed_cadences
     assert_equal :individual, generic_type.default_cadence
     assert_nil generic_type.required_cadence
+    assert_nil generic_type.visible_to
+    assert generic_type.visible_to?(Object.new)
     assert_equal true, @configuration.deliver_later
     assert_equal 60, @configuration.polling_interval_seconds
     assert_equal 15.minutes, @configuration.rollup_reservation_timeout

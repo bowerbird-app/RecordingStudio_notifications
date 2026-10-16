@@ -50,6 +50,8 @@ Scope options supported by the engine:
 - :root: must have a root recording
 - :optional_root: either is allowed
 
+`visible_to:` is an optional proc that receives the settings recipient. Omit it so every recipient sees the type. Settings and preference writes honor it. `notify` does not.
+
 ## 3) How comment creation triggers notifications via hook
 
 The hook is in:
