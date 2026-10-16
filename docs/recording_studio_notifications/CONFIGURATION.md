@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** October 8, 2026
+> *   **Last Updated:** October 16, 2026
 >
 > *Maintainers: Update the date above when modifying this file.*
 
@@ -118,10 +118,13 @@ RecordingStudioNotifications.configure do |config|
     allowed_cadences: %i[individual daily weekly monthly],
     default_cadence: :weekly,
     required_cadence: nil,
-    scope: :optional_root
+    scope: :optional_root,
+    visible_to: nil
   )
 end
 ```
+
+`visible_to` is an optional proc. It receives the signed-in settings recipient. `nil` keeps the type on every settings page. A falsey result hides the type from that recipient and ignores posted preferences for it. Delivery still accepts the type.
 
 ### Notification Cadence Rules
 

@@ -86,7 +86,7 @@ The engine registers a default `:generic` type with `:in_app` delivery. `allowed
 
 ### Notification types
 
-Each type has a `label`, optional `description`, `category`, Heroicons v2 `icon`, channels, scope, and optional `creation_action`. Valid scopes are:
+Each type has a `label`, optional `description`, `category`, Heroicons v2 `icon`, channels, scope, optional `creation_action`, and optional `visible_to`. Valid scopes are:
 
 - `:global`: always rootless.
 - `:root`: requires a root recording.
@@ -105,6 +105,23 @@ config.notification_types.register(
   scope: :optional_root
 )
 ```
+
+`visible_to:` is an optional proc. It receives the settings recipient. `nil` (the default) shows the type to everyone who can open settings. Use it to hide staff-only kinds from members. The settings page and preference writes share that filter. Delivery still uses every registered type.
+
+```ruby
+config.notification_types.register(
+  :app_error,
+  label: "App error",
+  default_channels: [:email],
+  available_channels: [:email],
+  required_channels: [],
+  allowed_cadences: [:individual, :daily],
+  default_cadence: :daily,
+  visible_to: ->(recipient) { recipient.staff? }
+)
+```
+
+A type with `required_channels: []` can be saved with no channel. Settings shows a None option. `notify` then creates nothing and raises nothing. Recipients who pick channels still get those deliveries.
 
 Cadence preferences and rollup delivery are disabled by default. Enable them only after registering rollup-capable external channel adapters:
 
@@ -245,7 +262,7 @@ All paths below are relative to the engine mount point:
 - `/notifications/clear_all`: clears visible unread notifications
 - `/settings`: notification channel and cadence preferences
 
-The engine resolves the current recipient from `current_user`, when available, then `config.actor_resolver`. It registers Accessible actions for viewing notifications and managing preferences when `RecordingStudioAccessible` is present. Root-scoped visibility checks Accessible `:view` against the root recording. A type's `creation_action:` is checked before it can be emitted.
+The engine resolves the current recipient from `current_user`, when available, then `config.actor_resolver`. It registers Accessible actions for viewing notifications and managing preferences when `RecordingStudioAccessible` is present. It also registers a default `:view` action that calls `RecordingStudioAccessible.authorized?(actor:, recording:, role: :view)` when the host has not defined `:view`. Root-scoped visibility uses that action on the root recording. A type's `creation_action:` is checked before it can be emitted.
 
 ## Hooks and instrumentation
 
@@ -295,7 +312,7 @@ RecordingStudioNotifications is a Recording Studio addon Rails engine for root-a
 ## Features
 
 - `RecordingStudioNotifications.notify` and `notify_each` public APIs
-- Notification type registry with `default_channels`, `required_channels`, `available_channels`, `scope`, and optional `creation_action`
+- Notification type registry with `default_channels`, `required_channels`, `available_channels`, `scope`, optional `creation_action`, and optional `visible_to`
 - Pluggable channel registry with bundled `:in_app` adapter
 - UUID notifications, deliveries, and preferences tables
 - Nullable `root_recording_id` for global/rootless notifications
@@ -420,13 +437,13 @@ Adapters must respond to:
 deliver(notification:, delivery:)
 ```
 
-Required channels are always delivered. Optional channels are delivered only when selected by the type/default request and not disabled by the recipient's preference.
+Required channels are always delivered. Optional channels are delivered only when selected by the type/default request and not disabled by the recipient's preference. When no channel remains, `notify` returns `nil` and writes nothing.
 
 Webhook delivery is intentionally deferred: host apps may register a custom adapter backed by CaptainHook or another approved outgoing provider API.
 
 ## Authorization
 
-The engine registers Accessible actions for viewing notifications and managing preferences when `RecordingStudioAccessible` is available. Root-scoped inbox visibility checks Accessible `:view` on the root recording. Preference pages use `:"recording_studio_notifications.manage_preferences"`. Types with `creation_action:` require that Accessible action before creation.
+The engine registers Accessible actions for viewing notifications and managing preferences when `RecordingStudioAccessible` is available. It defines a default `:view` action that defers to `authorized?(role: :view)` unless the host already defined `:view`. Root-scoped inbox visibility uses that action on the root recording. Preference pages use `:"recording_studio_notifications.manage_preferences"`. Types with `creation_action:` require that Accessible action before creation. Settings lists only types whose `visible_to` proc, when present, returns true for the recipient.
 
 ## Operations metrics
 

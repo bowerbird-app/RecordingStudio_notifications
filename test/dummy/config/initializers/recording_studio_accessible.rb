@@ -60,32 +60,5 @@ if defined?(RecordingStudioAccessible)
       recipient = context[:recipient]
       actor.present? && recipient.present? && actor.class.name == recipient.class.name && actor.id.to_s == recipient.id.to_s
     end
-
-    # Filter root-scoped inbox items to the root currently selected in the UI.
-    define_unless_present.call(:view) do |recording:, controller: nil, **|
-      next true if recording.blank?
-      next false unless controller&.respond_to?(:current_root_recording, true)
-
-      current_root = controller.send(:current_root_recording)
-      next false if current_root.blank?
-
-      next false unless current_root.id.to_s == recording.id.to_s
-
-      actor = begin
-        controller.respond_to?(:current_user, true) ? controller.send(:current_user) : nil
-      rescue StandardError
-        nil
-      end
-
-      unless actor && defined?(RecordingStudioAccessible) && RecordingStudioAccessible.respond_to?(:authorized?)
-        next true
-      end
-
-      begin
-        RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :view)
-      rescue StandardError
-        false
-      end
-    end
   end
 end

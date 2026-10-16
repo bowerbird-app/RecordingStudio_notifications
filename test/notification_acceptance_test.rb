@@ -43,6 +43,41 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_equal :daily, type.required_cadence
     assert_equal :root, type.scope
     assert_equal :create_comment_notification, type.creation_action
+    assert_nil type.visible_to
+    assert type.visible_to?(FakeActor.new("1"))
+  end
+
+  def test_notification_types_accept_optional_visible_to
+    staff_only = ->(recipient) { recipient.id == "staff" }
+    type = RecordingStudioNotifications.notification_types.register(
+      :staff_terms,
+      label: "Staff terms",
+      visible_to: staff_only
+    )
+
+    assert_equal staff_only, type.visible_to
+    assert type.visible_to?(FakeActor.new("staff"))
+    refute type.visible_to?(FakeActor.new("member"))
+  end
+
+  def test_register_rejects_unknown_options
+    assert_raises(ArgumentError) do
+      RecordingStudioNotifications.notification_types.register(
+        :unknown_option,
+        label: "Unknown option",
+        audience: :staff
+      )
+    end
+  end
+
+  def test_visible_to_must_be_callable
+    assert_raises(ArgumentError) do
+      RecordingStudioNotifications.notification_types.register(
+        :bad_visible_to,
+        label: "Bad visible to",
+        visible_to: :staff
+      )
+    end
   end
 
   def test_notification_type_scope_is_validated
@@ -128,6 +163,8 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes source, "default: requested.include?(channel)"
     assert_includes source, "enqueue_or_deliver!(notification) if should_deliver"
     assert_includes source, "create_deliveries!(notification)"
+    assert_includes source, "return nil if channel_keys.empty?"
+    refute_includes source, "at least one channel is required"
   end
 
   def test_delivery_uses_channel_architecture_and_instrumentation
@@ -273,7 +310,9 @@ class NotificationAcceptanceTest < Minitest::Test
     refute_includes index_view, "Total:"
     refute_includes index_view, "Unread:"
     assert_includes initializer, "config.current_root_resolver"
-    assert_includes accessible_initializer, "current_root.id.to_s == recording.id.to_s"
+    engine = File.read(File.expand_path("../lib/recording_studio_notifications/engine.rb", __dir__))
+    assert_includes engine, "authorized?(actor: actor, recording: recording, role: :view)"
+    refute_includes accessible_initializer, "define_unless_present.call(:view)"
   end
 
   def test_settings_ui_and_routes_exist_with_scoped_dropdown_layering
@@ -302,6 +341,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, "next if preference.channel.blank?"
     assert_includes controller, ".group_by { |type| notification_type_category(type) }"
     assert_includes controller, "next false if type.key == :generic"
+    assert_includes controller, "next false unless type.visible_to?(@recipient)"
     assert_includes controller,
                     "rollup_delivery_enabled? && (cadence_selectable?(type) || type.required_cadence.present?)"
     assert_includes controller, "def rollup_delivery_enabled?"
