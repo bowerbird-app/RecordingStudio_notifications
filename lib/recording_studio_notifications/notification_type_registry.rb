@@ -38,59 +38,9 @@ module RecordingStudioNotifications
       @mutex = Mutex.new
     end
 
-    def register(key, label:, description: nil, icon: nil, default_channels: nil, required_channels: [],
-                 available_channels: nil, scope: :optional_root, category: :general,
-                 creation_action: nil, allowed_cadences: [:individual], default_cadence: :individual,
-                 required_cadence: nil, visible_to: nil)
-      normalized_key = normalize_key!(key)
-      normalized_icon = normalize_icon(icon)
-      normalized_required = normalize_channels(required_channels)
-      default_channels_provided = !default_channels.nil?
-      normalized_default = default_channels_provided ? normalize_channels(default_channels) : nil
-      available_source = if available_channels.nil?
-                           default_available_channels(normalized_default,
-                                                      normalized_required)
-                         else
-                           available_channels
-                         end
-      normalized_available = available_source.nil? ? nil : normalize_channels(available_source)
-      normalized_scope = normalize_scope!(scope)
-      normalized_category = normalize_category(category)
-      normalized_allowed_cadences = normalize_cadences!(allowed_cadences)
-      normalized_default_cadence = normalize_cadence!(default_cadence)
-      normalized_required_cadence = required_cadence.nil? ? nil : normalize_cadence!(required_cadence)
-      normalized_visible_to = normalize_visible_to!(visible_to)
-
-      unless normalized_allowed_cadences.include?(normalized_default_cadence)
-        raise ArgumentError, "default cadence #{normalized_default_cadence.inspect} must be allowed"
-      end
-
-      if normalized_required_cadence && !normalized_allowed_cadences.include?(normalized_required_cadence)
-        raise ArgumentError, "required cadence #{normalized_required_cadence.inspect} must be allowed"
-      end
-
-      normalized_required.each do |channel|
-        raise ArgumentError, "required channel #{channel.inspect} must be available" unless normalized_available.include?(channel)
-      end
-
-      metadata = NotificationType.new(
-        key: normalized_key,
-        label: label.to_s,
-        category: normalized_category,
-        description: description&.to_s,
-        icon: normalized_icon,
-        default_channels: normalized_default,
-        required_channels: normalized_required,
-        available_channels: normalized_available,
-        allowed_cadences: normalized_allowed_cadences,
-        default_cadence: normalized_default_cadence,
-        required_cadence: normalized_required_cadence,
-        scope: normalized_scope,
-        creation_action: creation_action&.to_sym,
-        visible_to: normalized_visible_to
-      ).freeze
-
-      @mutex.synchronize { @types[normalized_key] = metadata }
+    def register(key, label:, **options)
+      metadata = build_notification_type(key, label, parse_register_options!(options))
+      @mutex.synchronize { @types[metadata.key] = metadata }
       metadata
     end
 
@@ -121,6 +71,76 @@ module RecordingStudioNotifications
     end
 
     private
+
+    def parse_register_options!(options)
+      parsed = {
+        description: options.delete(:description),
+        icon: options.delete(:icon),
+        default_channels: options.delete(:default_channels),
+        required_channels: options.delete(:required_channels) { [] },
+        available_channels: options.delete(:available_channels),
+        scope: options.delete(:scope) { :optional_root },
+        category: options.delete(:category) { :general },
+        creation_action: options.delete(:creation_action),
+        allowed_cadences: options.delete(:allowed_cadences) { [:individual] },
+        default_cadence: options.delete(:default_cadence) { :individual },
+        required_cadence: options.delete(:required_cadence),
+        visible_to: options.delete(:visible_to)
+      }
+      raise ArgumentError, "unknown register option: #{options.keys.join(', ')}" if options.any?
+
+      parsed
+    end
+
+    def build_notification_type(key, label, parsed)
+      normalized_key = normalize_key!(key)
+      normalized_required = normalize_channels(parsed[:required_channels])
+      default_channels_provided = !parsed[:default_channels].nil?
+      normalized_default = default_channels_provided ? normalize_channels(parsed[:default_channels]) : nil
+      available_source = if parsed[:available_channels].nil?
+                           default_available_channels(normalized_default, normalized_required)
+                         else
+                           parsed[:available_channels]
+                         end
+      normalized_available = available_source.nil? ? nil : normalize_channels(available_source)
+      normalized_allowed_cadences = normalize_cadences!(parsed[:allowed_cadences])
+      normalized_default_cadence = normalize_cadence!(parsed[:default_cadence])
+      normalized_required_cadence = parsed[:required_cadence].nil? ? nil : normalize_cadence!(parsed[:required_cadence])
+      validate_cadences!(normalized_allowed_cadences, normalized_default_cadence, normalized_required_cadence)
+      validate_required_channels!(normalized_required, normalized_available)
+
+      NotificationType.new(
+        key: normalized_key,
+        label: label.to_s,
+        category: normalize_category(parsed[:category]),
+        description: parsed[:description]&.to_s,
+        icon: normalize_icon(parsed[:icon]),
+        default_channels: normalized_default,
+        required_channels: normalized_required,
+        available_channels: normalized_available,
+        allowed_cadences: normalized_allowed_cadences,
+        default_cadence: normalized_default_cadence,
+        required_cadence: normalized_required_cadence,
+        scope: normalize_scope!(parsed[:scope]),
+        creation_action: parsed[:creation_action]&.to_sym,
+        visible_to: normalize_visible_to!(parsed[:visible_to])
+      ).freeze
+    end
+
+    def validate_cadences!(allowed_cadences, default_cadence, required_cadence)
+      raise ArgumentError, "default cadence #{default_cadence.inspect} must be allowed" unless allowed_cadences.include?(default_cadence)
+
+      return unless required_cadence
+      return if allowed_cadences.include?(required_cadence)
+
+      raise ArgumentError, "required cadence #{required_cadence.inspect} must be allowed"
+    end
+
+    def validate_required_channels!(required_channels, available_channels)
+      required_channels.each do |channel|
+        raise ArgumentError, "required channel #{channel.inspect} must be available" unless available_channels.include?(channel)
+      end
+    end
 
     def default_available_channels(default_channels, required_channels)
       return nil if default_channels.nil? && required_channels.empty?

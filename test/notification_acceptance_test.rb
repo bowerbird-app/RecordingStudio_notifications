@@ -60,6 +60,16 @@ class NotificationAcceptanceTest < Minitest::Test
     refute type.visible_to?(FakeActor.new("member"))
   end
 
+  def test_register_rejects_unknown_options
+    assert_raises(ArgumentError) do
+      RecordingStudioNotifications.notification_types.register(
+        :unknown_option,
+        label: "Unknown option",
+        audience: :staff
+      )
+    end
+  end
+
   def test_visible_to_must_be_callable
     assert_raises(ArgumentError) do
       RecordingStudioNotifications.notification_types.register(

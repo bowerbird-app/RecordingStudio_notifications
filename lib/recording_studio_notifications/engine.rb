@@ -27,6 +27,62 @@ module RecordingStudioNotifications
 
       private
 
+      def record_accessible_actions
+        return unless defined?(RecordingStudioAccessible)
+        return unless RecordingStudioAccessible.respond_to?(:register_action)
+
+        register_notifications_accessible_actions
+        define_notifications_accessible_defaults
+      end
+
+      def register_notifications_accessible_actions
+        RecordingStudioAccessible.register_action(
+          :view_notifications,
+          label: "View notifications",
+          description: "View in-app notifications for the current actor.",
+          source: "recording_studio_notifications",
+          recording_required: false
+        )
+        RecordingStudioAccessible.register_action(
+          :"recording_studio_notifications.manage_preferences",
+          label: "Manage notification preferences",
+          description: "Manage RecordingStudioNotifications channel preferences.",
+          source: "recording_studio_notifications",
+          recording_required: false
+        )
+        RecordingStudioAccessible.register_action(
+          :view,
+          label: "View",
+          description: "View a recording. Root-scoped notifications stay visible when this passes.",
+          source: "recording_studio_notifications",
+          recording_required: true
+        )
+      end
+
+      def define_notifications_accessible_defaults
+        define_default_identity_accessible_action(:view_notifications)
+        define_default_identity_accessible_action(:"recording_studio_notifications.manage_preferences")
+        define_default_view_accessible_action
+      end
+
+      def define_default_identity_accessible_action(action)
+        define_default_accessible_action(action) do |actor:, context: {}, **|
+          recipient = context[:recipient]
+          actor.present? && recipient.present? &&
+            actor.instance_of?(recipient.class) &&
+            actor.id.to_s == recipient.id.to_s
+        end
+      end
+
+      def define_default_view_accessible_action
+        define_default_accessible_action(:view) do |actor:, recording:, **|
+          next false unless actor && recording
+          next false unless RecordingStudioAccessible.respond_to?(:authorized?)
+
+          RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :view)
+        end
+      end
+
       def define_default_accessible_action(action, &)
         return unless RecordingStudioAccessible.respond_to?(:define_action)
         return if RecordingStudioAccessible.respond_to?(:action_defined?) &&
@@ -110,54 +166,7 @@ module RecordingStudioNotifications
 
     initializer "recording_studio_notifications.record_accessible_actions",
                 after: "recording_studio_notifications.load_config" do |_app|
-      next unless defined?(RecordingStudioAccessible)
-      next unless RecordingStudioAccessible.respond_to?(:register_action)
-
-      RecordingStudioAccessible.register_action(
-        :view_notifications,
-        label: "View notifications",
-        description: "View in-app notifications for the current actor.",
-        source: "recording_studio_notifications",
-        recording_required: false
-      )
-      RecordingStudioAccessible.register_action(
-        :"recording_studio_notifications.manage_preferences",
-        label: "Manage notification preferences",
-        description: "Manage RecordingStudioNotifications channel preferences.",
-        source: "recording_studio_notifications",
-        recording_required: false
-      )
-      RecordingStudioAccessible.register_action(
-        :view,
-        label: "View",
-        description: "View a recording. Root-scoped notifications stay visible when this passes.",
-        source: "recording_studio_notifications",
-        recording_required: true
-      )
-
-      RecordingStudioNotifications::Engine.send(:define_default_accessible_action,
-                                                :view_notifications) do |actor:, context: {}, **|
-        recipient = context[:recipient]
-        actor.present? && recipient.present? &&
-          actor.instance_of?(recipient.class) &&
-          actor.id.to_s == recipient.id.to_s
-      end
-
-      RecordingStudioNotifications::Engine.send(:define_default_accessible_action,
-                                                :"recording_studio_notifications.manage_preferences") do |actor:, context: {}, **|
-        recipient = context[:recipient]
-        actor.present? && recipient.present? &&
-          actor.instance_of?(recipient.class) &&
-          actor.id.to_s == recipient.id.to_s
-      end
-
-      RecordingStudioNotifications::Engine.send(:define_default_accessible_action,
-                                                :view) do |actor:, recording:, **|
-        next false unless actor && recording
-        next false unless RecordingStudioAccessible.respond_to?(:authorized?)
-
-        RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :view)
-      end
+      RecordingStudioNotifications::Engine.send(:record_accessible_actions)
     end
 
     initializer "recording_studio_notifications.metrics" do
