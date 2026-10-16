@@ -30,18 +30,18 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     refute connection.table_exists?(:recording_studio_device_sessions)
   end
 
-  test "Gemfiles pin Recording Studio to v4.6.0, Accessible to v0.18.0, Commentable to v0.5.0, and Admin to v2.3.0" do
+  test "Gemfiles pin Recording Studio to v4.7.0, Accessible to v0.18.0, Commentable to v0.5.0, and Admin to v2.3.0" do
     root_gemfile = File.read(Rails.root.join("../../Gemfile"))
     dummy_gemfile = File.read(Rails.root.join("Gemfile"))
 
-    assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v4.6.0"/, root_gemfile)
-    assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v4.6.0"/, dummy_gemfile)
+    assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v4.7.0"/, root_gemfile)
+    assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v4.7.0"/, dummy_gemfile)
     assert_match(/recording_studio_accessible.*, tag: "v0.18.0"/, root_gemfile)
     assert_match(/recording_studio_accessible.*, tag: "v0.18.0"/, dummy_gemfile)
     assert_match(/recording_studio_commentable.*, tag: "v0.5.0"/, dummy_gemfile)
     assert_match(/recording_studio_admin.*, tag: "v2.3.0"/, dummy_gemfile)
-    assert_match(/recording_studio_trashable.*, tag: "v0.10.0"/, root_gemfile)
-    assert_match(/recording_studio_trashable.*, tag: "v0.10.0"/, dummy_gemfile)
+    assert_match(/recording_studio_trashable.*, tag: "v0.11.0"/, root_gemfile)
+    assert_match(/recording_studio_trashable.*, tag: "v0.11.0"/, dummy_gemfile)
     assert_match(/recording_studio_metrics.*, tag: "v0.3.1"/, root_gemfile)
     assert_match(/recording_studio_metrics.*, tag: "v0.3.1"/, dummy_gemfile)
   end
