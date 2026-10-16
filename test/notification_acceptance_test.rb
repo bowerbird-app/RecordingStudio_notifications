@@ -300,7 +300,9 @@ class NotificationAcceptanceTest < Minitest::Test
     refute_includes index_view, "Total:"
     refute_includes index_view, "Unread:"
     assert_includes initializer, "config.current_root_resolver"
-    assert_includes accessible_initializer, "current_root.id.to_s == recording.id.to_s"
+    engine = File.read(File.expand_path("../lib/recording_studio_notifications/engine.rb", __dir__))
+    assert_includes engine, "authorized?(actor: actor, recording: recording, role: :view)"
+    refute_includes accessible_initializer, "define_unless_present.call(:view)"
   end
 
   def test_settings_ui_and_routes_exist_with_scoped_dropdown_layering
