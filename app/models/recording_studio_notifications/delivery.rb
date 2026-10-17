@@ -62,7 +62,41 @@ module RecordingStudioNotifications
       )
     end
 
+    def mark_email_unsubscribed!(at: Time.current)
+      transaction do
+        Preference.set!(
+          recipient: notification.recipient,
+          notification_type: notification.notification_type,
+          channel: :email,
+          enabled: false
+        )
+        remember_email_timestamp!("email_unsubscribed_at", at)
+      end
+    end
+
+    def mark_email_bounced!(at: Time.current)
+      remember_email_timestamp!("email_bounced_at", at)
+    end
+
+    def mark_email_opened!(at: Time.current)
+      remember_email_timestamp!("email_opened_at", at)
+    end
+
+    def mark_email_clicked!(at: Time.current)
+      remember_email_timestamp!("email_clicked_at", at)
+    end
+
+    def mark_email_complained!(at: Time.current)
+      remember_email_timestamp!("email_complained_at", at)
+    end
+
     private
+
+    def remember_email_timestamp!(key, at)
+      return self if metadata[key].present?
+
+      update!(metadata: metadata.merge(key => at.iso8601))
+    end
 
     def registered_channel
       return if channel.blank?
