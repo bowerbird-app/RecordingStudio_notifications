@@ -300,10 +300,10 @@ file; do not generate a per-repo dummy key.
 
 ## Validation
 
-Run the engine suite from the repository root:
+Run both suites from the repository root. `rake test:all` runs the gem suite, the dummy app suite, and prints one SimpleCov result for `app/` and `lib/`.
 
 ```bash
-bundle exec rake test
+bundle exec rake test:all
 ```
 # RecordingStudioNotifications
 
@@ -468,8 +468,8 @@ Subscribe to:
 
 ## Validation
 
-Run from the repository root:
+Run both suites from the repository root. `rake test:all` runs the gem suite, the dummy app suite, and prints one SimpleCov result for `app/` and `lib/`.
 
 ```bash
-bundle exec rake test
+bundle exec rake test:all
 ```

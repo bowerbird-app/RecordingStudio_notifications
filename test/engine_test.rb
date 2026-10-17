@@ -51,6 +51,58 @@ class EngineTest < Minitest::Test
     assert_includes engine, "return if RecordingStudioAccessible.respond_to?(:action_defined?) &&"
   end
 
+  def test_load_config_uses_each_pair_when_config_x_has_no_to_h
+    ordered = Object.new
+    ordered.define_singleton_method(:each_pair) { |&block| block.call("queue_name", :from_ordered_options) }
+    app = config_app(recording_studio_notifications: ordered)
+
+    find_initializer("recording_studio_notifications.load_config").block.call(app)
+
+    assert_equal :from_ordered_options, RecordingStudioNotifications.configuration.queue_name
+  end
+
+  def test_load_config_ignores_yaml_and_ordered_options_that_raise
+    missing = config_app(recording_studio_notifications: Object.new)
+    missing.define_singleton_method(:config_for) { |_name| raise "yaml missing" }
+    find_initializer("recording_studio_notifications.load_config").block.call(missing)
+
+    yaml = Object.new
+    yaml.define_singleton_method(:each) { raise "yaml each failed" }
+    ordered = Object.new
+    ordered.define_singleton_method(:each_pair) { raise "ordered options failed" }
+    app = config_app(recording_studio_notifications: ordered)
+    app.define_singleton_method(:config_for) { |_name| yaml }
+    find_initializer("recording_studio_notifications.load_config").block.call(app)
+
+    assert_equal :default, RecordingStudioNotifications.configuration.queue_name
+  end
+
+  def test_extensions_apply_once_and_skip_a_missing_target
+    widget = Class.new
+    widget.define_singleton_method(:name) { "CoverageWidget" }
+    model_calls = 0
+    RecordingStudioNotifications.configuration.hooks.extend_model(:CoverageWidget) do
+      model_calls += 1
+      def coverage_widget_ready?
+        true
+      end
+    end
+    RecordingStudioNotifications.configuration.hooks.extend_controller(:CoverageWidget) do
+      def coverage_controller_ready?
+        true
+      end
+    end
+
+    assert_nil RecordingStudioNotifications::Engine.send(:apply_extensions, nil, [])
+    RecordingStudioNotifications::Engine.apply_model_extensions(widget)
+    RecordingStudioNotifications::Engine.apply_model_extensions(widget)
+    RecordingStudioNotifications::Engine.apply_controller_extensions(widget)
+
+    assert_equal 1, model_calls
+    assert widget.new.coverage_widget_ready?
+    assert widget.new.coverage_controller_ready?
+  end
+
   def test_engine_loads_only_english_locale_files
     locale_dir = RecordingStudioNotifications::Engine.root.join("config/locales")
 
@@ -78,5 +130,15 @@ class EngineTest < Minitest::Test
   def find_initializer(name)
     RecordingStudioNotifications::Engine.initializers.find { |initializer| initializer.name == name } ||
       flunk("Expected initializer #{name.inspect}")
+  end
+
+  def config_app(recording_studio_notifications:)
+    config_x = Object.new
+    config_x.define_singleton_method(:recording_studio_notifications) { recording_studio_notifications }
+    app_config = Object.new
+    app_config.define_singleton_method(:x) { config_x }
+    app = Object.new
+    app.define_singleton_method(:config) { app_config }
+    app
   end
 end

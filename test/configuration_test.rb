@@ -50,6 +50,32 @@ class ConfigurationTest < Minitest::Test
     end
   end
 
+  def test_merge_ignores_a_value_that_cannot_be_enumerated
+    @configuration.queue_name = :keep
+
+    @configuration.merge!(nil)
+
+    assert_equal :keep, @configuration.queue_name
+  end
+
+  def test_resolve_actor_calls_the_resolver
+    @configuration.actor_resolver = -> { :current_actor }
+
+    assert_equal :current_actor, @configuration.resolve_actor
+
+    @configuration.actor_resolver = nil
+
+    assert_nil @configuration.resolve_actor
+  end
+
+  def test_resolve_current_root_uses_current_recording_and_ignores_a_missing_controller
+    controller = Object.new
+    controller.define_singleton_method(:current_recording) { :selected_root }
+
+    assert_equal :selected_root, @configuration.resolve_current_root(controller: controller)
+    assert_nil @configuration.resolve_current_root(controller: nil)
+  end
+
   def test_to_h_reports_runtime_registries
     result = @configuration.to_h
 

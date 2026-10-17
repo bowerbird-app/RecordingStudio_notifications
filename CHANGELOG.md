@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-10-17
+
+Test and repo cleanup. Notification behavior is unchanged.
+
+### Changed
+- Gem and dummy suites now collate SimpleCov, tracking `app/` and `lib/`. `rake test:all` prints that combined result. `coverage/` and `test/dummy/coverage/` are no longer committed.
+
+### Removed
+- Stale template notes: `MIGRATION_NOTES.md`, `UPDATE_SUMMARY.md`, and `docs/recording_studio_notifications/GEM_TEMPLATE_README.md`, `PRIVATE_GEMS.md`, and `SERVICES.md`.
+
+### Upgrade notes
+- Bump to `0.9.1`. No migration. No host changes.
+
 ## [0.9.0] - 2026-10-16
 
 ### Added
