@@ -77,6 +77,9 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 
 group :development, :test do
+  # Collated with the gem suite by the root Rakefile. The dummy bundle must be able to require it.
+  gem "simplecov", "0.22.0", require: false
+
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 

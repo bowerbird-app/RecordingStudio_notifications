@@ -147,6 +147,95 @@ class InstallGeneratorTest < Minitest::Test
     end
   end
 
+  def test_add_yaml_config_skips_the_file_when_declined
+    with_temp_app do |dir|
+      generator = build_generator(dir)
+
+      generator.stub(:yes?, false) do
+        generator.add_yaml_config
+      end
+
+      refute File.exist?(File.join(dir, "config/recording_studio_notifications.yml"))
+    end
+  end
+
+  def test_add_yaml_config_copies_the_template_when_accepted
+    with_temp_app do |dir|
+      generator = build_generator(dir)
+
+      generator.stub(:yes?, true) do
+        generator.add_yaml_config
+      end
+
+      yaml = File.read(File.join(dir, "config/recording_studio_notifications.yml"))
+      assert_includes yaml, "default_channels:"
+      assert_includes yaml, "allowed_url_hosts:"
+    end
+  end
+
+  def test_add_tailwind_source_reports_when_every_source_is_already_present
+    with_temp_app do |dir|
+      css_path = File.join(dir, "app/assets/tailwind/application.css")
+      File.write(css_path, ["@import \"tailwindcss\";", *tailwind_source_lines, ""].join("\n"))
+      generator = build_generator(dir)
+      messages = []
+
+      Rails.stub(:root, Pathname.new(dir)) do
+        generator.stub(:say, ->(message, color = nil) { messages << [message, color] }) do
+          generator.add_tailwind_source
+        end
+      end
+
+      assert_includes messages,
+                      ["Tailwind already configured to include RecordingStudioNotifications and FlatPack sources.", :green]
+    end
+  end
+
+  def test_polling_loader_reports_a_missing_stimulus_index
+    with_temp_app do |dir|
+      generator = build_generator(dir)
+      messages = []
+
+      Rails.stub(:root, Pathname.new(dir)) do
+        generator.stub(:say, ->(message, color = nil) { messages << [message, color] }) do
+          generator.add_notification_polling_controller_loader
+        end
+      end
+
+      assert_includes messages, ["Stimulus controller index not detected. Add this line to your controller loader:", :yellow]
+      assert_includes messages,
+                      ["  lazyLoadControllersFrom(\"controllers/recording_studio_notifications\", application)", :yellow]
+    end
+  end
+
+  def test_polling_loader_reports_a_missing_lazy_loader_import
+    with_temp_app do |dir|
+      controllers_path = File.join(dir, "app/javascript/controllers")
+      FileUtils.mkdir_p(controllers_path)
+      File.write(File.join(controllers_path, "index.js"), "import { application } from \"controllers/application\"\n")
+      generator = build_generator(dir)
+      messages = []
+
+      Rails.stub(:root, Pathname.new(dir)) do
+        generator.stub(:say, ->(message, color = nil) { messages << [message, color] }) do
+          generator.add_notification_polling_controller_loader
+        end
+      end
+
+      assert_includes messages, ["Could not find the Stimulus lazy loader. Add this line to your controller loader:", :yellow]
+      assert_equal "import { application } from \"controllers/application\"\n",
+                   File.read(File.join(controllers_path, "index.js"))
+    end
+  end
+
+  def test_bundler_install_source_lines_are_empty_when_bundle_path_fails
+    generator = build_generator(File.expand_path("..", __dir__))
+
+    Bundler.stub(:bundle_path, ->(*) { raise "bundle path unavailable" }) do
+      assert_equal [], generator.send(:bundler_install_source_lines)
+    end
+  end
+
   def test_show_readme_displays_install_guide_for_invoke_behavior
     generator = build_generator(File.expand_path("..", __dir__))
     shown_templates = []

@@ -8,6 +8,7 @@ DUMMY_TEST_FILES = [
   File.expand_path("test/recording_studio_v3_test.rb", __dir__)
 ].freeze
 DUMMY_GEMFILE = File.expand_path("test/dummy/Gemfile", __dir__)
+SIMPLECOV_HELPER = File.expand_path("test/simplecov_helper.rb", __dir__)
 DUMMY_APP_ROOT = File.expand_path("test/dummy", __dir__)
 TEST_ROOT = File.expand_path("test", __dir__)
 ROOT_TEST_EXCLUSIONS = %w[
@@ -40,9 +41,42 @@ end
 
 def dummy_bundle_base_env
   {
-    "BUNDLE_GEMFILE" => DUMMY_GEMFILE,
-    "DISABLE_SIMPLECOV" => "true"
+    "BUNDLE_GEMFILE" => DUMMY_GEMFILE
   }
+end
+
+def run_dummy_suite
+  Dir.chdir(DUMMY_APP_ROOT) do
+    env = dummy_bundle_env
+
+    run_command!(env, "bundle", "exec", "bin/rails", "db:prepare")
+    # bin/rails boots the app before test_helper, so start SimpleCov in this process first.
+    run_command!(
+      env.merge("SIMPLECOV_COMMAND_NAME" => "dummy"),
+      "bundle", "exec", "ruby", "-r#{SIMPLECOV_HELPER}", "bin/rails", "test"
+    )
+    DUMMY_TEST_FILES.each do |test_file|
+      command_name = "dummy-host-#{File.basename(test_file, '.rb')}"
+      run_command!(env.merge("SIMPLECOV_COMMAND_NAME" => command_name), "bundle", "exec", "ruby", "-I#{TEST_ROOT}", test_file)
+    end
+  end
+end
+
+def collate_coverage
+  require "simplecov"
+
+  result_files = Dir[File.expand_path("coverage/results/**/.resultset.json", __dir__)]
+  raise "No coverage results to collate. Run the gem and dummy suites first." if result_files.empty?
+
+  SimpleCov.collate(result_files) do
+    root File.expand_path(".", __dir__)
+    enable_coverage :branch
+    coverage_dir File.expand_path("coverage", __dir__)
+    add_filter "/test/"
+    add_filter "/config/"
+    add_filter "/db/"
+    track_files "{app,lib}/**/*.rb"
+  end
 end
 
 Rake::TestTask.new(:test) do |t|
@@ -63,20 +97,13 @@ namespace :test do
   end
 
   desc "Run dummy app integration tests under the dummy app bundle"
-  task :dummy do
-    Dir.chdir(DUMMY_APP_ROOT) do
-      env = dummy_bundle_env
+  task(:dummy) { run_dummy_suite }
 
-      run_command!(env, "bundle", "exec", "bin/rails", "db:prepare")
-      run_command!(env, "bundle", "exec", "bin/rails", "test")
-      DUMMY_TEST_FILES.each do |test_file|
-        run_command!(env, "bundle", "exec", "ruby", "-I#{TEST_ROOT}", test_file)
-      end
-    end
-  end
+  desc "Collate gem and dummy SimpleCov results into coverage/"
+  task(:coverage) { collate_coverage }
 
-  desc "Run gem and dummy app tests"
-  task all: %i[test dummy]
+  desc "Run gem and dummy app tests, then collate coverage"
+  task all: %i[test dummy coverage]
 end
 
 namespace :app do
