@@ -8,7 +8,7 @@ module RecordingStudioNotifications
   class Configuration
     attr_accessor :actor_resolver, :current_root_resolver, :allowed_url_hosts, :default_channels,
                   :deliver_later, :queue_name, :raise_on_delivery_error, :polling_interval_seconds,
-                  :rollup_reservation_timeout, :rollup_delivery_enabled
+                  :rollup_reservation_timeout, :rollup_delivery_enabled, :unsubscribe_expires_in
     attr_reader :hooks, :notification_types, :channels
 
     def initialize
@@ -22,6 +22,7 @@ module RecordingStudioNotifications
       @polling_interval_seconds = 60
       @rollup_reservation_timeout = 15.minutes
       @rollup_delivery_enabled = false
+      @unsubscribe_expires_in = 1.year
       @hooks = Hooks.new
       @notification_types = NotificationTypeRegistry.new
       @channels = ChannelRegistry.new
@@ -46,6 +47,7 @@ module RecordingStudioNotifications
         polling_interval_seconds: polling_interval_seconds,
         rollup_reservation_timeout: rollup_reservation_timeout,
         rollup_delivery_enabled: rollup_delivery_enabled,
+        unsubscribe_expires_in: unsubscribe_expires_in,
         raise_on_delivery_error: raise_on_delivery_error,
         notification_types: notification_types.keys,
         channels: channels.keys,

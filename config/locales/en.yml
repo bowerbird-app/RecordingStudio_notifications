@@ -41,6 +41,20 @@ en:
         help_required_only: This notification type has required channels only.
         help_optional: Choose which channels to receive notifications on.
         required_channel_tooltip: This channel can't be removed
+      unsubscribe:
+        confirm_title: Stop these emails?
+        confirm_subtitle: "%{type} by %{channel}."
+        confirm_button: Unsubscribe
+        done_title: You're unsubscribed.
+        done_subtitle: We won't send %{type} by %{channel}.
+        already_title: You're already unsubscribed.
+        already_subtitle: "%{type} by %{channel} is already off."
+        required_title: This one stays on.
+        required_subtitle: "%{type} always uses %{channel}."
+        missing_title: This unsubscribe link doesn't work.
+        missing_subtitle: It may have expired.
+        missing_link: Sign in to settings
+        one_click_body: Unsubscribed.
       flashes:
         marked_read: Notification marked read.
         marked_unread: Notification marked unread.

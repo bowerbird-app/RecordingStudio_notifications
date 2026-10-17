@@ -10,6 +10,8 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 - Global, root-scoped, and optional-root notification types
 - A pluggable channel registry with a bundled `:in_app` adapter
 - Required and optional delivery channels, controlled by recipient preferences
+- `inbox:` on a type or on `notify`, so a send can skip the inbox and its in-app delivery
+- Public unsubscribe links (`unsubscribe_url`, `list_unsubscribe_headers`) and delivery email timestamps (`mark_email_*`)
 - Optional per-type delivery cadences and grouped rollup delivery
 - FlatPack/Tailwind inbox, notification menu, and preference UI
 - Engine-owned Stimulus polling controller for the async notification menu
@@ -163,6 +165,28 @@ RecordingStudioNotifications.notify_each(
 
 Pass `channels:` to request a subset of a type's available channels. Required channels are always included. Optional channels respect each recipient's preference.
 
+Pass `inbox: false` to keep the notification and its email (and any other non-in-app) deliveries without listing it in the inbox, menu, unread count, or clear-all. The type can default `inbox:` too. A per-call value wins. `inbox: false` does not create an `:in_app` delivery, and it raises `ArgumentError` when `:in_app` is required. The default is `true`, so existing rows stay in the inbox. A retry with the same `idempotency_key` keeps the first `inbox` flag and the first set of channels. `open` still marks a hidden notification read and redirects. `show`, mark read, mark unread, archive, and unarchive return 404.
+
+## Unsubscribe
+
+```ruby
+url = RecordingStudioNotifications.unsubscribe_url(
+  recipient: user,
+  notification_type: :page_comment,
+  channel: :email
+)
+headers = RecordingStudioNotifications.list_unsubscribe_headers(
+  recipient: user,
+  notification_type: :page_comment,
+  channel: :email
+)
+# { "List-Unsubscribe" => "<https://...>", "List-Unsubscribe-Post" => "List-Unsubscribe=One-Click" }
+```
+
+The link is a signed GlobalID. Its purpose is that notification type and channel, so one link cannot change another type or channel. It expires after `config.unsubscribe_expires_in` (default 1 year). GET shows a confirmation page and writes nothing. The form POST turns that optional channel off, then redirects to the done page. A POST whose body is `List-Unsubscribe=One-Click` turns it off and returns 200. Required channels stay on. Set the host `default_url_options` (the same host mailers use) so the URL is absolute.
+
+`Delivery#mark_email_unsubscribed!(at:)` stores `email_unsubscribed_at` and turns that type's email preference off. `mark_email_bounced!`, `mark_email_opened!`, `mark_email_clicked!`, and `mark_email_complained!` store their own timestamps. A bounce does not mark the delivery failed.
+
 ## Host UI integration
 
 The engine supplies an inbox, preferences screen, and async top-nav notification menu. Add the menu helper to a host layout:
@@ -312,7 +336,9 @@ RecordingStudioNotifications is a Recording Studio addon Rails engine for root-a
 ## Features
 
 - `RecordingStudioNotifications.notify` and `notify_each` public APIs
-- Notification type registry with `default_channels`, `required_channels`, `available_channels`, `scope`, optional `creation_action`, and optional `visible_to`
+- Notification type registry with `default_channels`, `required_channels`, `available_channels`, `scope`, optional `creation_action`, optional `visible_to`, and optional `inbox`
+- Public unsubscribe links and `list_unsubscribe_headers`
+- `Delivery#mark_email_unsubscribed!`, `mark_email_bounced!`, `mark_email_opened!`, `mark_email_clicked!`, and `mark_email_complained!`
 - Pluggable channel registry with bundled `:in_app` adapter
 - UUID notifications, deliveries, and preferences tables
 - Nullable `root_recording_id` for global/rootless notifications

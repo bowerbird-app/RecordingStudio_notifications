@@ -77,6 +77,20 @@ fr:
         help_required_only: Ce type n’a que des canaux obligatoires.
         help_optional: Choisissez les canaux où recevoir les notifications.
         required_channel_tooltip: Ce canal ne peut pas être retiré
+      unsubscribe:
+        confirm_title: Arrêter ces e-mails ?
+        confirm_subtitle: "%{type} par %{channel}."
+        confirm_button: Se désabonner
+        done_title: Vous êtes désabonné.
+        done_subtitle: Nous n’enverrons plus %{type} par %{channel}.
+        already_title: Vous êtes déjà désabonné.
+        already_subtitle: "%{type} par %{channel} est déjà coupé."
+        required_title: Celui-ci reste activé.
+        required_subtitle: "%{type} utilise toujours %{channel}."
+        missing_title: Ce lien de désabonnement ne fonctionne pas.
+        missing_subtitle: Il a peut-être expiré.
+        missing_link: Se connecter aux réglages
+        one_click_body: Désabonné.
       flashes:
         marked_read: Notification marquée comme lue.
         marked_unread: Notification marquée comme non lue.

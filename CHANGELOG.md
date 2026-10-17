@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-17
+
+### Added
+- `inbox` on notifications (boolean, default `true`). Register a type with `inbox:`, or pass `inbox:` to `notify`, to keep the row and its non-in-app deliveries out of the inbox. `inbox: false` skips the `:in_app` delivery. Index, menu, group page, unread count, and clear-all use the `in_inbox` scope. `show` and the other member actions return 404 for a hidden row. `open` still marks it read and redirects. Admin and the sent and read-vs-unread metrics still count it. A retry with the same idempotency key keeps the first `inbox` flag.
+- Public unsubscribe. `RecordingStudioNotifications.unsubscribe_url` and `list_unsubscribe_headers` build an absolute signed link whose purpose is that notification type and channel. GET confirms and writes nothing. The form POST turns the optional channel off and redirects to the done page. A POST body of `List-Unsubscribe=One-Click` turns it off and returns 200. Tokens expire after `unsubscribe_expires_in` (default 1 year).
+- `Delivery#mark_email_unsubscribed!(at:)`, `mark_email_bounced!(at:)`, `mark_email_opened!(at:)`, `mark_email_clicked!(at:)`, and `mark_email_complained!(at:)`. Each stores its timestamp in delivery metadata. Unsubscribe also turns that type's email preference off. A bounce does not change delivery status.
+
+### Upgrade notes
+- Bump to `0.10.0`.
+- Run `bin/rails generate recording_studio_notifications:migrations` and `bin/rails db:migrate`. The new migration adds `inbox` (boolean, null false, default true). Existing rows stay in the inbox.
+- `notify` and notification type registration accept `inbox:`. `inbox: false` with a required `:in_app` channel raises `ArgumentError` and writes nothing.
+- Hosts that put the unsubscribe URL in mail set `default_url_options` (the same host mailers already need) so the link is absolute.
+- No compatibility shim.
+
 ## [0.9.1] - 2026-10-17
 
 Test and repo cleanup. Notification behavior is unchanged.

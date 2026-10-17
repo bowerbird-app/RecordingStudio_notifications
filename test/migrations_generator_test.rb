@@ -15,7 +15,7 @@ class MigrationsGeneratorTest < Minitest::Test
       end
 
       copied = Dir.children(File.join(dir, "db/migrate")).sort
-      assert_equal 4, copied.size
+      assert_equal engine_migration_count, copied.size
       copied.each do |filename|
         assert_match(/\A\d{14}_/, filename)
         assert File.size(File.join(dir, "db/migrate", filename)).positive?
@@ -36,7 +36,7 @@ class MigrationsGeneratorTest < Minitest::Test
 
       names = Dir.children(File.join(dir, "db/migrate"))
       assert_includes names, "20200101000000_create_recording_studio_notifications.rb"
-      assert_equal 4, names.size
+      assert_equal engine_migration_count, names.size
       assert_includes messages, ["  skip  create_recording_studio_notifications.rb (already exists)", :yellow]
       assert_equal "# existing\n", File.read(File.join(dir, "db/migrate/20200101000000_create_recording_studio_notifications.rb"))
     end
@@ -75,6 +75,10 @@ class MigrationsGeneratorTest < Minitest::Test
   end
 
   private
+
+  def engine_migration_count
+    Dir.children(File.expand_path("../db/migrate", __dir__)).size
+  end
 
   def with_destination(&)
     Dir.mktmpdir("migrations-generator") do |dir|

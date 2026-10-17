@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** October 16, 2026
+> *   **Last Updated:** October 17, 2026
 >
 > *Maintainers: Update the date above when modifying this file.*
 
@@ -42,6 +42,7 @@ This does the following:
 | `polling_interval_seconds` | Integer | `60` | Polling cadence for async notification menu refresh. |
 | `rollup_reservation_timeout` | ActiveSupport duration | `15.minutes` | Releases an interrupted rollup reservation for a later scheduler retry. |
 | `rollup_delivery_enabled` | Boolean | `false` | Enables scheduled external rollup dispatch after channel adapters and scheduler are ready. |
+| `unsubscribe_expires_in` | ActiveSupport duration | `1.year` | Lifetime of a signed public unsubscribe link. The link only turns one optional channel off. |
 
 ---
 
@@ -65,6 +66,9 @@ RecordingStudioNotifications.configure do |config|
 
   # Enable only after configuring a recurring scheduler and rollup-capable adapters.
   config.rollup_delivery_enabled = false
+
+  # Signed unsubscribe links. Mailers need the same host for an absolute URL.
+  config.unsubscribe_expires_in = 1.year
 end
 ```
 

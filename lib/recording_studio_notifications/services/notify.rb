@@ -2,19 +2,21 @@
 
 require_relative "cadence_period"
 require_relative "channel_applicability"
+require_relative "inbox_flag"
 
 module RecordingStudioNotifications
   module Services
     class Notify
       include ChannelApplicability
+      include InboxFlag
 
       def self.call(...)
         new(...).call
       end
 
-      def initialize(notification_type:, recipient:, title:, body: nil, url: nil, metadata: {}, actor: nil,
+      def initialize(notification_type:, recipient:, title:, body: nil, url: nil, metadata: {}, actor: nil, # rubocop:disable Metrics/ParameterLists
                      notifiable: nil, recording: nil, root_recording: nil, channels: nil, idempotency_key: nil,
-                     deliver_later: nil)
+                     deliver_later: nil, inbox: nil)
         @notification_type = notification_type.to_s
         @recipient = recipient
         @title = title
@@ -28,23 +30,28 @@ module RecordingStudioNotifications
         @requested_channels = channels
         @idempotency_key = idempotency_key.presence
         @deliver_later = deliver_later
+        @inbox_override = inbox.nil? ? nil : ActiveModel::Type::Boolean.new.cast(inbox)
       end
 
       def call
         validate_inputs!
-        return nil if channel_keys.empty?
+        existing = find_idempotent_notification
+        unless existing
+          reject_hidden_required_in_app!
+          return nil if channel_keys.empty?
+        end
 
         authorize_creation!
 
         hooks.run(:before_service, self.class, service_payload)
-        result = hooks.run_around(:around_service, self) { create_and_deliver! }
+        result = hooks.run_around(:around_service, self) { create_and_deliver!(existing) }
         hooks.run(:after_service, self.class, result)
         result
       end
 
       private
 
-      def create_and_deliver!
+      def create_and_deliver!(existing)
         notification = nil
         should_deliver_immediately = false
 
@@ -56,8 +63,8 @@ module RecordingStudioNotifications
           root_recording_id: resolved_root_recording&.id
         ) do
           Notification.transaction do
-            notification = find_idempotent_notification || create_notification!
-            create_deliveries!(notification)
+            notification = existing || create_notification!
+            create_deliveries!(notification) if notification.previously_new_record?
             should_deliver_immediately = notification.deliveries.pending.any? { |delivery| !delivery.deferred_rollup? }
 
             notification
@@ -161,7 +168,8 @@ module RecordingStudioNotifications
           body: @body,
           url: @url,
           metadata: @metadata,
-          idempotency_key: @idempotency_key
+          idempotency_key: @idempotency_key,
+          inbox: inbox?
         )
       rescue ActiveRecord::RecordNotUnique
         retry unless (existing = find_idempotent_notification)
@@ -245,33 +253,10 @@ module RecordingStudioNotifications
           optional = selected_optional_channels
           selected = (optional + required).uniq
           enabled = selected.select { |channel| required.include?(channel) || preference_enabled?(channel, default: true) }
-          enabled.select { |channel| channel_applicable?(channel) || required.include?(channel) }
+          without_hidden_in_app(
+            enabled.select { |channel| channel_applicable?(channel) || required.include?(channel) }
+          )
         end
-      end
-
-      def requested_optional_channels
-        channels = Array(@requested_channels || type_definition.default_channels || RecordingStudioNotifications.configuration.default_channels)
-        channels.map { |channel| channel.to_s.strip.to_sym }.uniq - type_definition.required_channels
-      end
-
-      def selected_optional_channels
-        requested = requested_optional_channels
-        candidates = type_definition.available_channels ? type_definition.optional_channels : requested
-
-        candidates.select do |channel|
-          preference_enabled?(channel, default: requested.include?(channel))
-        end
-      end
-
-      def preference_enabled?(channel, default:)
-        return default unless preference_table_available?
-
-        RecordingStudioNotifications::Preference.enabled_for?(
-          recipient: @recipient,
-          notification_type: @notification_type,
-          channel: channel,
-          default: default
-        )
       end
 
       def consistent_root_scope?

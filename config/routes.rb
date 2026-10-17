@@ -3,6 +3,9 @@
 RecordingStudioNotifications::Engine.routes.draw do
   resource :settings, only: %i[show update]
 
+  get "unsubscribe/:notification_type/:channel", to: "unsubscribes#show", as: :unsubscribe
+  post "unsubscribe/:notification_type/:channel", to: "unsubscribes#update"
+
   resources :notifications, only: %i[index show] do
     collection do
       get :menu
