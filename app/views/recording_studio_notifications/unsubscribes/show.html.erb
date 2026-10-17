@@ -1,0 +1,25 @@
+<% content_for :title, unsubscribe_title %>
+
+<%= render FlatPack::PageTitle::Component.new(
+      title: unsubscribe_title,
+      subtitle: unsubscribe_subtitle,
+      variant: :h1
+    ) %>
+
+<% if @outcome == :confirm %>
+  <%= form_with url: request.fullpath, method: :post, data: { turbo: false } do %>
+    <%= render FlatPack::Button::Component.new(
+          text: notifications_t("unsubscribe.confirm_button"),
+          style: :primary,
+          size: :md,
+          type: "submit"
+        ) %>
+  <% end %>
+<% elsif @outcome == :missing %>
+  <%= render FlatPack::Button::Component.new(
+        text: notifications_t("unsubscribe.missing_link"),
+        href: settings_href,
+        style: :primary,
+        size: :md
+      ) %>
+<% end %>

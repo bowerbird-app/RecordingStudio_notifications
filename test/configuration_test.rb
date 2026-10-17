@@ -18,6 +18,9 @@ class ConfigurationTest < Minitest::Test
     assert_nil generic_type.required_cadence
     assert_nil generic_type.visible_to
     assert generic_type.visible_to?(Object.new)
+    assert_equal true, generic_type.inbox
+    assert_equal 1.year, @configuration.unsubscribe_expires_in
+    assert_equal 1.year, @configuration.to_h.fetch(:unsubscribe_expires_in)
     assert_equal true, @configuration.deliver_later
     assert_equal 60, @configuration.polling_interval_seconds
     assert_equal 15.minutes, @configuration.rollup_reservation_timeout
@@ -36,6 +39,35 @@ class ConfigurationTest < Minitest::Test
     assert_equal :notifications, @configuration.queue_name
     assert_equal 30, @configuration.polling_interval_seconds
     refute_respond_to @configuration, :unknown
+  end
+
+  def test_inbox_defaults_true_and_rejects_a_required_in_app_channel
+    hidden = @configuration.notification_types.register(
+      :inbox_hidden,
+      label: "Inbox hidden",
+      inbox: false,
+      default_channels: [:in_app],
+      available_channels: [:in_app]
+    )
+    assert_equal false, hidden.inbox
+
+    error = assert_raises(ArgumentError) do
+      @configuration.notification_types.register(
+        :inbox_required,
+        label: "Inbox required",
+        inbox: false,
+        required_channels: [:in_app],
+        available_channels: [:in_app]
+      )
+    end
+    assert_equal "inbox cannot be false when in_app is a required channel", error.message
+    refute @configuration.notification_types.registered?(:inbox_required)
+  end
+
+  def test_merge_sets_unsubscribe_expiry
+    @configuration.merge!("unsubscribe_expires_in" => 2.days)
+
+    assert_equal 2.days, @configuration.unsubscribe_expires_in
   end
 
   def test_notification_type_registry_requires_non_blank_keys

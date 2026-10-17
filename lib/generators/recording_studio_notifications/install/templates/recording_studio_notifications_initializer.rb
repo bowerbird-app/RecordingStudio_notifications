@@ -16,6 +16,10 @@ RecordingStudioNotifications.configure do |config|
   # Default: 60 (1 minute)
   # config.polling_interval_seconds = 60
 
+  # Public unsubscribe links expire after this duration. Default: 1 year.
+  # Mailers need default_url_options so unsubscribe_url is absolute.
+  # config.unsubscribe_expires_in = 1.year
+
   # Register notification types used by your app.
   # Icons come from Heroicons v2 names. Omit icon: to default to :bell.
   config.notification_types.register(

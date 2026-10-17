@@ -61,6 +61,34 @@ module RecordingStudioNotifications
       end
     end
 
+    def unsubscribe_purpose(notification_type, channel)
+      "recording_studio_notifications.unsubscribe.#{notification_type.to_s.strip}.#{channel.to_s.strip}"
+    end
+
+    def unsubscribe_token(recipient:, notification_type:, channel:)
+      recipient.to_sgid(
+        for: unsubscribe_purpose(notification_type, channel),
+        expires_in: configuration.unsubscribe_expires_in
+      ).to_s
+    end
+
+    def unsubscribe_url(recipient:, notification_type:, channel:)
+      mounted_notification_routes.unsubscribe_url(
+        notification_type.to_s,
+        channel.to_s,
+        token: unsubscribe_token(recipient:, notification_type:, channel:),
+        **absolute_url_options
+      )
+    end
+
+    def list_unsubscribe_headers(recipient:, notification_type:, channel:)
+      url = unsubscribe_url(recipient:, notification_type:, channel:)
+      {
+        "List-Unsubscribe" => "<#{url}>",
+        "List-Unsubscribe-Post" => "List-Unsubscribe=One-Click"
+      }
+    end
+
     def delivery_payload_resolvers
       @delivery_payload_resolvers ||= DeliveryPayloadRegistry.new
     end
@@ -86,6 +114,16 @@ module RecordingStudioNotifications
         body: notification.body,
         url: notification.url
       )
+    end
+
+    def mounted_notification_routes
+      Engine.routes.url_helpers
+    end
+
+    def absolute_url_options
+      routes = Rails.application.routes.default_url_options || {}
+      mailer = Rails.application.config.action_mailer.default_url_options || {}
+      routes.merge(mailer).symbolize_keys
     end
 
     def normalize_delivery_payload(value)
