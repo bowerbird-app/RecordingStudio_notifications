@@ -22,6 +22,7 @@ module RecordingStudioNotifications
     scope :read, -> { where.not(read_at: nil).or(where.not(cleared_at: nil)) }
     scope :archived, -> { where.not(archived_at: nil) }
     scope :active, -> { where(archived_at: nil) }
+    scope :in_inbox, -> { where(inbox: true) }
     scope :for_recipient, ->(recipient) { where(recipient: recipient) }
     scope :for_root_recording, ->(recording) { where(root_recording: recording) }
     scope :rootless_or_global, -> { where(root_recording_id: nil) }

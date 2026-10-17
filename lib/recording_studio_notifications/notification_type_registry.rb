@@ -16,6 +16,7 @@ module RecordingStudioNotifications
     :scope,
     :creation_action,
     :visible_to,
+    :inbox,
     keyword_init: true
   ) do
     def optional_channels
@@ -85,7 +86,8 @@ module RecordingStudioNotifications
         allowed_cadences: options.delete(:allowed_cadences) { [:individual] },
         default_cadence: options.delete(:default_cadence) { :individual },
         required_cadence: options.delete(:required_cadence),
-        visible_to: options.delete(:visible_to)
+        visible_to: options.delete(:visible_to),
+        inbox: options.delete(:inbox) { true }
       }
       raise ArgumentError, "unknown register option: #{options.keys.join(', ')}" if options.any?
 
@@ -108,6 +110,8 @@ module RecordingStudioNotifications
       normalized_required_cadence = parsed[:required_cadence].nil? ? nil : normalize_cadence!(parsed[:required_cadence])
       validate_cadences!(normalized_allowed_cadences, normalized_default_cadence, normalized_required_cadence)
       validate_required_channels!(normalized_required, normalized_available)
+      inbox = normalize_inbox!(parsed[:inbox])
+      validate_inbox!(inbox, normalized_required)
 
       NotificationType.new(
         key: normalized_key,
@@ -123,8 +127,22 @@ module RecordingStudioNotifications
         required_cadence: normalized_required_cadence,
         scope: normalize_scope!(parsed[:scope]),
         creation_action: parsed[:creation_action]&.to_sym,
-        visible_to: normalize_visible_to!(parsed[:visible_to])
+        visible_to: normalize_visible_to!(parsed[:visible_to]),
+        inbox: inbox
       ).freeze
+    end
+
+    def normalize_inbox!(inbox)
+      return true if inbox.nil?
+
+      ActiveModel::Type::Boolean.new.cast(inbox)
+    end
+
+    def validate_inbox!(inbox, required_channels)
+      return if inbox
+      return unless required_channels.include?(:in_app)
+
+      raise ArgumentError, "inbox cannot be false when in_app is a required channel"
     end
 
     def validate_cadences!(allowed_cadences, default_cadence, required_cadence)

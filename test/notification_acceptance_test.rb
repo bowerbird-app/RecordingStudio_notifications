@@ -153,7 +153,9 @@ class NotificationAcceptanceTest < Minitest::Test
   end
 
   def test_notify_applies_required_channels_preferences_creation_auth_and_instrumentation
-    source = File.read(File.expand_path("../lib/recording_studio_notifications/services/notify.rb", __dir__))
+    source = %w[notify.rb inbox_flag.rb].map do |name|
+      File.read(File.expand_path("../lib/recording_studio_notifications/services/#{name}", __dir__))
+    end.join
 
     assert_includes source, "type_definition.required_channels"
     assert_includes source, "Preference.enabled_for?"

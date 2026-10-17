@@ -11,6 +11,7 @@ module RecordingStudioNotifications
 
     before_action :set_recipient
     before_action :set_notification, only: %i[show open mark_read mark_unread archive unarchive]
+    before_action :require_inbox_notification, only: %i[show mark_read mark_unread archive unarchive]
 
     def index
       return unless authorize_notifications!(recipient: @recipient)
@@ -159,8 +160,12 @@ module RecordingStudioNotifications
       @notification = Notification.for_recipient(@recipient).find(params[:id])
     end
 
+    def require_inbox_notification
+      head :not_found unless @notification.inbox?
+    end
+
     def scoped_notifications
-      notifications = Notification.for_recipient(@recipient).active.visible_in_inbox
+      notifications = Notification.for_recipient(@recipient).active.visible_in_inbox.in_inbox
       notifications = notifications.for_current_root_inbox(@current_root_recording) if @inbox_scope == "current_root"
       notifications.newest_first
     end
