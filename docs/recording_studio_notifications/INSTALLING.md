@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** May 5, 2026
+> *   **Last Updated:** October 19, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -16,6 +16,7 @@ This guide explains how to install the RecordingStudioNotifications engine in yo
 
 - Rails 8.1+ application
 - PostgreSQL (recommended for UUID compatibility)
+- `flat_pack` `~> 0.1.254` (git tag `v0.1.254`). Hosts also need Accessible `>= 0.20.0` and Admin `>= 2.4.0`. A card that still uses `style: :outlined` moves to `style: :default, border: :strong`.
 - TailwindCSS (optional, for styling engine views)
 
 ---
@@ -35,6 +36,7 @@ gem "recording_studio_notifications", path: "../recording_studio_notifications"
 
 # Or from RubyGems (after publishing)
 gem "recording_studio_notifications"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.254"
 ```
 
 ### 2. Install Dependencies

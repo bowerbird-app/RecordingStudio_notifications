@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-19
+
+### Changed
+- Requires `flat_pack` `~> 0.1.254`. Development and dummy Gemfiles pin tag `v0.1.254`.
+- The inbox card uses `style: :default` and `border: :strong`. That is the 0.1.237 colour-style API for the old outlined card (surface fill, 2px border).
+
+### Upgrade notes
+- Bump to `0.11.0`. No migration.
+- Hosts on this version need Flatpack `~> 0.1.254` (git tag `v0.1.254`), Accessible `>= 0.20.0`, and Admin `>= 2.4.0`.
+- Move a host card that still uses `style: :outlined` to `style: :default, border: :strong`.
+- No compatibility shim.
+
 ## [0.10.0] - 2026-10-17
 
 ### Added
