@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-19
+
+### Added
+- Admin hub widget and screen for `notification_deliveries.failed_by_channel_over_time`. The compact chart on All notifications links to a site-scoped screen. Both read `RecordingStudioMetrics.execute` with `group_by=channel`. Admin stays optional.
+
+### Upgrade notes
+- Bump to `0.11.0`. No migration. No host code change when Admin is already mounted and `all_notifications` is enabled.
+- Hosts without `recording_studio_admin` are unchanged. The gem still does not depend on that gem.
+- Site-scoped Admin cards need `site_admin_recording_resolver` to return the same recording as `access_recording_resolver`.
+
 ## [0.10.0] - 2026-10-17
 
 ### Added

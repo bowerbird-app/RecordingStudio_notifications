@@ -17,6 +17,9 @@ require "recording_studio_notifications/delivery_payload_registry"
 require "recording_studio_notifications/metrics"
 
 if defined?(RecordingStudioAdmin)
+  require "recording_studio_notifications/admin/failed_deliveries_chart"
+  require "recording_studio_notifications/admin/failed_deliveries_widget"
+  require "recording_studio_notifications/admin/failed_deliveries_screen"
   require "recording_studio_notifications/admin/all_notifications_screen"
   require "recording_studio_notifications/admin/all_notifications_section"
 end

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+return unless defined?(RecordingStudioAdmin)
+
 module RecordingStudioNotifications
   module Admin
     class AllNotificationsScreen < RecordingStudioAdmin::Screen

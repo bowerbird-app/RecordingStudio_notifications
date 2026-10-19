@@ -116,6 +116,13 @@ fr:
         workspace: Espace
         system: Système
       admin:
+        failed_deliveries:
+          title: Envois ratés
+          subtitle: Par canal, dans le temps
+          summary: Ratés
+          info: Envois encore en échec. Un succès plus tard les retire.
+          open: Voir le graphique
+          other: Autre
         all_notifications:
           title: Toutes les notifications
           subtitle: Vue d’ensemble des notifications racine et globales

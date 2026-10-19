@@ -77,6 +77,13 @@ en:
       categories:
         general: General
       admin:
+        failed_deliveries:
+          title: Failed deliveries
+          subtitle: By channel, over time
+          summary: Failed
+          info: Sends that are still failed. A later success drops off.
+          open: See the chart
+          other: Other
         all_notifications:
           title: All notifications
           subtitle: Root-scoped and global notification overview
