@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "cgi"
+require "json"
 require "devise/test/integration_helpers"
 
 class AdminFailedDeliveriesTest < ActionDispatch::IntegrationTest
@@ -33,5 +35,46 @@ class AdminFailedDeliveriesTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Error<"
     refute_includes response.body, "See the chart"
     refute_includes response.body, "translation missing"
+
+    get "/admin/screens/recording_studio_notifications_failed_deliveries",
+        headers: { "Turbo-Frame" => "screen-chart" }
+
+    assert_response :success
+    assert_admin_chart_xy_series(response.body)
+  end
+
+  test "all notifications widget series uses x/y hashes for the admin chart" do
+    get "/admin/sections/all_notifications/widgets/#{chart_widget_key}"
+
+    assert_response :success
+    assert_admin_chart_xy_series(response.body)
+  end
+
+  private
+
+  def chart_widget_key
+    RecordingStudioNotifications::Admin::FailedDeliveriesChart::WIDGET_KEY
+  end
+
+  def assert_admin_chart_xy_series(html)
+    body = CGI.unescapeHTML(html)
+    match = body.match(/data-flat-pack--chart-series-value="(\[\{.*\}\])"/m)
+    assert match, "expected a Flatpack chart series payload"
+
+    series = JSON.parse(match[1])
+    assert_kind_of Array, series
+    refute_empty series
+
+    series.each do |line|
+      assert line["name"].present?
+      data = line.fetch("data")
+      assert_kind_of Array, data
+      data.each do |point|
+        assert_kind_of Hash, point, "admin line charts expect {x, y} hashes, not [date, value] tuples"
+        assert point.key?("x")
+        assert point.key?("y")
+        assert_kind_of Numeric, point["y"]
+      end
+    end
   end
 end

@@ -8,15 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.11.0] - 2026-10-19
+## [0.12.0] - 2026-10-19
 
 ### Added
 - Admin hub widget and screen for `notification_deliveries.failed_by_channel_over_time`. The compact chart on All notifications links to a site-scoped screen. The screen lists stored failed `Delivery` rows (time, recipient, channel, error) with date-range, channel, and kind filters. The chart still reads `RecordingStudioMetrics.execute` with `group_by=channel`. Admin stays optional.
 
+### Fixed
+- Failed-deliveries widget and screen charts send `{ x:, y: }` points (numeric `y`) so the Flatpack line chart can draw. Tuple `[date, value]` points showed the legend and a 0–12 axis with no lines.
+
 ### Upgrade notes
-- Bump to `0.11.0`. No migration. No host code change when Admin is already mounted and `all_notifications` is enabled.
+- Bump to `0.12.0`. No migration. No host code change when Admin is already mounted and `all_notifications` is enabled.
 - Hosts without `recording_studio_admin` are unchanged. The gem still does not depend on that gem.
 - Site-scoped Admin cards need `site_admin_recording_resolver` to return the same recording as `access_recording_resolver`.
+
+## [0.11.0] - 2026-10-19
+
+### Changed
+- Requires `flat_pack` `~> 0.1.254`. Development and dummy Gemfiles pin tag `v0.1.254`.
+- The inbox card uses `style: :default` and `border: :strong`. That is the 0.1.237 colour-style API for the old outlined card (surface fill, 2px border).
+
+### Upgrade notes
+- Bump to `0.11.0`. No migration.
+- Hosts on this version need Flatpack `~> 0.1.254` (git tag `v0.1.254`), Accessible `>= 0.20.0`, and Admin `>= 2.4.0`.
+- Move a host card that still uses `style: :outlined` to `style: :default, border: :strong`.
+- No compatibility shim.
 
 ## [0.10.0] - 2026-10-17
 

@@ -56,7 +56,16 @@ class FailedDeliveriesChartTest < ActiveSupport::TestCase
     series.each do |line|
       assert line[:name].present?
       assert_kind_of Array, line[:data]
+      refute_empty line[:data]
+      line[:data].each do |point|
+        assert_kind_of Hash, point
+        assert point.key?(:x)
+        assert point.key?(:y)
+        refute_kind_of Array, point
+        assert_kind_of Numeric, point[:y]
+      end
     end
+    assert series.any? { |line| line[:data].any? { |point| point[:y].positive? } }
     assert_operator chart.total(@context), :>=, 1
   end
 

@@ -57,8 +57,16 @@ module RecordingStudioNotifications
         { name: Copy.t("admin.failed_deliveries.other", default: "Other"), data: points(other[:data] || other["data"]) }
       end
 
+      # Flatpack line charts (ApexCharts category axis) plot `{ x:, y: }` hashes.
+      # Tuple points `[date, value]` keep the legend but leave the line empty
+      # (default y-axis 0–12). Admin dummy charts use this hash shape.
       def points(rows)
-        Array(rows).map { |row| [row[:date] || row["date"], row[:value] || row["value"]] }
+        Array(rows).map do |row|
+          {
+            x: row[:date] || row["date"],
+            y: (row[:value] || row["value"]).to_i
+          }
+        end
       end
 
       def channel_name(key)
