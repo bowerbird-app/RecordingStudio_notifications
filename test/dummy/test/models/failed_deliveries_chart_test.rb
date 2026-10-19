@@ -24,7 +24,12 @@ class FailedDeliveriesChartTest < ActiveSupport::TestCase
       actor: @staff,
       title: "Failed chart #{SecureRandom.hex(4)}"
     )
-    notification.deliveries.create!(channel: "email", status: "failed")
+    @failed = notification.deliveries.create!(
+      channel: "email",
+      status: "failed",
+      error_message: "provider unavailable"
+    )
+    @delivered = notification.deliveries.create!(channel: "in_app", status: "delivered")
     Current.actor = nil
     @context = AdminContext.new(
       current_actor: @staff,
@@ -63,9 +68,33 @@ class FailedDeliveriesChartTest < ActiveSupport::TestCase
     assert_equal chart_widget_key, widget.key
     assert_equal chart_screen_key, screen.key
     assert_includes section.widget_keys, chart_widget_key
+    refute_includes screen.widget_keys, chart_widget_key
+    assert(section.links.any? { |link| link.name == :failed_deliveries })
     assert_equal chart_screen_key, widget.link_to.call(path_context)
     assert_equal screen, RecordingStudioAdmin.screen_for(chart_screen_key)
     assert_equal widget, RecordingStudioAdmin.widget_for(chart_widget_key)
+  end
+
+  test "failed deliveries table reads stored delivery rows and filters by channel and kind" do
+    screen = RecordingStudioNotifications::Admin::FailedDeliveriesScreen
+    relation = screen.query.call(nil)
+    kind = screen.filters.find { |filter| filter.key == :kind }
+    channel = screen.filters.find { |filter| filter.key == :channel }
+
+    assert_includes relation, @failed
+    refute_includes relation, @delivered
+
+    columns = screen.table.columns.index_by(&:key)
+    assert_equal "User ##{@recipient.id}", columns.fetch(:recipient).value.call(@failed, nil)
+    assert_equal "provider unavailable", columns.fetch(:error_message).value.call(@failed, nil)
+
+    by_kind = kind.apply(relation, "mention", nil)
+    assert_includes by_kind, @failed
+    refute_includes kind.apply(relation, "page_comment", nil), @failed
+
+    by_channel = channel.apply(relation, "email", nil)
+    assert_includes by_channel, @failed
+    refute_includes channel.apply(relation, "in_app", nil), @failed
   end
 
   private

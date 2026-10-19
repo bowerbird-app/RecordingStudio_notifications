@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.11.0] - 2026-10-19
 
 ### Added
-- Admin hub widget and screen for `notification_deliveries.failed_by_channel_over_time`. The compact chart on All notifications links to a site-scoped screen. Both read `RecordingStudioMetrics.execute` with `group_by=channel`. Admin stays optional.
+- Admin hub widget and screen for `notification_deliveries.failed_by_channel_over_time`. The compact chart on All notifications links to a site-scoped screen. The screen lists stored failed `Delivery` rows (time, recipient, channel, error) with date-range, channel, and kind filters. The chart still reads `RecordingStudioMetrics.execute` with `group_by=channel`. Admin stays optional.
 
 ### Upgrade notes
 - Bump to `0.11.0`. No migration. No host code change when Admin is already mounted and `all_notifications` is enabled.

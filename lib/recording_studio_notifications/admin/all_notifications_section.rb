@@ -17,7 +17,7 @@ module RecordingStudioNotifications
            style: :primary
 
       link :failed_deliveries,
-           text: ->(_context) { Copy.t("admin.failed_deliveries.open", default: "See the chart") },
+           text: ->(_context) { Copy.t("admin.failed_deliveries.title", default: "Failed deliveries") },
            url: ->(context) { context.admin_screen_path(FailedDeliveriesChart::SCREEN_KEY) },
            style: :secondary
 

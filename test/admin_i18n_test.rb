@@ -19,11 +19,12 @@ class AdminI18nTest < Minitest::Test
       assert_equal "Unread", Copy.t("admin.all_notifications.status.unread")
       assert_equal "-", Copy.t("admin.all_notifications.actor.none")
       assert_equal "Failed deliveries", Copy.t("admin.failed_deliveries.title")
-      assert_equal "By channel, over time", Copy.t("admin.failed_deliveries.subtitle")
+      assert_equal "Sends that are still failed", Copy.t("admin.failed_deliveries.subtitle")
       assert_equal "Failed", Copy.t("admin.failed_deliveries.summary")
       assert_equal "Sends that are still failed. A later success drops off.", Copy.t("admin.failed_deliveries.info")
-      assert_equal "See the chart", Copy.t("admin.failed_deliveries.open")
       assert_equal "Other", Copy.t("admin.failed_deliveries.other")
+      assert_equal "-", Copy.t("admin.failed_deliveries.recipient.none")
+      assert_equal "-", Copy.t("admin.failed_deliveries.error.none")
     end
   end
 
@@ -41,7 +42,14 @@ class AdminI18nTest < Minitest::Test
     assert_includes section, 'Copy.t("admin.all_notifications.open_table"'
     assert_includes section, "FailedDeliveriesChart::WIDGET_KEY"
     assert_includes section, "FailedDeliveriesChart::SCREEN_KEY"
+    refute_includes section, "See the chart"
+    refute_includes section, "failed_deliveries.open"
     assert_includes failed, 'Copy.t("admin.failed_deliveries.title"'
+    refute_includes failed, "widget FailedDeliveriesChart::WIDGET_KEY"
+    assert_includes failed, "filter :date_range"
+    assert_includes failed, "filter :channel"
+    assert_includes failed, "filter :kind"
+    refute_includes failed, "filter :status"
     assert_includes widget, "FailedDeliveriesChart.series"
     assert_includes source, 'title: "Type"'
     refute_includes source, 'title "All notifications"'

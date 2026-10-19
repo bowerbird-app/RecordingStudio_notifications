@@ -14,7 +14,6 @@ module RecordingStudioNotifications
       change_good_when :down
       chart_type :line
       series { |context| FailedDeliveriesChart.series(context) }
-      link_label { Copy.t("admin.failed_deliveries.open", default: "See the chart") }
       link_to { |context| context.admin_screen_path(FailedDeliveriesChart::SCREEN_KEY) }
     end
   end

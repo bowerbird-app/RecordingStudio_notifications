@@ -72,7 +72,7 @@ class LocalesTest < Minitest::Test
           assert_equal english, Copy.t("admin.all_notifications.#{key}")
         end
         assert_equal "Failed deliveries", Copy.t("admin.failed_deliveries.title")
-        assert_equal "See the chart", Copy.t("admin.failed_deliveries.open")
+        assert_equal "Sends that are still failed", Copy.t("admin.failed_deliveries.subtitle")
         assert_equal "Type", Copy.t("admin.all_notifications.columns.type")
         assert_equal "Root", Copy.t("admin.all_notifications.scope.root")
         assert_equal "Unread", Copy.t("admin.all_notifications.status.unread")

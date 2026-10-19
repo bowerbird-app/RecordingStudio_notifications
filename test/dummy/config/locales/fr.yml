@@ -118,11 +118,19 @@ fr:
       admin:
         failed_deliveries:
           title: Envois ratés
-          subtitle: Par canal, dans le temps
+          subtitle: Envois encore en échec
           summary: Ratés
           info: Envois encore en échec. Un succès plus tard les retire.
-          open: Voir le graphique
           other: Autre
+          recipient:
+            none: "-"
+          error:
+            none: "-"
+          columns:
+            time: Heure
+            recipient: Destinataire
+            channel: Canal
+            error: Erreur
         all_notifications:
           title: Toutes les notifications
           subtitle: Vue d’ensemble des notifications racine et globales

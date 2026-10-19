@@ -79,11 +79,19 @@ en:
       admin:
         failed_deliveries:
           title: Failed deliveries
-          subtitle: By channel, over time
+          subtitle: Sends that are still failed
           summary: Failed
           info: Sends that are still failed. A later success drops off.
-          open: See the chart
           other: Other
+          recipient:
+            none: "-"
+          error:
+            none: "-"
+          columns:
+            time: Time
+            recipient: Recipient
+            channel: Channel
+            error: Error
         all_notifications:
           title: All notifications
           subtitle: Root-scoped and global notification overview
