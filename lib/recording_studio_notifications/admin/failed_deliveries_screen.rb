@@ -11,6 +11,8 @@ module RecordingStudioNotifications
       title { Copy.t("admin.failed_deliveries.title", default: "Failed deliveries") }
       subtitle { Copy.t("admin.failed_deliveries.subtitle", default: "By channel, over time") }
 
+      query { |_context| RecordingStudioNotifications::Delivery.failed }
+
       summary do
         label ->(_context) { Copy.t("admin.failed_deliveries.summary", default: "Failed") }
         value ->(context) { FailedDeliveriesChart.total(context) }

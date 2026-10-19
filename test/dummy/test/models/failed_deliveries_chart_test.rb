@@ -42,7 +42,7 @@ class FailedDeliveriesChartTest < ActiveSupport::TestCase
     chart = RecordingStudioNotifications::Admin::FailedDeliveriesChart
     result = chart.execute(@context)
 
-    assert_equal "notification_deliveries.failed_by_channel_over_time", result.identifier
+    assert_equal "notification_deliveries.failed_by_channel_over_time", result.metric
     assert_equal :channel, result.group_by.to_sym if result.respond_to?(:group_by) && result.group_by
 
     series = chart.series(@context)
