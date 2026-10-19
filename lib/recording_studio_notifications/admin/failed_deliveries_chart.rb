@@ -57,9 +57,9 @@ module RecordingStudioNotifications
         { name: Copy.t("admin.failed_deliveries.other", default: "Other"), data: points(other[:data] || other["data"]) }
       end
 
-      # Flatpack line charts (ApexCharts category axis) plot `{ x:, y: }` hashes.
-      # Tuple points `[date, value]` keep the legend but leave the line empty
-      # (default y-axis 0–12). Admin dummy charts use this hash shape.
+      # ApexCharts 3.45.1 (no xaxis type datetime) treats a tuple's string date as
+      # a number, so every point lands at x=0 and the line collapses. `{ x:, y: }`
+      # hashes are what Admin charts that render (for example api_requests) emit.
       def points(rows)
         Array(rows).map do |row|
           {

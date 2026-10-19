@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Admin hub widget and screen for `notification_deliveries.failed_by_channel_over_time`. The compact chart on All notifications links to a site-scoped screen. The screen lists stored failed `Delivery` rows (time, recipient, channel, error) with date-range, channel, and kind filters. The chart still reads `RecordingStudioMetrics.execute` with `group_by=channel`. Admin stays optional.
 
 ### Fixed
-- Failed-deliveries widget and screen charts send `{ x:, y: }` points (numeric `y`) so the Flatpack line chart can draw. Tuple `[date, value]` points showed the legend and a 0–12 axis with no lines.
+- Failed-deliveries widget and screen charts send `{ x:, y: }` points (numeric `y`) so ApexCharts can draw. Tuple `[date, value]` points had string dates coerced to numbers, so every point landed at x=0.
 
 ### Upgrade notes
 - Bump to `0.12.0`. No migration. No host code change when Admin is already mounted and `all_notifications` is enabled.

@@ -43,7 +43,7 @@ class FailedDeliveriesChartTest < ActiveSupport::TestCase
     Current.actor = nil
   end
 
-  test "chart series and total read the failed deliveries metric grouped by channel" do
+  test "chart series points are x/y hashes and the total reads failed deliveries by channel" do
     chart = RecordingStudioNotifications::Admin::FailedDeliveriesChart
     result = chart.execute(@context)
 
