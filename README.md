@@ -21,13 +21,13 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 
 - Ruby 3.3 or newer
 - Rails 8.1
-- `recording_studio`, `recording_studio_accessible`, `flat_pack`, and `view_component`
+- `recording_studio`, `recording_studio_accessible`, `flat_pack` 0.1.254 or newer, and `view_component`
 - `recording_studio_metrics` for operations metrics registration
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus
 
 Development and dummy Gemfiles pin Recording Studio to GitHub tag `v4.7.0` and Accessible to `v0.18.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
 
-Root and dummy Gemfiles pin Trashable `v0.11.0` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.3.0` and Metrics `v0.3.1`.
+Root and dummy Gemfiles pin Trashable `v0.11.0` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.3.0` and Metrics `v0.3.1`. Both Gemfiles pin Flatpack to GitHub tag `v0.1.254`. Inbox cards use `style: :default` and `border: :strong` (the 0.1.237 colour-style API). `style: :outlined` raises on that Flatpack.
 
 ## Installation
 
