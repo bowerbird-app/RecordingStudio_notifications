@@ -39,6 +39,9 @@ class EngineTest < Minitest::Test
 
     assert_includes engine, 'initializer "recording_studio_notifications.metrics"'
     assert_includes engine, "RecordingStudioNotifications::Metrics.register!"
+    assert_includes engine, "next unless defined?(RecordingStudioAdmin)"
+    assert_includes engine, "RecordingStudioAdmin.register_widget"
+    assert_includes engine, "RecordingStudioNotifications::Admin::FailedDeliveriesScreen"
     refute_includes engine, "RecordingStudioMetrics::Api.register!"
   end
 

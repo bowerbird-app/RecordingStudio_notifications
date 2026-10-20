@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.11.0", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.12.0", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -28,6 +28,7 @@ class RecordingStudioNotificationsTest < Minitest::Test
     spec = Gem::Specification.load(gemspec_path)
     assert(spec.files.none? { |path| path.start_with?(".cursor/") })
     refute_includes spec.dependencies.map(&:name), "recording_studio_internationalization"
+    refute_includes spec.dependencies.map(&:name), "recording_studio_admin"
     assert_includes spec.dependencies.map(&:name), "recording_studio_metrics"
     flat_pack = spec.dependencies.find { |dependency| dependency.name == "flat_pack" }
     assert_equal "~> 0.1.254", flat_pack.requirement.to_s

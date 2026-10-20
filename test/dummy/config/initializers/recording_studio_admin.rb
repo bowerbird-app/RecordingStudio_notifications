@@ -13,14 +13,14 @@ RecordingStudioAdmin.configure do |config|
   # config.async_widgets.max_concurrent_requests = 4
   # config.async_widgets.retry_count = 1
 
-  config.access_recording_resolver = lambda do |context|
-    # Return the AdminRoot recording for the current admin surface.
-    # In this dummy app the admin root is the first AdminRoot recordable.
+  admin_root_recording = lambda do |_context|
     root_recordable = AdminRoot.first
     next nil unless root_recordable
 
     RecordingStudio.root_recording_for(root_recordable)
   end
+  config.access_recording_resolver = admin_root_recording
+  config.site_admin_recording_resolver = admin_root_recording
 
   # Add per-route admin surfaces when different URL entrypoints should resolve
   # different access recordings or layouts.

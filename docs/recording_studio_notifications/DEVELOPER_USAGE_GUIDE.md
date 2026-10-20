@@ -72,12 +72,11 @@ Note: the final full URL depends on your mount path.
 
 ## 3a. Internationalization
 
-Customer screens and Admin All notifications chrome (title, subtitle, summary,
-open-table link, and scope/status/actor cell labels) use Rails I18n under
-`recording_studio.notifications.*`. The gem ships English only. Hosts add other
-languages in their own locale files. Do not add
-`RecordingStudio_Internationalization` to this gem; install it in the host if
-you want a language selector.
+Customer screens and Admin chrome (All notifications plus the failed-deliveries
+widget and screen) use Rails I18n under `recording_studio.notifications.*`. The
+gem ships English only. Hosts add other languages in their own locale files. Do
+not add `RecordingStudio_Internationalization` to this gem; install it in the
+host if you want a language selector.
 
 Stored notification titles and bodies stay as written. Notification,
 Preference, and Delivery validation messages stay English literals so

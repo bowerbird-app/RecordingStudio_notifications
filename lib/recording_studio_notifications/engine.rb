@@ -177,10 +177,15 @@ module RecordingStudioNotifications
                 after: "recording_studio_notifications.load_config" do |_app|
       next unless defined?(RecordingStudioAdmin)
 
+      require "recording_studio_notifications/admin/failed_deliveries_chart"
+      require "recording_studio_notifications/admin/failed_deliveries_widget"
+      require "recording_studio_notifications/admin/failed_deliveries_screen"
       require "recording_studio_notifications/admin/all_notifications_screen"
       require "recording_studio_notifications/admin/all_notifications_section"
 
       config.to_prepare do
+        RecordingStudioAdmin.register_widget(RecordingStudioNotifications::Admin::FailedDeliveriesWidget)
+        RecordingStudioAdmin.register_screen(RecordingStudioNotifications::Admin::FailedDeliveriesScreen)
         RecordingStudioAdmin.register_screen(RecordingStudioNotifications::Admin::AllNotificationsScreen)
         RecordingStudioAdmin.register_section(RecordingStudioNotifications::Admin::AllNotificationsSection)
       end

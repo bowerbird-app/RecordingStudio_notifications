@@ -45,7 +45,7 @@ gem "recording_studio_internationalization", github: "bowerbird-app/RecordingStu
 gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.254"
 
 # Admin panel for Recording Studio
-gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "v2.3.0"
+gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "v2.4.0"
 # Trashable query helpers for Admin 2.3+ (engine not booted). Metrics already pinned below.
 gem "recording_studio_trashable", github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.11.0",
                                   require: false
