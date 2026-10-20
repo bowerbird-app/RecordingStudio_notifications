@@ -30,6 +30,8 @@ class RecordingStudioNotificationsTest < Minitest::Test
     refute_includes spec.dependencies.map(&:name), "recording_studio_internationalization"
     refute_includes spec.dependencies.map(&:name), "recording_studio_admin"
     assert_includes spec.dependencies.map(&:name), "recording_studio_metrics"
+    flat_pack = spec.dependencies.find { |dependency| dependency.name == "flat_pack" }
+    assert_equal "~> 0.1.254", flat_pack.requirement.to_s
   end
 
   def test_engine_routes_notifications_as_root
@@ -83,7 +85,8 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_includes views, "FlatPack::"
     assert_includes views, "FlatPack::Notification::Component"
     assert_includes views, "FlatPack::Grid::Component.new(cols: 2"
-    assert_includes views, "FlatPack::Card::Component.new(style: :outlined)"
+    assert_includes views, "FlatPack::Card::Component.new(style: :default, border: :strong)"
+    refute_includes views, "style: :outlined"
     assert_includes views, "card.body do"
     refute_includes views, "padding: :none"
     assert_includes views, "anchor_href: main_app.root_path"

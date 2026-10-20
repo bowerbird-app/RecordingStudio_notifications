@@ -21,13 +21,15 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 
 - Ruby 3.3 or newer
 - Rails 8.1
-- `recording_studio`, `recording_studio_accessible`, `flat_pack`, and `view_component`
+- `recording_studio`, `recording_studio_accessible` `>= 0.20.0`, `flat_pack` `~> 0.1.254`, and `view_component`
 - `recording_studio_metrics` for operations metrics registration
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus
 
 Development and dummy Gemfiles pin Recording Studio to GitHub tag `v4.7.0` and Accessible to `v0.18.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
 
-Root and dummy Gemfiles pin Trashable `v0.11.0` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.3.0` and Metrics `v0.3.1`.
+Root and dummy Gemfiles pin Trashable `v0.11.0` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.3.0` and Metrics `v0.3.1`. Both Gemfiles pin Flatpack to GitHub tag `v0.1.254`. Inbox cards use `style: :default` and `border: :strong` (the 0.1.237 colour-style API).
+
+Hosts on `0.11.0` need Flatpack `~> 0.1.254` (git tag `v0.1.254`), Accessible `>= 0.20.0`, and Admin `>= 2.4.0`. Move a host card that still uses `style: :outlined` to `style: :default, border: :strong`.
 
 ## Installation
 
@@ -35,6 +37,7 @@ Add the gem to the host application's `Gemfile`:
 
 ```ruby
 gem "recording_studio_notifications"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.254"
 ```
 
 Install the engine, copy migrations, and migrate:
@@ -358,6 +361,7 @@ Add the gem and install it in your host app:
 
 ```ruby
 gem "recording_studio_notifications"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.254"
 ```
 
 ```bash
@@ -483,7 +487,7 @@ The engine provides:
 - `/notifications/menu.json` async top-nav menu payload (unread count + recent notifications)
 - `/settings` notification channel preferences
 
-The inbox list is wrapped in a FlatPack outlined card (default body padding) inside a 2-column grid. Inbox, settings, and menu views use FlatPack components and Tailwind utility classes only.
+The inbox list is wrapped in a FlatPack card with `style: :default` and `border: :strong` (default body padding) inside a 2-column grid. Inbox, settings, and menu views use FlatPack components and Tailwind utility classes only.
 
 ## Instrumentation
 
