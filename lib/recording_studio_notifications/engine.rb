@@ -178,6 +178,7 @@ module RecordingStudioNotifications
       next unless defined?(RecordingStudioAdmin)
 
       require "recording_studio_notifications/admin/failed_deliveries_chart"
+      require "recording_studio_notifications/admin/failed_deliveries_screen_chart"
       require "recording_studio_notifications/admin/failed_deliveries_widget"
       require "recording_studio_notifications/admin/failed_deliveries_screen"
       require "recording_studio_notifications/admin/all_notifications_screen"

@@ -35,12 +35,17 @@ class AdminFailedDeliveriesTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Recipient<"
     assert_includes response.body, ">Channel<"
     assert_includes response.body, ">Error<"
-    assert_includes response.body, recipient.email
     assert_includes response.body, 'data-recording-studio-admin--screen-filters-modal-filters-value="false"'
     refute_includes response.body, 'data-recording-studio-admin--screen-filters-modal-filters-value="true"'
     %w[hour day week month year].each { |bucket| assert_match(/\b#{bucket}\b/, response.body) }
     refute_includes response.body, "See the chart"
     refute_includes response.body, "translation missing"
+
+    get "/admin/screens/recording_studio_notifications_failed_deliveries",
+        headers: { "Turbo-Frame" => "screen-table" }
+
+    assert_response :success
+    assert_includes response.body, recipient.email
 
     get "/admin/screens/recording_studio_notifications_failed_deliveries",
         headers: { "Turbo-Frame" => "screen-chart" }

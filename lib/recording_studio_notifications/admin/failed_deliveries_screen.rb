@@ -14,7 +14,8 @@ module RecordingStudioNotifications
       query do |_context|
         RecordingStudioNotifications::Delivery
           .failed
-          .includes(notification: :recipient)
+          .includes(:notification)
+          .preload(notification: :recipient)
       end
 
       filter_presentation :inline

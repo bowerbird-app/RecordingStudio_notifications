@@ -32,6 +32,7 @@ class AdminI18nTest < Minitest::Test
     source = File.read(File.expand_path("../lib/recording_studio_notifications/admin/all_notifications_screen.rb", __dir__))
     section = File.read(File.expand_path("../lib/recording_studio_notifications/admin/all_notifications_section.rb", __dir__))
     failed = File.read(File.expand_path("../lib/recording_studio_notifications/admin/failed_deliveries_screen.rb", __dir__))
+    chart = File.read(File.expand_path("../lib/recording_studio_notifications/admin/failed_deliveries_chart.rb", __dir__))
     widget = File.read(File.expand_path("../lib/recording_studio_notifications/admin/failed_deliveries_widget.rb", __dir__))
 
     assert_includes source, 'Copy.t("admin.all_notifications.title"'
@@ -47,9 +48,10 @@ class AdminI18nTest < Minitest::Test
     refute_includes section, "failed_deliveries.open"
     assert_includes failed, 'Copy.t("admin.failed_deliveries.title"'
     refute_includes failed, "widget FailedDeliveriesChart::WIDGET_KEY"
-    assert_includes failed, "includes(notification: :recipient)"
+    assert_includes failed, "preload(notification: :recipient)"
     assert_includes failed, "recipient.respond_to?(:email)"
     assert_includes failed, "FailedDeliveriesChart.screen_series"
+    assert_includes chart, "FailedDeliveriesScreenChart.series"
     assert_includes failed, "filter_presentation :inline"
     assert_includes failed, "filter :date_range"
     assert_includes failed, "filter :group_by, values: %i[hour day week month year], default: :day"

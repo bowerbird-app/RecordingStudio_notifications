@@ -140,7 +140,7 @@ class FailedDeliveriesChartTest < ActiveSupport::TestCase
       query_count += 1
     end
     ActiveSupport::Notifications.subscribed(subscriber, "sql.active_record") do
-      loaded.each { |row| screen.class.recipient_label_for(row) }
+      loaded.each { |row| screen.recipient_label_for(row) }
     end
     assert_equal 0, query_count
 
@@ -154,8 +154,8 @@ class FailedDeliveriesChartTest < ActiveSupport::TestCase
         7
       )
     )
-    assert_equal "User #99", screen.class.recipient_label_for(missing)
-    assert_equal "User #7", screen.class.recipient_label_for(blank)
+    assert_equal "User #99", screen.recipient_label_for(missing)
+    assert_equal "User #7", screen.recipient_label_for(blank)
   end
 
   test "failed deliveries screen chart uses the filtered table scope and group by interval" do
