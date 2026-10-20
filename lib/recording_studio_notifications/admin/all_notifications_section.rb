@@ -13,8 +13,7 @@ module RecordingStudioNotifications
 
       link :notifications_table,
            text: ->(_context) { Copy.t("admin.all_notifications.open_table", default: "Open notifications table") },
-           url: ->(context) { context.admin_screen_path("recording_studio_notifications_all_notifications") },
-           style: :primary
+           url: ->(context) { context.admin_screen_path("recording_studio_notifications_all_notifications") }
 
       link :failed_deliveries,
            text: ->(_context) { Copy.t("admin.failed_deliveries.title", default: "Failed deliveries") },

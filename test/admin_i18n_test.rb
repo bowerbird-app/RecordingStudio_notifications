@@ -42,14 +42,25 @@ class AdminI18nTest < Minitest::Test
     assert_includes section, 'Copy.t("admin.all_notifications.open_table"'
     assert_includes section, "FailedDeliveriesChart::WIDGET_KEY"
     assert_includes section, "FailedDeliveriesChart::SCREEN_KEY"
+    refute_includes section, "style: :primary"
     refute_includes section, "See the chart"
     refute_includes section, "failed_deliveries.open"
     assert_includes failed, 'Copy.t("admin.failed_deliveries.title"'
     refute_includes failed, "widget FailedDeliveriesChart::WIDGET_KEY"
+    assert_includes failed, "includes(notification: :recipient)"
+    assert_includes failed, "recipient.respond_to?(:email)"
+    assert_includes failed, "FailedDeliveriesChart.screen_series"
+    assert_includes failed, "filter_presentation :inline"
     assert_includes failed, "filter :date_range"
+    assert_includes failed, "filter :group_by, values: %i[hour day week month year], default: :day"
     assert_includes failed, "filter :channel"
     assert_includes failed, "filter :kind"
     refute_includes failed, "filter :status"
+    date_range_at = failed.index("filter :date_range")
+    group_by_at = failed.index("filter :group_by")
+    assert date_range_at
+    assert group_by_at
+    assert_operator date_range_at, :<, group_by_at
     assert_includes widget, "FailedDeliveriesChart.series"
     assert_includes source, 'title: "Type"'
     refute_includes source, 'title "All notifications"'
