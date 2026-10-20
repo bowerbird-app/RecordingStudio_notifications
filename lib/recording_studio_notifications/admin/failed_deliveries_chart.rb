@@ -9,6 +9,7 @@ module RecordingStudioNotifications
       SCREEN_KEY = "recording_studio_notifications_failed_deliveries"
       WIDGET_KEY = "widgets.recording_studio_notifications.failed_deliveries"
       INTERVAL = :day
+      INTERVALS = %i[hour day week month year].freeze
 
       module_function
 
@@ -20,6 +21,10 @@ module RecordingStudioNotifications
         return lines if lines.any?
 
         [{ name: Copy.t("admin.failed_deliveries.title", default: "Failed deliveries"), data: points(result.data) }]
+      end
+
+      def screen_series(admin_context)
+        FailedDeliveriesScreenChart.series(admin_context)
       end
 
       def total(admin_context)

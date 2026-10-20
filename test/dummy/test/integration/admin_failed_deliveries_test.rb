@@ -24,6 +24,8 @@ class AdminFailedDeliveriesTest < ActionDispatch::IntegrationTest
   end
 
   test "failed deliveries screen renders the failed delivery table and filters" do
+    recipient = create_failed_delivery_recipient
+
     get "/admin/screens/recording_studio_notifications_failed_deliveries"
 
     assert_response :success
@@ -33,8 +35,17 @@ class AdminFailedDeliveriesTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Recipient<"
     assert_includes response.body, ">Channel<"
     assert_includes response.body, ">Error<"
+    assert_includes response.body, 'data-recording-studio-admin--screen-filters-modal-filters-value="false"'
+    refute_includes response.body, 'data-recording-studio-admin--screen-filters-modal-filters-value="true"'
+    %w[hour day week month year].each { |bucket| assert_match(/\b#{bucket}\b/, response.body) }
     refute_includes response.body, "See the chart"
     refute_includes response.body, "translation missing"
+
+    get "/admin/screens/recording_studio_notifications_failed_deliveries",
+        headers: { "Turbo-Frame" => "screen-table" }
+
+    assert_response :success
+    assert_includes response.body, recipient.email
 
     get "/admin/screens/recording_studio_notifications_failed_deliveries",
         headers: { "Turbo-Frame" => "screen-chart" }
@@ -54,6 +65,24 @@ class AdminFailedDeliveriesTest < ActionDispatch::IntegrationTest
 
   def chart_widget_key
     RecordingStudioNotifications::Admin::FailedDeliveriesChart::WIDGET_KEY
+  end
+
+  def create_failed_delivery_recipient
+    recipient = User.create!(
+      email: "failed-admin-#{SecureRandom.hex(4)}@example.com",
+      password: "Password",
+      password_confirmation: "Password"
+    )
+    Current.actor = @user
+    notification = RecordingStudioNotifications::Notification.create!(
+      notification_type: :mention,
+      recipient: recipient,
+      actor: @user,
+      title: "Failed admin #{SecureRandom.hex(4)}"
+    )
+    notification.deliveries.create!(channel: "email", status: "failed", error_message: "provider unavailable")
+    Current.actor = nil
+    recipient
   end
 
   def assert_admin_chart_xy_series(html)

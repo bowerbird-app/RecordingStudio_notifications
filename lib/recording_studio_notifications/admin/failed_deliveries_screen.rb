@@ -15,9 +15,12 @@ module RecordingStudioNotifications
         RecordingStudioNotifications::Delivery
           .failed
           .includes(:notification)
+          .preload(notification: :recipient)
       end
 
+      filter_presentation :inline
       filter :date_range, field: "recording_studio_notifications_deliveries.updated_at", default: :last_30_days
+      filter :group_by, values: %i[hour day week month year], default: :day
       filter :channel,
              field: :channel,
              options: -> { RecordingStudioNotifications.channels.keys.map(&:to_s) }
@@ -33,7 +36,7 @@ module RecordingStudioNotifications
       chart do
         title { Copy.t("admin.failed_deliveries.title", default: "Failed deliveries") }
         type :line
-        series { |context| FailedDeliveriesChart.series(context) }
+        series { |context| FailedDeliveriesChart.screen_series(context) }
       end
 
       table do
@@ -64,6 +67,12 @@ module RecordingStudioNotifications
         def recipient_label_for(row)
           notification = row.notification
           return Copy.t("admin.failed_deliveries.recipient.none", default: "-") unless notification
+
+          recipient = notification.recipient
+          email = recipient.email if recipient.respond_to?(:email)
+          return email if email.present?
+
+          return Copy.t("admin.failed_deliveries.recipient.none", default: "-") if notification.recipient_id.blank?
 
           "#{notification.recipient_type} ##{notification.recipient_id}"
         end
