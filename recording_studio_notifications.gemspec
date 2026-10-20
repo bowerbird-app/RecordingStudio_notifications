@@ -26,6 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rails", "~> 8.1.0"
   spec.add_dependency "recording_studio", "~> 4.2"
   spec.add_dependency "recording_studio_accessible"
-  spec.add_dependency "recording_studio_metrics", ">= 0.3.0", "< 0.4"
+  spec.add_dependency "recording_studio_metrics", ">= 0.3.0", "< 0.6"
   spec.add_dependency "view_component"
 end
