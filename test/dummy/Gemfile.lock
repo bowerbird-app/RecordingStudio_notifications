@@ -111,12 +111,12 @@ GIT
 PATH
   remote: ../..
   specs:
-    recording_studio_notifications (0.13.0)
+    recording_studio_notifications (0.13.1)
       flat_pack (~> 0.1.254)
       rails (~> 8.1.0)
       recording_studio (~> 4.2)
       recording_studio_accessible
-      recording_studio_metrics (>= 0.3.0, < 0.6)
+      recording_studio_metrics (>= 0.3.0, < 1.0)
       view_component
 
 GEM
@@ -690,7 +690,7 @@ CHECKSUMS
   recording_studio_commentable (0.5.0)
   recording_studio_internationalization (0.1.2)
   recording_studio_metrics (0.5.0)
-  recording_studio_notifications (0.13.0)
+  recording_studio_notifications (0.13.1)
   recording_studio_notifications_email (0.3.1)
   recording_studio_root_switchable (0.9.0)
   recording_studio_trashable (0.11.0)
