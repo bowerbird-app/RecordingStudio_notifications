@@ -2,8 +2,6 @@
 
 module RecordingStudioNotifications
   class SettingsController < ApplicationController
-    layout "recording_studio_notifications/blank"
-
     helper_method :channel_configurable?, :cadence_selectable?, :rollup_delivery_enabled?, :channel_settings_help_text,
                   :cadence_option_label
 

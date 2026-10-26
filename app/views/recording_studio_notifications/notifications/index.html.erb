@@ -9,15 +9,22 @@
   }
 </style>
 
-<div class="mx-auto flex w-full flex-col gap-6">
-  <%= render FlatPack::PageNav::Component.new(
-    anchor_href: main_app.root_path
-  ) %>
-
+<% notifications_page_heading :title, notifications_t("inbox.title") %>
+<% flat_pack_page_nav(
+     round: true,
+     style: :default,
+     back_href: main_app.root_path,
+     back_tooltip: notifications_t("navigation.home"),
+     anchor_href: main_app.root_path,
+     anchor_tooltip: notifications_t("navigation.home")
+   ) %>
+<% recording_studio_page_nav_right do %>
   <%= render partial: "recording_studio_notifications/notifications/title" %>
+<% end %>
 
+<div class="mx-auto flex w-full flex-col gap-6">
   <%= render FlatPack::Grid::Component.new(cols: 2, align: :start) do %>
-    <%= render FlatPack::Card::Component.new(style: :default, border: :strong) do |card| %>
+    <%= render FlatPack::Card::Component.new(border: :strong) do |card| %>
       <% card.body do %>
         <% if @notification_sections.any? %>
           <div id="notifications-list" class="flex flex-col">

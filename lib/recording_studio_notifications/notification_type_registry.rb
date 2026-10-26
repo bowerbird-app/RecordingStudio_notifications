@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "active_model"
+
 module RecordingStudioNotifications
   NotificationType = Struct.new(
     :key,

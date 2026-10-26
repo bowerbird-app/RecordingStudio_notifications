@@ -1,0 +1,20 @@
+<% back_href = content_for(:page_nav_back_url).presence %>
+<% anchor_href = content_for(:page_nav_anchor_url).presence %>
+<% back_tooltip = content_for(:page_nav_back_label).presence || t("recording_studio.admin.navigation.go_back", default: "Go back") %>
+<% anchor_tooltip = content_for(:page_nav_anchor_label).presence || t("recording_studio.admin.navigation.close", default: "Close") %>
+<% if back_href.present? || anchor_href.present? %>
+  <% flat_pack_page_nav(
+       round: true,
+       style: :default,
+       back_href: back_href,
+       back_tooltip: back_tooltip,
+       anchor_href: anchor_href,
+       anchor_tooltip: anchor_tooltip
+     ) %>
+  <%= flat_pack_page_nav_tag %>
+<% end %>
+<% if content_for?(:page_nav_right) %>
+  <div class="mb-4 flex justify-end">
+    <%= yield :page_nav_right %>
+  </div>
+<% end %>

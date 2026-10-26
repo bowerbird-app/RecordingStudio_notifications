@@ -1,10 +1,13 @@
-<% content_for :title, unsubscribe_title %>
-
-<%= render FlatPack::PageTitle::Component.new(
-      title: unsubscribe_title,
-      subtitle: unsubscribe_subtitle,
-      variant: :h1
-    ) %>
+<% notifications_page_heading :title, unsubscribe_title %>
+<% notifications_page_heading :subtitle, unsubscribe_subtitle %>
+<% flat_pack_page_nav(
+     round: true,
+     style: :default,
+     back_href: settings_href,
+     back_tooltip: notifications_t("settings.title"),
+     anchor_href: settings_href,
+     anchor_tooltip: notifications_t("settings.title")
+   ) %>
 
 <% if @outcome == :confirm %>
   <%= form_with url: request.fullpath, method: :post, data: { turbo: false } do %>

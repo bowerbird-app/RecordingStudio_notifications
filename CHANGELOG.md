@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-26
+
+### Changed
+- Requires `recording_studio` `>= 6.1.0` and `flat_pack` `>= 0.1.315`. Development Gemfiles pin Recording Studio tag `v6.1.0`, Flatpack commit `1fcbafe94f8eb118f0a22182f63f5110fcc97a56` (`0.1.319`), and `view_component` `4.19.0` (`>= 4.14, < 5`).
+- Inbox, notification, settings, and unsubscribe screens use `recording_studio_layout`. `config.layout` defaults to `nil`, which follows `RecordingStudio.configuration.layout` and then `"recording_studio/default_layout"`.
+- Page titles come from `content_for :title` and `content_for :subtitle` through `notifications_page_heading`, so an apostrophe in a title stays an apostrophe. Back and close use `flat_pack_page_nav`. Show actions use `register_page_nav`. Inbox clear and settings stay in `recording_studio_page_nav_right` so clear-all can replace them.
+- `FlatPack::Card` calls drop `style:`. Inbox cards keep `border: :strong`.
+
+### Removed
+- `app/views/layouts/recording_studio_notifications/blank.html.erb`.
+
+### Upgrade notes
+- Bump to `0.14.0`. No migration.
+- Require Recording Studio `>= 6.1.0` and Flatpack `>= 0.1.315`. `view_component` must be `>= 4.14` and `< 5`.
+- Set `RecordingStudioNotifications.configuration.layout` when these screens should not use the host's `RecordingStudio.configuration.layout`. `nil` falls through. `false` renders no layout. A callable must be `->(controller:) { ... }`.
+- Remove `style:` from `FlatPack::Card::Component.new`. Use `border:`.
+- Remove `anchor_href:` and `back_href:` from `FlatPack::PageNav::Component.new`. Pass them to `flat_pack_page_nav`.
+- Do not render a second page title in the view body. The default layout already renders one `h1`.
+- `"recording_studio/default_layout"` does not set `lang` or `dir`. Host layouts that call `recording_studio_locale_attributes` still do. Inbox, settings, notification, and unsubscribe use that default layout when `config.layout` is nil.
+- Sibling gems that still cap `recording_studio` below 5 need the same gemspec widen used in `test/support/widen_recording_studio_requirement.rb` until those gems allow 6.1.0.
+- Admin 2.4 still calls `recording_studio_page_nav` and, when `engine_layout` is not the default layout, renders page nav with removed Flatpack keywords. The dummy app defines that method and replaces `recording_studio_admin/shared/_page_nav` until Admin ships a Flatpack 0.1.315 nav.
+- The dummy app pins Root Switchable `v0.10.0`. `v0.9.0` passes `anchor_label` to `PageNav` and raises on Flatpack 0.1.315. That 0.10 dropdown template still calls `button_attributes`, which Flatpack 0.1.319 removed, so the dummy renders the trigger with the current button.
+- No compatibility shim.
+
 ## [0.13.2] - 2026-10-27
 
 ### Changed
@@ -378,7 +402,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.2...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.12.1...v0.13.0

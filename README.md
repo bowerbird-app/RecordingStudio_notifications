@@ -21,15 +21,15 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 
 - Ruby 3.3 or newer
 - Rails 8.1
-- `recording_studio`, `recording_studio_accessible` `>= 0.20.0`, `flat_pack` `~> 0.1.254`, and `view_component`
+- `recording_studio` `>= 6.1.0`, `recording_studio_accessible` `>= 0.20.0`, `flat_pack` `>= 0.1.315`, and `view_component` `>= 4.14, < 5`
 - `recording_studio_metrics` for operations metrics registration
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus
 
-Development and dummy Gemfiles pin Recording Studio to GitHub tag `v4.7.0` and Accessible to `v0.18.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
+Development and dummy Gemfiles pin Recording Studio to GitHub tag `v6.1.0` and Accessible to `v0.18.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
 
-Root and dummy Gemfiles pin Trashable `v0.11.0` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.4.0` and Metrics `v0.5.0`. Both Gemfiles pin Flatpack to GitHub tag `v0.1.254`. Inbox cards use `style: :default` and `border: :strong` (the 0.1.237 colour-style API).
+Root and dummy Gemfiles pin Trashable `v0.11.0` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.4.0` and Metrics `v0.5.0`. Both Gemfiles pin Flatpack to commit `1fcbafe94f8eb118f0a22182f63f5110fcc97a56` (`FlatPack::VERSION` `0.1.319`) and `view_component` `4.19.0`. Inbox cards use `border: :strong`. `Card` no longer takes `style:`.
 
-Hosts on `0.11.0` need Flatpack `~> 0.1.254` (git tag `v0.1.254`), Accessible `>= 0.20.0`, and Admin `>= 2.4.0`. Move a host card that still uses `style: :outlined` to `style: :default, border: :strong`.
+Hosts need Recording Studio `>= 6.1.0`, Flatpack `>= 0.1.315`, `view_component` `>= 4.14, < 5`, Accessible `>= 0.20.0`, and Admin `>= 2.4.0`. A card that still passes `style:` drops that keyword and sets `border:` instead.
 
 ## Installation
 
@@ -37,7 +37,8 @@ Add the gem to the host application's `Gemfile`:
 
 ```ruby
 gem "recording_studio_notifications"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.254"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.1.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", ref: "1fcbafe94f8eb118f0a22182f63f5110fcc97a56"
 ```
 
 Install the engine, copy migrations, and migrate:
@@ -88,6 +89,21 @@ end
 ```
 
 The engine registers a default `:generic` type with `:in_app` delivery. `allowed_url_hosts` controls absolute HTTP(S) notification URLs; relative paths are always accepted.
+
+### Layout
+
+`config.layout` chooses the shell for inbox, settings, notification, and unsubscribe. It defaults to `nil`. `"recording_studio/default_layout"` does not set `lang` or `dir`. A host layout that calls `recording_studio_locale_attributes` still does.
+
+```ruby
+config.layout = nil
+config.layout = "application"
+config.layout = false
+config.layout = ->(controller:) { "recording_studio/default_layout" }
+```
+
+`nil` uses `RecordingStudio.configuration.layout`, then `"recording_studio/default_layout"`. `false` renders no layout. A callable is invoked as `call(controller:)` and must return a String, `nil`, or `false`. Anything else raises `ArgumentError` when assigned.
+
+The default template draws one page title from `content_for :title` and `content_for :subtitle`. Back and close come from `flat_pack_page_nav`. Page actions come from `register_page_nav` or `recording_studio_page_nav_right`. Do not render a second `FlatPack::PageTitle` in the view body.
 
 ### Notification types
 
@@ -361,7 +377,8 @@ Add the gem and install it in your host app:
 
 ```ruby
 gem "recording_studio_notifications"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.254"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.1.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", ref: "1fcbafe94f8eb118f0a22182f63f5110fcc97a56"
 ```
 
 ```bash
@@ -404,6 +421,8 @@ Notification type scopes are:
 - `:global` - always rootless.
 - `:root` - requires a root recording.
 - `:optional_root` - may be root-scoped or rootless/global.
+
+`config.layout` defaults to `nil`, which follows `RecordingStudio.configuration.layout` and then `"recording_studio/default_layout"`. Set a layout name, `false`, or `->(controller:) { ... }`. That default layout does not set `lang` or `dir`.
 
 The top-nav notification menu loads asynchronously after page render and then polls for updates on `config.polling_interval_seconds` (default: 60 seconds).
 

@@ -108,6 +108,33 @@ class ConfigurationTest < Minitest::Test
     assert_nil @configuration.resolve_current_root(controller: nil)
   end
 
+  def test_layout_accepts_nil_false_a_name_and_a_keyword_callable
+    assert_nil @configuration.layout
+
+    @configuration.layout = false
+    assert_equal false, @configuration.layout
+
+    @configuration.layout = "admin"
+    assert_equal "admin", @configuration.layout
+
+    callable = ->(controller:) { controller.class.name }
+    @configuration.layout = callable
+    assert_equal callable, @configuration.layout
+
+    assert_raises(ArgumentError) { @configuration.layout = "  " }
+    assert_equal callable, @configuration.layout
+    assert_raises(ArgumentError) { @configuration.layout = ->(controller) { "admin-#{controller.class}" } }
+    assert_equal callable, @configuration.layout
+    assert_raises(ArgumentError) { @configuration.layout = Object.new }
+    assert_equal callable, @configuration.layout
+  end
+
+  def test_controllers_do_not_hardcode_a_recording_studio_layout
+    root = File.expand_path("..", __dir__)
+
+    assert_empty RecordingStudio::Layout.hardcoded_layout_paths(root)
+  end
+
   def test_to_h_reports_runtime_registries
     result = @configuration.to_h
 

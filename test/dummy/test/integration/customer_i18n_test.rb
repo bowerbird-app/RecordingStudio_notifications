@@ -35,7 +35,8 @@ class CustomerI18nTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, ">Notifications</h1>"
     assert_includes response.body, ">Settings</span>"
-    assert_select "html[lang='en']"
+    assert_select "body[data-recording-studio-default-layout]"
+    assert_select "html:not([lang])"
 
     get "/notifications/settings"
 
@@ -44,7 +45,7 @@ class CustomerI18nTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Channel</label>"
     assert_includes response.body, ">Frequency</label>"
     assert_includes response.body, "Save settings"
-    assert_select "html[lang='en']"
+    assert_select "html:not([lang])"
   end
 
   test "dummy French locale renders the notifications list and settings" do
@@ -53,7 +54,7 @@ class CustomerI18nTest < ActionDispatch::IntegrationTest
     get "/notifications"
 
     assert_response :success
-    assert_select "html[lang='fr']"
+    assert_select "html:not([lang])"
     assert_includes response.body, ">Notifications</h1>"
     assert_includes response.body, ">Réglages</span>"
     refute_includes response.body, ">Settings</span>"

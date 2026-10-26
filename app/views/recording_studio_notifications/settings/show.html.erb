@@ -1,3 +1,13 @@
+<% notifications_page_heading :title, notifications_t("settings.title") %>
+<% flat_pack_page_nav(
+     round: true,
+     style: :default,
+     back_href: notifications_path,
+     back_tooltip: notifications_t("inbox.title"),
+     anchor_href: main_app.root_path,
+     anchor_tooltip: notifications_t("navigation.home")
+   ) %>
+
 <div class="mx-auto flex w-full max-w-3xl flex-col gap-6">
   <style>
     .rsn-settings-accordion [data-controller="flat-pack--accordion"] {
@@ -52,15 +62,6 @@
       transform: translateX(-50%) translateY(0);
     }
   </style>
-
-  <%= render FlatPack::PageNav::Component.new(
-    anchor_href: main_app.root_path
-  ) %>
-
-  <%= render FlatPack::PageTitle::Component.new(
-    title: notifications_t("settings.title"),
-    variant: :h1
-  ) %>
 
   <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4 rsn-settings-accordion", data: {
         controller: "recording-studio-notifications--notification-settings",

@@ -39,6 +39,8 @@ fr:
     notifications:
       layout:
         title: Notifications
+      navigation:
+        home: Accueil
       menu:
         title: Notifications
         title_with_count: "Notifications (%{count})"

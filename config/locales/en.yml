@@ -3,6 +3,8 @@ en:
     notifications:
       layout:
         title: Notifications
+      navigation:
+        home: Home
       menu:
         title: Notifications
         title_with_count: "Notifications (%{count})"

@@ -7,7 +7,7 @@ module RecordingStudioNotifications
     helper NotificationsHelper
     helper_method :unsubscribe_title, :unsubscribe_subtitle, :settings_href
 
-    layout "recording_studio_notifications/blank"
+    recording_studio_layout { RecordingStudioNotifications.configuration.layout }
 
     skip_forgery_protection
     before_action :skip_session_cookie

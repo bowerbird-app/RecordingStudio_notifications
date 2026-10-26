@@ -9,7 +9,7 @@ module RecordingStudioNotifications
     attr_accessor :actor_resolver, :current_root_resolver, :allowed_url_hosts, :default_channels,
                   :deliver_later, :queue_name, :raise_on_delivery_error, :polling_interval_seconds,
                   :rollup_reservation_timeout, :rollup_delivery_enabled, :unsubscribe_expires_in
-    attr_reader :hooks, :notification_types, :channels
+    attr_reader :hooks, :notification_types, :channels, :layout
 
     def initialize
       @actor_resolver = -> { Current.actor if defined?(Current) && Current.respond_to?(:actor) }
@@ -23,6 +23,7 @@ module RecordingStudioNotifications
       @rollup_reservation_timeout = 15.minutes
       @rollup_delivery_enabled = false
       @unsubscribe_expires_in = 1.year
+      @layout = nil
       @hooks = Hooks.new
       @notification_types = NotificationTypeRegistry.new
       @channels = ChannelRegistry.new
@@ -36,6 +37,10 @@ module RecordingStudioNotifications
         available_channels: default_channels,
         scope: :optional_root
       )
+    end
+
+    def layout=(value)
+      @layout = RecordingStudio::Layout.accept(value)
     end
 
     def to_h

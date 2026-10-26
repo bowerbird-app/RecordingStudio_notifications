@@ -7,8 +7,6 @@ module RecordingStudioNotifications
     PER_PAGE = 25
     GROUP_NOTIFICATIONS_PER_PAGE = 20
 
-    layout "recording_studio_notifications/blank", only: :index
-
     before_action :set_recipient
     before_action :set_notification, only: %i[show open mark_read mark_unread archive unarchive]
     before_action :require_inbox_notification, only: %i[show mark_read mark_unread archive unarchive]

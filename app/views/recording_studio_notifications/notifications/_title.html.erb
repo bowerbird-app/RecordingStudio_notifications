@@ -1,24 +1,17 @@
-<div id="notifications-title">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: notifications_t("inbox.title"),
-    variant: :h1
-  ) do |page_title| %>
-    <% page_title.slot do %>
-      <% if @has_unread_notifications %>
-        <%= render FlatPack::Button::Component.new(
-          text: notifications_t("inbox.clear_all"),
-          href: clear_all_notifications_path,
-          style: :default,
-          size: :md,
-          data: { turbo_method: :patch, turbo_stream: true }
-        ) %>
-      <% end %>
-      <%= render FlatPack::Button::Component.new(
-        text: notifications_t("inbox.settings"),
-        href: settings_path,
-        style: :default,
-        size: :md
-      ) %>
-    <% end %>
+<div id="notifications-title" class="flex flex-wrap items-center gap-2">
+  <% if @has_unread_notifications %>
+    <%= render FlatPack::Button::Component.new(
+      text: notifications_t("inbox.clear_all"),
+      href: clear_all_notifications_path,
+      style: :default,
+      size: :md,
+      data: { turbo_method: :patch, turbo_stream: true }
+    ) %>
   <% end %>
+  <%= render FlatPack::Button::Component.new(
+    text: notifications_t("inbox.settings"),
+    href: settings_path,
+    style: :default,
+    size: :md
+  ) %>
 </div>

@@ -10,7 +10,7 @@
 <% if @page_recording %>
   <div class="mt-6">
     <h2 class="text-lg font-semibold text-[var(--surface-content-color)] mb-4">Comments</h2>
-    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+    <%= render FlatPack::Card::Component.new(border: :default) do |card| %>
       <% card.body do %>
         <% comments = RecordingStudioCommentable::Comment
              .joins("INNER JOIN recording_studio_recordings AS comment_recordings ON comment_recordings.recordable_type = 'RecordingStudioCommentable::Comment' AND comment_recordings.recordable_id = recording_studio_comments.id AND comment_recordings.trashed_at IS NULL")
@@ -58,7 +58,7 @@
     <% end %>
   </div>
 <% else %>
-  <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+  <%= render FlatPack::Card::Component.new(border: :default) do |card| %>
     <% card.body do %>
       <p class="text-sm text-[var(--surface-muted-content-color)]">This page has not been recorded in a workspace yet. Run seeds to create the recording.</p>
     <% end %>
