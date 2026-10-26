@@ -391,6 +391,9 @@ class NotificationAcceptanceTest < Minitest::Test
     refute_includes settings, "hidden_field_tag"
     assert_includes settings, ".rsn-settings-accordion"
     assert_includes settings, "overflow: visible"
+    assert_includes settings, "flex w-full flex-col gap-6"
+    refute_includes settings, "max-w-3xl"
+    refute_includes settings, "mx-auto"
   end
 
   def test_dummy_top_nav_uses_flatpack_notification_component
