@@ -7,6 +7,8 @@ module RecordingStudioNotifications
       "rounded-full bg-red-600 px-1 text-[10px] font-semibold leading-none text-white"
     ].join(" ").freeze
 
+    UNREAD_DOT_CLASSES = "absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-600"
+
     def notifications_t(key, **)
       Copy.t(key, **)
     end
@@ -79,14 +81,19 @@ module RecordingStudioNotifications
     end
 
     def notification_type_leading_icon(notification_type, unread: false, size: :md)
-      icon_classes = ["text-[var(--surface-muted-content-color)]"]
-      icon_classes << "fp-red-dot" if unread
-
-      render FlatPack::Shared::IconComponent.new(
+      icon = render FlatPack::Shared::IconComponent.new(
         name: notification_type_icon_for(notification_type),
         size: size,
-        class: icon_classes.join(" ")
+        class: "text-[var(--surface-muted-content-color)]"
       )
+      return icon unless unread
+
+      content_tag(:span, class: "relative inline-flex shrink-0") do
+        safe_join([
+                    icon,
+                    content_tag(:span, "", class: UNREAD_DOT_CLASSES, aria: { hidden: true })
+                  ])
+      end
     end
 
     def notification_group_badge_text(count)

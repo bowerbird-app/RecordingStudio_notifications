@@ -30,7 +30,8 @@ class NotificationSeedInboxTest < ActionDispatch::IntegrationTest
       assert_includes response.body, "data-flat-pack--icon-name-value=\"#{icon}\""
     end
 
-    assert_includes response.body, "fp-red-dot"
+    assert_includes response.body, "absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-600"
+    refute_includes response.body, "fp-red-dot"
     assert_includes response.body, ">Clear all</span>"
   end
 end

@@ -13,7 +13,7 @@
 @source "../../views/**/*.erb";
 
 /* Include this engine's views and helpers (path gem / local checkout).
-   Helpers hold class strings such as UNREAD_BADGE_CLASSES. */
+   Helpers hold class strings such as UNREAD_BADGE_CLASSES and UNREAD_DOT_CLASSES. */
 @source "../../../../../app/views/**/*.erb";
 @source "../../../../../app/helpers/**/*.rb";
 

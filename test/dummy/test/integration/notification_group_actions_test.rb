@@ -77,7 +77,8 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Settings</span>"
     assert_operator response.body.index("Clear all"), :<, response.body.index(">Settings</span>")
     assert_includes response.body, "fp-button-raised"
-    assert_includes response.body, "fp-red-dot"
+    assert_includes response.body, "absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-600"
+    refute_includes response.body, "fp-red-dot"
 
     patch "/notifications/notifications/clear_all", as: :turbo_stream
 
@@ -89,6 +90,7 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Clear all"
     assert_includes response.body, ">Settings</span>"
     refute_includes response.body, "unread notifications\""
+    refute_includes response.body, "absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-600"
     refute_includes response.body, "fp-red-dot"
     assert unread_notification.reload.cleared_at.present?
     assert_nil unread_notification.read_at
@@ -101,6 +103,7 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     refute_includes response.body, "Clear all"
+    refute_includes response.body, "absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-600"
     refute_includes response.body, "fp-red-dot"
   end
 
