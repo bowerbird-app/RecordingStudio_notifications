@@ -47,6 +47,8 @@ class NotificationCadenceSettingsTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Change notification cadence."
     refute_includes response.body, "This cadence is required for required settings cadence test."
     assert_includes response.body, "mt-3 grid gap-4 md:grid-cols-2"
+    assert_includes response.body, "flex flex-col gap-6"
+    assert_includes response.body, "border-b border-[var(--surface-border-color)] pb-6 last:border-b-0"
     assert_includes response.body, "border border-[var(--surface-border-color)]"
     assert_includes response.body, "cadences[settings_cadence_test]"
     assert_includes response.body, 'name="cadences[required_settings_cadence_test]"'

@@ -73,9 +73,9 @@
       <%= render FlatPack::Accordion::Component.new(allow_multiple: true) do |accordion| %>
         <% @notification_type_groups.each do |category, types| %>
           <% accordion.item(id: "settings-category-#{category}", title: notifications_t("categories.#{category}", default: category.to_s.titleize), open: true) do %>
-            <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-6">
               <% types.each do |type| %>
-                <section class="border-b border-[var(--surface-border-color)] pb-4 last:border-b-0">
+                <section class="border-b border-[var(--surface-border-color)] pb-6 last:border-b-0">
                   <h2 class="text-sm font-semibold text-[var(--surface-content-color)]"><%= type.label %></h2>
                   <div class="mt-3 grid gap-4 md:grid-cols-2">
                     <% if channel_configurable?(type) %>
