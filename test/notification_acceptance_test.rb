@@ -316,6 +316,8 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes notifications_helper, "notifications_t("
     assert_includes notifications_helper, '"inbox.unread_aria"'
     assert_includes notifications_helper, "bg-red-600"
+    assert_includes notifications_helper, "-left-2 -top-2"
+    refute_includes notifications_helper, "-right-2 -top-2"
     assert_includes notifications_helper, "fp-red-dot"
     assert_includes notifications_helper, "def notification_group_next_page_dom_id(group, page)"
     assert_includes notifications_helper, "NotificationsController::GROUP_NOTIFICATIONS_PER_PAGE"

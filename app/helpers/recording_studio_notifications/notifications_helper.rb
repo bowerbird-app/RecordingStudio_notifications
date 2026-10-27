@@ -3,7 +3,7 @@
 module RecordingStudioNotifications
   module NotificationsHelper
     UNREAD_BADGE_CLASSES = [
-      "absolute -right-2 -top-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center",
+      "absolute -left-2 -top-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center",
       "rounded-full bg-red-600 px-1 text-[10px] font-semibold leading-none text-white"
     ].join(" ").freeze
 
