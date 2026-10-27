@@ -311,7 +311,10 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes notification_partial, "active: false"
     refute_includes notification_partial, "active: notification.unread?"
     assert_includes notification_partial, 'notification.unread? ? "font-semibold" : "font-normal"'
-    assert_includes notification_partial, 'title_color = notification.unread? ? "text-(--surface-content-color)" : "text-(--surface-muted-content-color)"'
+    assert_includes(
+      notification_partial,
+      'title_color = notification.unread? ? "text-(--surface-content-color)" : "text-(--surface-muted-content-color)"'
+    )
     assert_includes notification_partial, "truncate text-sm <%= weight %> <%= title_color %>"
     assert_includes notification_partial, "text-xs <%= weight %>"
     assert_includes notification_partial, 'class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"'
