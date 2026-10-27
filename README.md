@@ -506,7 +506,7 @@ The engine provides:
 - `/notifications/menu.json` async top-nav menu payload (unread count + recent notifications)
 - `/settings` notification channel preferences
 
-The inbox list is wrapped in a FlatPack card with `style: :default` and `border: :strong` (default body padding) inside a 2-column grid. Inbox, settings, and menu views use FlatPack components and Tailwind utility classes only. On settings, each notification type is a row in its category accordion. A divider separates those rows, with space above and below the line on desktop and mobile.
+The inbox list is wrapped in a FlatPack card with `style: :default` and `border: :strong` (default body padding) inside a 2-column grid. Inbox, settings, and menu views use FlatPack components and Tailwind utility classes only. On settings, each notification type is a row in its category accordion. A divider separates those rows, with 2.5rem (40px) above and below the line on desktop and mobile. The last type in a category has no extra space under it. That spacing is a style rule in the settings view, so a host does not need those Tailwind utilities compiled.
 
 ## Instrumentation
 

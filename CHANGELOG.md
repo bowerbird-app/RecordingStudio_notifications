@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Settings categories and the first inbox group start expanded. Flatpack's accordion reads `dataset.flatPackAccordionOpen`, which does not see `data-flat-pack--accordion-open`, so `open: true` was closed on connect.
 - The Frequency label for cadence `:individual` is Instant. French in the dummy app is Instantané. The stored key stays `individual`.
 - Channel and Frequency fields no longer show help text under the control.
-- Settings type rows leave space above and below the divider between notification types (`pb-6` on the row, `gap-6` between rows).
+- Settings type rows leave 2.5rem (40px) above and below the divider between notification types. The last type in a category has no extra bottom padding. The spacing is a style rule in the settings view, so it does not depend on a host Tailwind rebuild.
 
 ### Removed
 - `app/views/layouts/recording_studio_notifications/blank.html.erb`.
@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Admin 2.4 still calls `recording_studio_page_nav` and, when `engine_layout` is not the default layout, renders page nav with removed Flatpack keywords. The dummy app defines that method and replaces `recording_studio_admin/shared/_page_nav` until Admin ships a Flatpack 0.1.315 nav.
 - The dummy app pins Root Switchable `v0.10.0`. `v0.9.0` passes `anchor_label` to `PageNav` and raises on Flatpack 0.1.315. That 0.10 dropdown template still calls `button_attributes`, which Flatpack 0.1.319 removed, so the dummy renders the trigger with the current button.
 - Frequency copy for `:individual` is Instant. Existing rows stay `individual`. No migration.
-- Settings type rows have more space around the divider. No host markup change.
+- Settings type rows have 2.5rem (40px) of space around the divider. The last type in a category has no extra bottom padding. No host markup change.
 - No compatibility shim.
 
 ## [0.13.2] - 2026-10-27

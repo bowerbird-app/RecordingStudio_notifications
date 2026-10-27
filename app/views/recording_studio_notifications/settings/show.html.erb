@@ -61,6 +61,19 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
+    .rsn-settings-type-list {
+      gap: 2.5rem;
+    }
+
+    .rsn-settings-type-row {
+      padding-bottom: 2.5rem;
+    }
+
+    .rsn-settings-type-row:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
   </style>
 
   <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4 rsn-settings-accordion", data: {
@@ -73,9 +86,9 @@
       <%= render FlatPack::Accordion::Component.new(allow_multiple: true) do |accordion| %>
         <% @notification_type_groups.each do |category, types| %>
           <% accordion.item(id: "settings-category-#{category}", title: notifications_t("categories.#{category}", default: category.to_s.titleize), open: true) do %>
-            <div class="flex flex-col gap-6">
+            <div class="rsn-settings-type-list flex flex-col gap-10">
               <% types.each do |type| %>
-                <section class="border-b border-[var(--surface-border-color)] pb-6 last:border-b-0">
+                <section class="rsn-settings-type-row border-b border-[var(--surface-border-color)] pb-10 last:border-b-0 last:pb-0">
                   <h2 class="text-sm font-semibold text-[var(--surface-content-color)]"><%= type.label %></h2>
                   <div class="mt-3 grid gap-4 md:grid-cols-2">
                     <% if channel_configurable?(type) %>
