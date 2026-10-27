@@ -11,8 +11,13 @@ class NotificationsInboxTest < Minitest::Test
     menu_helper = File.read(helper("menu_helper.rb"))
 
     assert_includes index, "notifications/page"
+    assert_includes index, ".rsn-inbox-card .text-\\(--surface-content-color\\)"
+    assert_includes index, ".rsn-inbox-card .text-\\(--surface-muted-content-color\\)"
+    assert_includes index, "color: var(--surface-content-color);"
+    assert_includes index, "color: var(--surface-muted-content-color);"
     assert_includes notification, 'weight = notification.unread? ? "font-semibold" : "font-normal"'
-    assert_includes notification, "truncate text-sm <%= weight %>"
+    assert_includes notification, 'title_color = notification.unread? ? "text-(--surface-content-color)" : "text-(--surface-muted-content-color)"'
+    assert_includes notification, "truncate text-sm <%= weight %> <%= title_color %>"
     assert_includes notification, "line-clamp-2 text-xs <%= weight %>"
     assert_includes notification, 'class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"'
     refute_includes notification, "font-medium"
@@ -20,7 +25,8 @@ class NotificationsInboxTest < Minitest::Test
 
     assert_includes group, "unread = group.unread_count.positive?"
     assert_includes group, 'weight = unread ? "font-semibold" : "font-normal"'
-    assert_includes group, "block truncate <%= weight %>"
+    assert_includes group, 'title_color = unread ? "text-(--surface-content-color)" : "text-(--surface-muted-content-color)"'
+    assert_includes group, "block truncate <%= weight %> <%= title_color %>"
     assert_includes group, "text-xs <%= weight %> text-(--surface-muted-content-color)"
     assert_includes group, 'class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"'
     assert_includes group, "notifications/notification"

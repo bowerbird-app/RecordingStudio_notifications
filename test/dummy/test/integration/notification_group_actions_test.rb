@@ -54,11 +54,13 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, 'class="truncate text-sm font-semibold text-(--surface-content-color)">Bold unread title'
     assert_includes response.body, 'class="line-clamp-2 text-xs font-semibold text-(--surface-muted-content-color)">A note under the bold title'
-    assert_includes response.body, 'class="truncate text-sm font-normal text-(--surface-content-color)">Regular read title'
+    assert_includes response.body, 'class="truncate text-sm font-normal text-(--surface-muted-content-color)">Regular read title'
     assert_includes response.body, 'class="line-clamp-2 text-xs font-normal text-(--surface-muted-content-color)">A note under the regular title'
-    assert_includes response.body, 'class="truncate text-sm font-normal text-(--surface-content-color)">Already read rollup item'
-    assert_includes response.body, 'class="block truncate font-semibold">Group action test'
-    assert_includes response.body, 'class="block truncate font-normal">Read group'
+    assert_includes response.body, 'class="truncate text-sm font-normal text-(--surface-muted-content-color)">Already read rollup item'
+    assert_includes response.body, 'class="block truncate font-semibold text-(--surface-content-color)">Group action test'
+    assert_includes response.body, 'class="block truncate font-normal text-(--surface-muted-content-color)">Read group'
+    assert_includes response.body, "color: var(--surface-muted-content-color);"
+    assert_includes response.body, "color: var(--surface-content-color);"
     assert_includes response.body, "text-sm font-semibold text-(--surface-muted-content-color) whitespace-nowrap"
     assert_includes response.body, "text-sm font-normal text-(--surface-muted-content-color) whitespace-nowrap"
   end
