@@ -88,8 +88,10 @@ class RecordingStudioNotificationsTest < Minitest::Test
 
     assert_includes views, "FlatPack::"
     assert_includes views, "FlatPack::Notification::Component"
-    assert_includes views, "FlatPack::Grid::Component.new(cols: 2"
-    assert_includes views, "FlatPack::Card::Component.new(border: :strong)"
+    assert_includes views, "FlatPack::Grid::Component.new(cols: 3"
+    assert_includes views, "lg:col-span-2"
+    refute_includes views, "list-item-active-background-color"
+    assert_includes views, "FlatPack::Card::Component.new(border: :strong,"
     refute_includes views, "style: :outlined"
     refute_includes views, "FlatPack::PageNav::Component.new("
     refute_includes views, "Card::Component.new(style:"

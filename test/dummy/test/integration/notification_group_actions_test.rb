@@ -32,7 +32,11 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Group action test"
     assert_includes response.body, ">Settings</span>"
-    assert_includes response.body, "grid-cols-1 md:grid-cols-2"
+    assert_includes response.body, "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+    assert_includes response.body, "lg:col-span-2"
+    assert_includes response.body, "grid-column: span 2"
+    assert_includes response.body, "padding: 1rem 1.25rem"
+    refute_includes response.body, "list-item-active-background-color"
     assert_includes response.body, "border-2 border-[var(--card-border-color)]"
     assert_includes response.body, "p-[var(--card-padding-md)] flex-1 overflow-hidden"
     assert_includes response.body, "aria-label=\"2 unread notifications\""
