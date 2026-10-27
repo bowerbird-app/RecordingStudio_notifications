@@ -23,6 +23,38 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     sign_in @user
   end
 
+  test "unread titles are semibold and read titles are regular weight" do
+    RecordingStudioNotifications.notification_types.register(
+      :read_group_weight,
+      label: "Read group",
+      scope: :global,
+      default_channels: [:in_app],
+      available_channels: [:in_app],
+      allowed_cadences: [:daily],
+      default_cadence: :daily
+    )
+    create_notification(title: "Bold unread title", created_at: Time.current, body: "A note under the bold title")
+    create_notification(title: "Regular read title", created_at: 1.minute.ago, read_at: Time.current)
+    RecordingStudioNotifications::Notification.create!(
+      recipient: @user,
+      notification_type: :read_group_weight,
+      title: "Already read rollup item",
+      created_at: Time.current,
+      updated_at: Time.current,
+      read_at: Time.current
+    )
+
+    get "/notifications"
+
+    assert_response :success
+    assert_includes response.body, 'class="truncate text-sm font-semibold text-(--surface-content-color)">Bold unread title'
+    assert_includes response.body, 'class="truncate text-sm font-normal text-(--surface-content-color)">Regular read title'
+    assert_includes response.body, 'class="truncate text-sm font-normal text-(--surface-content-color)">Already read rollup item'
+    assert_includes response.body, 'class="block truncate font-semibold">Group action test'
+    assert_includes response.body, 'class="block truncate font-normal">Read group'
+    assert_includes response.body, "line-clamp-2 text-xs font-normal"
+  end
+
   test "digest groups do not render a mark-all-read control" do
     create_notification(title: "Unread in group", created_at: Time.current)
     create_notification(title: "Another unread notification", created_at: 1.minute.ago)
@@ -175,11 +207,12 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
 
   private
 
-  def create_notification(title:, created_at:, read_at: nil, recipient: @user)
+  def create_notification(title:, created_at:, read_at: nil, recipient: @user, body: nil)
     RecordingStudioNotifications::Notification.create!(
       recipient: recipient,
       notification_type: :group_action_test,
       title: title,
+      body: body,
       created_at: created_at,
       updated_at: created_at,
       read_at: read_at
