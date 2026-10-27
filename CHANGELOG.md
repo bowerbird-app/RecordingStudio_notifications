@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Page titles come from `content_for :title` and `content_for :subtitle` through `notifications_page_heading`, so an apostrophe in a title stays an apostrophe. Back and close use `flat_pack_page_nav`. Show actions use `register_page_nav`. Inbox clear and settings stay in `recording_studio_page_nav_right` so clear-all can replace them.
 - `FlatPack::Card` calls drop `style:`. Inbox cards keep `border: :strong`.
 - The settings form fills the default layout width. It no longer sits in a centered `max-w-3xl` column.
+- Settings categories and the first inbox group start expanded. Flatpack's accordion reads `dataset.flatPackAccordionOpen`, which does not see `data-flat-pack--accordion-open`, so `open: true` was closed on connect.
 
 ### Removed
 - `app/views/layouts/recording_studio_notifications/blank.html.erb`.

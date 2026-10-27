@@ -64,7 +64,7 @@
   </style>
 
   <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4 rsn-settings-accordion", data: {
-        controller: "recording-studio-notifications--notification-settings",
+        controller: "recording-studio-notifications--notification-settings recording-studio-notifications--accordion-open",
         action: "change->recording-studio-notifications--notification-settings#syncNoneSelection",
         recording_studio_notifications__notification_settings_required_channels_value: @required_channels_by_type.to_json,
         recording_studio_notifications__notification_settings_required_channel_tooltip_value: notifications_t("settings.required_channel_tooltip")

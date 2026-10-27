@@ -1,4 +1,4 @@
-<div id="<%= notification_group_dom_id(group) %>">
+<div id="<%= notification_group_dom_id(group) %>" data-controller="recording-studio-notifications--accordion-open">
   <% if group.individual? %>
     <%= render FlatPack::List::Component.new(spacing: :dense, class: "space-y-0") do %>
       <%= render partial: "recording_studio_notifications/notifications/notification", locals: { notification: group.latest_notification } %>
