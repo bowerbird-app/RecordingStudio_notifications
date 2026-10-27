@@ -24,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unread inbox rows and rollup headers no longer use the active list background. The red unread mark stays.
 - Inbox rows and rollup headers use 1rem of vertical padding and 1.25rem of horizontal padding. The rule is in the inbox view, so it does not depend on a host Tailwind rebuild.
 
+### Fixed
+- Tailwind scans this gem's `app/helpers`, so the unread rollup badge classes in `NotificationsHelper` (`text-white`, `bg-red-600`, and the rest) are compiled. A views-only `@source` left the count in the inherited text color.
+
 ### Removed
 - `app/views/layouts/recording_studio_notifications/blank.html.erb`.
 
@@ -41,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Frequency copy for `:individual` is Instant. Existing rows stay `individual`. No migration.
 - Settings type rows have 2.5rem (40px) of space around the divider. The last type in a category has no extra bottom padding. No host markup change.
 - Inbox overrides that still use `cols: 2` should use `cols: 3` and span the card 2 columns. Unread rows no longer take the active list background. Row padding is 1rem by 1.25rem. No migration.
+- Add a Tailwind `@source` for this gem's `app/helpers/**/*.rb` next to the views source (`app/{views,helpers}/**/*.{erb,rb}`), then run `bin/rails tailwindcss:build`. Re-running the install generator adds the helper line when it is missing. The unread count badge uses `text-white` from `NotificationsHelper`.
 - No compatibility shim.
 
 ## [0.13.2] - 2026-10-27

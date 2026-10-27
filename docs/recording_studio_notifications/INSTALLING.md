@@ -102,14 +102,15 @@ See [CONFIGURATION.md](CONFIGURATION.md) for all options.
 
 ### Tailwind CSS
 
-If your app uses Tailwind, the generator adds `@source` directives to include engine views and FlatPack components:
+If your app uses Tailwind, the generator adds `@source` directives to include engine views, engine helpers, and FlatPack components:
 
 ```css
 @source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/helpers/**/*.rb";
 @source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 ```
 
-This ensures Tailwind scans the engine's templates for class names during CSS compilation.
+This ensures Tailwind scans the engine's templates and helper class strings during CSS compilation. The unread count badge classes live in `NotificationsHelper`, so a views-only scan misses `text-white`.
 
 ---
 
@@ -148,6 +149,7 @@ Add to your `app/assets/tailwind/application.css`:
 
 ```css
 @source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/helpers/**/*.rb";
 @source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 ```
 

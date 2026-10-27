@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** December 11, 2025
+> *   **Last Updated:** October 27, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -28,6 +28,7 @@ Modify the host app’s Tailwind entry file:
 Add scan directives:
 
     @source "/path/to/gems/my_engine/app/views/**/*.erb";
+    @source "/path/to/gems/my_engine/app/helpers/**/*.rb";
     @source "/path/to/gems/my_engine/app/components/**/*.html.erb";
 
 ------------------------------------------------------------
@@ -256,11 +257,12 @@ The file `test/dummy/app/assets/tailwind/application.css` configures Tailwind:
 ```css
 @import "tailwindcss";
 
-/* Include the engine's views in the Tailwind build */
+/* Include the engine's views and helpers in the Tailwind build */
 @source "../../../../../app/views/**/*.erb";
+@source "../../../../../app/helpers/**/*.rb";
 ```
 
-> **Note:** The relative path `../../../../../app/views/**/*.erb` points from the dummy app up to the engine's `app/views` folder so Tailwind can detect classes used in engine templates. Host applications will use the gem path instead.
+> **Note:** The relative paths point from the dummy app up to the engine's `app/views` and `app/helpers` folders so Tailwind can detect classes used in engine templates and helper class strings. Host applications scan `app/{views,helpers}/**/*.{erb,rb}` on the installed gem instead.
 
 ------------------------------------------------------------
 5.3 Auto-Rebuild in Development

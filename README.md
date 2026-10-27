@@ -56,7 +56,7 @@ The installer mounts the engine at `/recording_studio_notifications` by default.
 bin/rails generate recording_studio_notifications:install --mount-path=/notifications
 ```
 
-The installer also adds Tailwind source paths when it finds `app/assets/tailwind/application.css`, and adds the engine's polling controller to a standard Stimulus controller loader. Review the generated `config/initializers/recording_studio_notifications.rb`, register the notification types your app emits, and configure its actor/root resolvers.
+The installer also adds Tailwind `@source` paths when it finds `app/assets/tailwind/application.css`, and adds the engine's polling controller to a standard Stimulus controller loader. Host apps should scan `app/{views,helpers}/**/*.{erb,rb}` on this gem (views and helpers). Class strings such as the unread count badge live in helpers, so a views-only scan misses `text-white`. Run `bin/rails tailwindcss:build` after adding those sources. Review the generated `config/initializers/recording_studio_notifications.rb`, register the notification types your app emits, and configure its actor/root resolvers.
 
 ## Configuration
 
