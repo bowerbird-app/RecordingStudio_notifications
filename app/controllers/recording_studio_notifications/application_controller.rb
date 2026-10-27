@@ -6,6 +6,8 @@ module RecordingStudioNotifications
   class ApplicationController < parent_controller
     include ::RecordingStudio::RootSwitchable::ControllerSupport if defined?(::RecordingStudio::RootSwitchable::ControllerSupport)
 
+    recording_studio_layout { RecordingStudioNotifications.configuration.layout }
+
     protect_from_forgery with: :exception
 
     helper NotificationsHelper

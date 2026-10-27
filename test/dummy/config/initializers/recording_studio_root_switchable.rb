@@ -72,6 +72,28 @@ RecordingStudioRootSwitchable.configure do |config|
   end
 end
 
+# Root Switchable 0.10 renders its dropdown with button_attributes, which
+# Flatpack 0.1.319 removed. Draw the same menu with the current trigger.
+module RootSwitchDropdownTemplate
+  def call
+    tag.div(**wrapper_attributes) do
+      safe_join([
+        render_trigger_button,
+        tag.div(**menu_attributes) do
+          render(RecordingStudioRootSwitchable::RootSwitch::RowsComponent.new(menu_rows: menu_rows))
+        end
+      ])
+    end
+  end
+end
+
+Rails.application.config.to_prepare do
+  dropdown = RecordingStudioRootSwitchable::RootSwitch::DropdownComponent
+  next if dropdown.ancestors.include?(RootSwitchDropdownTemplate)
+
+  dropdown.prepend(RootSwitchDropdownTemplate)
+end
+
 def internal_route?(path)
   routes = [
     Rails.application.routes,

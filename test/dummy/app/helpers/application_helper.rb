@@ -71,6 +71,32 @@ module ApplicationHelper
 		)
 	end
 
+	# Admin 2.4 still calls the helper Recording Studio removed in v5.
+	# It only fills the slots the page nav partial reads.
+	def recording_studio_page_nav(title: nil, **options)
+		content_for(:title, title) if title.present?
+
+		%i[
+			page_nav_anchor_url
+			page_nav_anchor_icon
+			page_nav_anchor_label
+			page_nav_back_url
+			page_nav_back_icon
+			page_nav_back_label
+			page_nav_back_style
+			page_nav_back_size
+		].each do |slot_key|
+			next unless options.key?(slot_key)
+
+			value = options.fetch(slot_key)
+			next if value.nil?
+
+			content_for(slot_key, value)
+		end
+
+		nil
+	end
+
 	def dummy_document_attributes
 		attributes = { "data-theme" => "rounded" }
 		attributes.merge!(recording_studio_locale_attributes) if respond_to?(:recording_studio_locale_attributes)

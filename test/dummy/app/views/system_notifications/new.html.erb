@@ -4,7 +4,7 @@
   variant: :h1
 ) %>
 
-<%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+<%= render FlatPack::Card::Component.new(border: :default) do |card| %>
   <% card.body do %>
     <%= form_with(model: @system_notification, local: true, class: "space-y-4") do |f| %>
       <% if @system_notification.errors.any? %>

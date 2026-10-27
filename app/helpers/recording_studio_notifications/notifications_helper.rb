@@ -3,12 +3,21 @@
 module RecordingStudioNotifications
   module NotificationsHelper
     UNREAD_BADGE_CLASSES = [
-      "absolute -right-2 -top-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center",
+      "absolute -left-2 -top-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center",
       "rounded-full bg-red-600 px-1 text-[10px] font-semibold leading-none text-white"
     ].join(" ").freeze
 
+    UNREAD_DOT_CLASSES = "absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-600"
+
     def notifications_t(key, **)
       Copy.t(key, **)
+    end
+
+    # The default layout strips the captured slot, which drops the safe flag
+    # after the buffer has already escaped the text. PageTitle then escapes it
+    # again. A safe string stays literal in the buffer so PageTitle escapes once.
+    def notifications_page_heading(slot, text)
+      content_for(slot, text.to_s.html_safe)
     end
 
     def notification_icon_for(notification)
@@ -72,14 +81,19 @@ module RecordingStudioNotifications
     end
 
     def notification_type_leading_icon(notification_type, unread: false, size: :md)
-      icon_classes = ["text-[var(--surface-muted-content-color)]"]
-      icon_classes << "fp-red-dot" if unread
-
-      render FlatPack::Shared::IconComponent.new(
+      icon = render FlatPack::Shared::IconComponent.new(
         name: notification_type_icon_for(notification_type),
         size: size,
-        class: icon_classes.join(" ")
+        class: "text-[var(--surface-muted-content-color)]"
       )
+      return icon unless unread
+
+      content_tag(:span, class: "relative inline-flex shrink-0") do
+        safe_join([
+                    icon,
+                    content_tag(:span, "", class: UNREAD_DOT_CLASSES, aria: { hidden: true })
+                  ])
+      end
     end
 
     def notification_group_badge_text(count)

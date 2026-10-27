@@ -104,7 +104,7 @@ module RecordingStudioNotifications
         notifications, others = missing_lines.partition { |line| line.include?("recording_studio_notifications") }
 
         [
-          ("\n/* Include RecordingStudioNotifications engine views for Tailwind CSS */" if notifications.any?),
+          ("\n/* Include RecordingStudioNotifications engine views and helpers for Tailwind CSS */" if notifications.any?),
           notifications,
           ("\n/* Include FlatPack component sources for Tailwind CSS */" if others.any?),
           others
@@ -124,12 +124,16 @@ module RecordingStudioNotifications
           # From app/assets/tailwind/, Rails.root is ../../../ (not ../../).
           # Git gems live under ruby/*/bundler/gems/<name>-<hash>/, so match with *-suffixes.
           '@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
+          '@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/helpers/**/*.rb";',
           '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
+          '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/helpers/**/*.rb";',
           '@source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
           '@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
           '@source "/usr/local/lib/ruby/gems/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
+          '@source "/usr/local/lib/ruby/gems/*/bundler/gems/recording_studio_notifications-*/app/helpers/**/*.rb";',
           '@source "/usr/local/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
           '@source "/opt/hostedtoolcache/Ruby/*/x64/lib/ruby/gems/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";',
+          '@source "/opt/hostedtoolcache/Ruby/*/x64/lib/ruby/gems/*/bundler/gems/recording_studio_notifications-*/app/helpers/**/*.rb";',
           '@source "/opt/hostedtoolcache/Ruby/*/x64/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";',
           *bundler_install_source_lines
         ]
@@ -141,6 +145,7 @@ module RecordingStudioNotifications
 
         [
           %(@source "#{bundle_path}/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";),
+          %(@source "#{bundle_path}/bundler/gems/recording_studio_notifications-*/app/helpers/**/*.rb";),
           %(@source "#{bundle_path}/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";)
         ]
       rescue StandardError

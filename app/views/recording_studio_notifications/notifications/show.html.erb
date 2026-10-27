@@ -1,71 +1,29 @@
-<div class="mx-auto flex w-full max-w-3xl flex-col gap-6">
-  <%= render FlatPack::PageNav::Component.new(
-    anchor_href: main_app.root_path
-  ) %>
-
-  <%= render FlatPack::PageTitle::Component.new(
-    title: @notification.title,
-    subtitle: @notification.notification_type.humanize,
-    variant: :h1
-  ) %>
-
-  <% if @notification.body.present? %>
-    <p class="text-sm leading-6 text-(--surface-content-color)"><%= @notification.body %></p>
+<% notifications_page_heading :title, @notification.title %>
+<% notifications_page_heading :subtitle, @notification.notification_type.humanize %>
+<% flat_pack_page_nav(
+     round: true,
+     style: :default,
+     back_href: notifications_path,
+     back_tooltip: notifications_t("inbox.title"),
+     anchor_href: main_app.root_path,
+     anchor_tooltip: notifications_t("navigation.home")
+   ) %>
+<% if @notification.url.present? %>
+  <% register_page_nav notifications_t("show.open_related"), @notification.url, role: :primary %>
+<% end %>
+<% unless @notification.archived? %>
+  <% if @notification.unread? %>
+    <% register_page_nav notifications_t("show.mark_read"), mark_read_notification_path(@notification), role: :secondary, data: { turbo_method: :patch } %>
+  <% else %>
+    <% register_page_nav notifications_t("show.mark_unread"), mark_unread_notification_path(@notification), role: :secondary, data: { turbo_method: :patch } %>
   <% end %>
+<% end %>
+<% if @notification.archived? %>
+  <% register_page_nav notifications_t("show.unarchive"), unarchive_notification_path(@notification), role: :secondary, data: { turbo_method: :patch } %>
+<% else %>
+  <% register_page_nav notifications_t("show.archive"), archive_notification_path(@notification), role: :destructive, data: { turbo_method: :patch } %>
+<% end %>
 
-  <% if @notification.url.present? %>
-    <div class="flex flex-wrap gap-2">
-      <%= link_to @notification.url do %>
-        <%= render FlatPack::Button::Component.new(text: notifications_t("show.open_related"), style: :primary, size: :md) %>
-      <% end %>
-
-      <% unless @notification.archived? %>
-        <% if @notification.unread? %>
-          <%= link_to mark_read_notification_path(@notification), data: { turbo_method: :patch } do %>
-            <%= render FlatPack::Button::Component.new(text: notifications_t("show.mark_read"), size: :md) %>
-          <% end %>
-        <% else %>
-          <%= link_to mark_unread_notification_path(@notification), data: { turbo_method: :patch } do %>
-            <%= render FlatPack::Button::Component.new(text: notifications_t("show.mark_unread"), size: :md) %>
-          <% end %>
-        <% end %>
-      <% end %>
-
-      <% if @notification.archived? %>
-        <%= link_to unarchive_notification_path(@notification), data: { turbo_method: :patch } do %>
-          <%= render FlatPack::Button::Component.new(text: notifications_t("show.unarchive"), size: :md) %>
-        <% end %>
-      <% else %>
-        <%= link_to archive_notification_path(@notification), data: { turbo_method: :patch } do %>
-          <%= render FlatPack::Button::Component.new(text: notifications_t("show.archive"), size: :md) %>
-        <% end %>
-      <% end %>
-    </div>
-  <% end %>
-
-  <% unless @notification.url.present? %>
-    <div class="flex flex-wrap gap-2">
-      <% unless @notification.archived? %>
-        <% if @notification.unread? %>
-          <%= link_to mark_read_notification_path(@notification), data: { turbo_method: :patch } do %>
-            <%= render FlatPack::Button::Component.new(text: notifications_t("show.mark_read"), size: :md) %>
-          <% end %>
-        <% else %>
-          <%= link_to mark_unread_notification_path(@notification), data: { turbo_method: :patch } do %>
-            <%= render FlatPack::Button::Component.new(text: notifications_t("show.mark_unread"), size: :md) %>
-          <% end %>
-        <% end %>
-      <% end %>
-
-      <% if @notification.archived? %>
-        <%= link_to unarchive_notification_path(@notification), data: { turbo_method: :patch } do %>
-          <%= render FlatPack::Button::Component.new(text: notifications_t("show.unarchive"), size: :md) %>
-        <% end %>
-      <% else %>
-        <%= link_to archive_notification_path(@notification), data: { turbo_method: :patch } do %>
-          <%= render FlatPack::Button::Component.new(text: notifications_t("show.archive"), size: :md) %>
-        <% end %>
-      <% end %>
-    </div>
-  <% end %>
-</div>
+<% if @notification.body.present? %>
+  <p class="text-sm leading-6 text-(--surface-content-color)"><%= @notification.body %></p>
+<% end %>

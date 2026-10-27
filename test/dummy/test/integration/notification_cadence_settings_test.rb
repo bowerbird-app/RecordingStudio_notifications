@@ -44,9 +44,18 @@ class NotificationCadenceSettingsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Settings cadence test"
     assert_includes response.body, ">Channel</label>"
     assert_includes response.body, ">Frequency</label>"
-    assert_includes response.body, "Change notification cadence."
-    assert_includes response.body, "This cadence is required for required settings cadence test."
+    refute_includes response.body, "Change notification cadence."
+    refute_includes response.body, "This cadence is required for required settings cadence test."
     assert_includes response.body, "mt-3 grid gap-4 md:grid-cols-2"
+    assert_includes response.body, "rsn-settings-type-list flex flex-col gap-10"
+    assert_includes response.body, "rsn-settings-type-row border-b border-[var(--surface-border-color)] pb-10 last:border-b-0 last:pb-0"
+    assert_includes response.body, ".rsn-settings-type-list"
+    assert_includes response.body, "gap: 2.5rem"
+    assert_includes response.body, ".rsn-settings-type-row"
+    assert_includes response.body, "padding-bottom: 2.5rem"
+    assert_includes response.body, ".rsn-settings-type-row:last-child"
+    assert_includes response.body, "padding-bottom: 0"
+    assert_includes response.body, "border-bottom: 0"
     assert_includes response.body, "border border-[var(--surface-border-color)]"
     assert_includes response.body, "cadences[settings_cadence_test]"
     assert_includes response.body, 'name="cadences[required_settings_cadence_test]"'
@@ -56,6 +65,8 @@ class NotificationCadenceSettingsTest < ActionDispatch::IntegrationTest
     refute_includes settings_section, 'disabled="disabled" data-action="flat-pack--select#toggle"'
     refute_includes settings_section, 'name="preferences[settings_cadence_test][]" value="in_app" disabled'
     assert_includes response.body, 'value="daily" selected="selected">Daily</option>'
+    assert_includes settings_section, 'value="individual">Instant</option>'
+    refute_includes settings_section, ">Individual</option>"
     required_section = response.body[/Required settings cadence test.*?<\/section>/m, 0]
     assert required_section
     assert_includes required_section, 'name="preferences[required_settings_cadence_test][]" value="in_app"'

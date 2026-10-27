@@ -1,4 +1,14 @@
-<div class="mx-auto flex w-full max-w-3xl flex-col gap-6">
+<% notifications_page_heading :title, notifications_t("settings.title") %>
+<% flat_pack_page_nav(
+     round: true,
+     style: :default,
+     back_href: notifications_path,
+     back_tooltip: notifications_t("inbox.title"),
+     anchor_href: main_app.root_path,
+     anchor_tooltip: notifications_t("navigation.home")
+   ) %>
+
+<div class="flex w-full flex-col gap-6">
   <style>
     .rsn-settings-accordion [data-controller="flat-pack--accordion"] {
       overflow: visible;
@@ -51,19 +61,23 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
+    .rsn-settings-type-list {
+      gap: 2.5rem;
+    }
+
+    .rsn-settings-type-row {
+      padding-bottom: 2.5rem;
+    }
+
+    .rsn-settings-type-row:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
   </style>
 
-  <%= render FlatPack::PageNav::Component.new(
-    anchor_href: main_app.root_path
-  ) %>
-
-  <%= render FlatPack::PageTitle::Component.new(
-    title: notifications_t("settings.title"),
-    variant: :h1
-  ) %>
-
   <%= form_with url: settings_path, method: :patch, class: "flex flex-col gap-4 rsn-settings-accordion", data: {
-        controller: "recording-studio-notifications--notification-settings",
+        controller: "recording-studio-notifications--notification-settings recording-studio-notifications--accordion-open",
         action: "change->recording-studio-notifications--notification-settings#syncNoneSelection",
         recording_studio_notifications__notification_settings_required_channels_value: @required_channels_by_type.to_json,
         recording_studio_notifications__notification_settings_required_channel_tooltip_value: notifications_t("settings.required_channel_tooltip")
@@ -72,9 +86,9 @@
       <%= render FlatPack::Accordion::Component.new(allow_multiple: true) do |accordion| %>
         <% @notification_type_groups.each do |category, types| %>
           <% accordion.item(id: "settings-category-#{category}", title: notifications_t("categories.#{category}", default: category.to_s.titleize), open: true) do %>
-            <div class="flex flex-col gap-3">
+            <div class="rsn-settings-type-list flex flex-col gap-10">
               <% types.each do |type| %>
-                <section class="border-b border-[var(--surface-border-color)] pb-4 last:border-b-0">
+                <section class="rsn-settings-type-row border-b border-[var(--surface-border-color)] pb-10 last:border-b-0 last:pb-0">
                   <h2 class="text-sm font-semibold text-[var(--surface-content-color)]"><%= type.label %></h2>
                   <div class="mt-3 grid gap-4 md:grid-cols-2">
                     <% if channel_configurable?(type) %>
@@ -83,7 +97,6 @@
                         options: @channel_select_options.fetch(type.key),
                         label: notifications_t("settings.channel"),
                         placeholder: (type.optional_channels.any? ? notifications_t("settings.placeholder_search") : notifications_t("settings.placeholder_required")),
-                        help_text: type.description.presence || channel_settings_help_text(type),
                         searchable: true,
                         multiple: true,
                         disabled: type.optional_channels.empty?,
@@ -97,7 +110,6 @@
                         name: "cadences[#{type.key}]",
                         options: @cadence_select_options.fetch(type.key),
                         label: notifications_t("settings.frequency"),
-                        help_text: notifications_t("settings.cadence_help"),
                         searchable: false,
                         value: @selected_cadences.fetch(type.key),
                         class: "w-full"
@@ -107,7 +119,6 @@
                         name: "cadences[#{type.key}]",
                         options: type.allowed_cadences.map { |cadence| [cadence_option_label(cadence), cadence.to_s] },
                         label: notifications_t("settings.frequency"),
-                        help_text: notifications_t("settings.cadence_required", label: type.label.downcase),
                         disabled: true,
                         searchable: false,
                         value: type.required_cadence.to_s,

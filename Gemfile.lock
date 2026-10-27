@@ -1,9 +1,10 @@
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio.git
-  revision: 613501164c57b6f0bf6e8e356d593b1e5c151368
-  tag: v4.7.0
+  revision: 403521dddc141ddb12d1ed8d8b30bd4105a9d6f8
+  tag: v6.1.0
   specs:
-    recording_studio (4.7.0)
+    recording_studio (6.1.0)
+      flat_pack (>= 0.1.315)
       rails (>= 8.1.0)
 
 GIT
@@ -13,7 +14,7 @@ GIT
   specs:
     recording_studio_accessible (0.18.0)
       rails (~> 8.1.0)
-      recording_studio (~> 4.2)
+      recording_studio (>= 6.1.0)
       recording_studio_trashable (~> 0.10)
 
 GIT
@@ -23,7 +24,7 @@ GIT
   specs:
     recording_studio_metrics (0.5.0)
       rails (~> 8.1.0)
-      recording_studio (~> 4.2)
+      recording_studio (>= 6.1.0)
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_trashable.git
@@ -33,30 +34,30 @@ GIT
     recording_studio_trashable (0.11.0)
       flat_pack (>= 0.1.74)
       rails (~> 8.1.0)
-      recording_studio (~> 4.7)
+      recording_studio (>= 6.1.0)
       recording_studio_metrics (~> 0.2)
 
 GIT
   remote: https://github.com/bowerbird-app/flatpack.git
-  revision: a17074f91915f7b52ffc755a1411e186bd9e20e7
-  tag: v0.1.254
+  revision: 1fcbafe94f8eb118f0a22182f63f5110fcc97a56
+  ref: 1fcbafe94f8eb118f0a22182f63f5110fcc97a56
   specs:
-    flat_pack (0.1.254)
+    flat_pack (0.1.319)
       pagy (~> 9.0)
       rails (>= 7.1, < 9)
       tailwind_merge (~> 0.13)
-      view_component (~> 4.12.0)
+      view_component (>= 4.14, < 5)
 
 PATH
   remote: .
   specs:
-    recording_studio_notifications (0.13.2)
-      flat_pack (~> 0.1.254)
+    recording_studio_notifications (0.14.0)
+      flat_pack (>= 0.1.315)
       rails (~> 8.1.0)
-      recording_studio (>= 4.2, < 7)
+      recording_studio (>= 6.1.0)
       recording_studio_accessible
       recording_studio_metrics (>= 0.3.0, < 1.0)
-      view_component
+      view_component (>= 4.14, < 5)
 
 GEM
   remote: https://rubygems.org/
@@ -328,10 +329,9 @@ GEM
     unicode-emoji (4.1.0)
     uri (1.1.1)
     useragent (0.16.11)
-    view_component (4.12.0)
+    view_component (4.19.0)
       actionview (>= 7.1.0)
       activesupport (>= 7.1.0)
-      concurrent-ruby (~> 1)
     warden (1.2.9)
       rack (>= 2.0.9)
     websocket-driver (0.8.2)
@@ -364,6 +364,7 @@ DEPENDENCIES
   rubocop-rails
   simplecov
   sprockets-rails
+  view_component (= 4.19.0)
 
 CHECKSUMS
   action_text-trix (2.1.19) sha256=7012f59421009cf284aa651294896414d653a61a2417c9b8714c8476d2f74009
@@ -393,7 +394,7 @@ CHECKSUMS
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
   erb (6.0.5) sha256=858e63488cb796c9daba8b6e9ff4b3879c395022049be9a66a8e00980e612eac
   erubi (1.13.1) sha256=a082103b0885dbc5ecf1172fede897f9ebdb745a4b97a5e8dc63953db1ee4ad9
-  flat_pack (0.1.254)
+  flat_pack (0.1.319)
   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
@@ -441,10 +442,10 @@ CHECKSUMS
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
   rbs (4.0.3) sha256=5a7bf70e2628549d9a1f44eae447b2cfe55968a9c60cfff52693a4bdcc020e14
   rdoc (8.0.0) sha256=03bf8c08a9639658855a0cfd77c0abca8325c227693f7f33f82957811348c469
-  recording_studio (4.7.0)
+  recording_studio (6.1.0)
   recording_studio_accessible (0.18.0)
   recording_studio_metrics (0.5.0)
-  recording_studio_notifications (0.13.2)
+  recording_studio_notifications (0.14.0)
   recording_studio_trashable (0.11.0)
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4
   reline (0.6.3) sha256=1198b04973565b36ec0f11542ab3f5cfeeec34823f4e54cebde90968092b1835
@@ -469,7 +470,7 @@ CHECKSUMS
   unicode-emoji (4.1.0) sha256=4997d2d5df1ed4252f4830a9b6e86f932e2013fbff2182a9ce9ccabda4f325a5
   uri (1.1.1) sha256=379fa58d27ffb1387eaada68c749d1426738bd0f654d812fcc07e7568f5c57c6
   useragent (0.16.11) sha256=700e6413ad4bb954bb63547fa098dddf7b0ebe75b40cc6f93b8d54255b173844
-  view_component (4.12.0) sha256=b9a5979d1c43eba2aa21a06a86f661aab3990104855f2909ef7c3779acdcdcb4
+  view_component (4.19.0) sha256=e75d3d5cf1f56c47118752436173e0d417d31ce79412919bc4232060257fe615
   warden (1.2.9) sha256=46684f885d35a69dbb883deabf85a222c8e427a957804719e143005df7a1efd0
   websocket-driver (0.8.2) sha256=97c556b019bf3410b4961002ac501621e9322d3f8a7bc02161a09301cc4c4146
   websocket-extensions (0.1.5) sha256=1c6ba63092cda343eb53fc657110c71c754c56484aad42578495227d717a8241

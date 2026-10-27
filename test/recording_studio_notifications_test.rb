@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.13.2", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.14.0", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -30,11 +30,12 @@ class RecordingStudioNotificationsTest < Minitest::Test
     refute_includes spec.dependencies.map(&:name), "recording_studio_internationalization"
     refute_includes spec.dependencies.map(&:name), "recording_studio_admin"
     assert_includes spec.dependencies.map(&:name), "recording_studio_metrics"
-    recording_studio = spec.dependencies.find { |dependency| dependency.name == "recording_studio" }
-    assert_equal ">= 4.2, < 7", recording_studio.requirement.to_s
-    assert recording_studio.requirement.satisfied_by?(Gem::Version.new("6.1.0"))
     flat_pack = spec.dependencies.find { |dependency| dependency.name == "flat_pack" }
-    assert_equal "~> 0.1.254", flat_pack.requirement.to_s
+    assert_equal ">= 0.1.315", flat_pack.requirement.to_s
+    studio = spec.dependencies.find { |dependency| dependency.name == "recording_studio" }
+    assert_equal ">= 6.1.0", studio.requirement.to_s
+    view_component = spec.dependencies.find { |dependency| dependency.name == "view_component" }
+    assert_equal ">= 4.14, < 5", view_component.requirement.to_s
   end
 
   def test_engine_routes_notifications_as_root
@@ -87,9 +88,13 @@ class RecordingStudioNotificationsTest < Minitest::Test
 
     assert_includes views, "FlatPack::"
     assert_includes views, "FlatPack::Notification::Component"
-    assert_includes views, "FlatPack::Grid::Component.new(cols: 2"
-    assert_includes views, "FlatPack::Card::Component.new(style: :default, border: :strong)"
+    assert_includes views, "FlatPack::Grid::Component.new(cols: 3"
+    assert_includes views, "lg:col-span-2"
+    refute_includes views, "list-item-active-background-color"
+    assert_includes views, "FlatPack::Card::Component.new(border: :strong,"
     refute_includes views, "style: :outlined"
+    refute_includes views, "FlatPack::PageNav::Component.new("
+    refute_includes views, "Card::Component.new(style:"
     assert_includes views, "card.body do"
     refute_includes views, "padding: :none"
     assert_includes views, "anchor_href: main_app.root_path"

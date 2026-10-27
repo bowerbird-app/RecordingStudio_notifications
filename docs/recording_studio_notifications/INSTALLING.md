@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** October 19, 2026
+> *   **Last Updated:** October 26, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -16,7 +16,11 @@ This guide explains how to install the RecordingStudioNotifications engine in yo
 
 - Rails 8.1+ application
 - PostgreSQL (recommended for UUID compatibility)
-- `flat_pack` `~> 0.1.254` (git tag `v0.1.254`). Hosts also need Accessible `>= 0.20.0` and Admin `>= 2.4.0`. A card that still uses `style: :outlined` moves to `style: :default, border: :strong`.
+- `recording_studio` `>= 6.1.0` (git tag `v6.1.0`)
+- `flat_pack` `>= 0.1.315`. Development pins commit `1fcbafe94f8eb118f0a22182f63f5110fcc97a56` (`0.1.319`).
+- `view_component` `>= 4.14, < 5` (development pins `4.19.0`)
+- Accessible `>= 0.20.0` and Admin `>= 2.4.0`
+- A card drops `style:` and sets `border:` (`border: :strong` on an inbox card, `border: :default` otherwise)
 - TailwindCSS (optional, for styling engine views)
 
 ---
@@ -36,7 +40,8 @@ gem "recording_studio_notifications", path: "../recording_studio_notifications"
 
 # Or from RubyGems (after publishing)
 gem "recording_studio_notifications"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.254"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.1.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", ref: "1fcbafe94f8eb118f0a22182f63f5110fcc97a56"
 ```
 
 ### 2. Install Dependencies
@@ -97,14 +102,15 @@ See [CONFIGURATION.md](CONFIGURATION.md) for all options.
 
 ### Tailwind CSS
 
-If your app uses Tailwind, the generator adds `@source` directives to include engine views and FlatPack components:
+If your app uses Tailwind, the generator adds `@source` directives to include engine views, engine helpers, and FlatPack components:
 
 ```css
 @source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/helpers/**/*.rb";
 @source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 ```
 
-This ensures Tailwind scans the engine's templates for class names during CSS compilation.
+This ensures Tailwind scans the engine's templates and helper class strings during CSS compilation. The unread count badge classes live in `NotificationsHelper`, so a views-only scan misses `text-white`.
 
 ---
 
@@ -143,6 +149,7 @@ Add to your `app/assets/tailwind/application.css`:
 
 ```css
 @source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/views/**/*.erb";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/recording_studio_notifications-*/app/helpers/**/*.rb";
 @source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 ```
 

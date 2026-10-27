@@ -255,11 +255,18 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes application_controller, "RecordingStudio::RootSwitchable::ControllerSupport"
     assert_includes application_controller, "actor || RecordingStudioNotifications.configuration.resolve_actor"
     assert_includes index_view, "id=\"notifications-list\" class=\"flex flex-col\""
-    assert_includes index_view, "FlatPack::PageNav::Component.new("
+    assert_includes index_view, "flat_pack_page_nav("
+    assert_includes index_view, "notifications_page_heading :title"
+    refute_includes index_view, "FlatPack::PageNav::Component.new("
+    refute_includes index_view, "FlatPack::PageTitle::Component"
     assert_includes index_view, "anchor_href: main_app.root_path"
     refute_includes index_view, "anchor_url:"
-    assert_includes index_view, "FlatPack::Grid::Component.new(cols: 2"
-    assert_includes index_view, "FlatPack::Card::Component.new(style: :default, border: :strong)"
+    assert_includes index_view, "FlatPack::Grid::Component.new(cols: 3, align: :start, class: \"rsn-inbox-grid\")"
+    assert_includes index_view, "class: \"rsn-inbox-card lg:col-span-2\""
+    assert_includes index_view, "grid-column: span 2"
+    assert_includes index_view, "padding: 1.5rem"
+    assert_includes index_view, "FlatPack::Card::Component.new(border: :strong,"
+    refute_includes index_view, "Card::Component.new(style:"
     refute_includes index_view, "style: :outlined"
     assert_includes index_view, "card.body do"
     refute_includes index_view, "padding: :none"
@@ -283,6 +290,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes page_view, "recording_studio_notifications/notifications/group"
     assert_includes page_view, "divide-y divide-(--surface-border-color)"
     assert_includes group_partial, "notification_group_dom_id(group)"
+    assert_includes group_partial, "recording-studio-notifications--accordion-open"
     assert_includes group_partial, "FlatPack::List::Component.new(spacing: :dense, class: \"space-y-0\")"
     assert_includes group_partial, "FlatPack::Accordion::Component.new"
     assert_includes group_partial, "left_slot: notification_group_leading_icon(group)"
@@ -290,21 +298,38 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes group_partial, "group.period_label"
     assert_includes group_partial, "'unread' if unread"
     refute_includes group_partial, "Mark all read"
-    assert_includes group_partial,
-                    "[&_[data-flat-pack--accordion-target=trigger]]:bg-[var(--list-item-active-background-color)]"
+    refute_includes group_partial, "list-item-active-background-color"
+    assert_includes group_partial, "[&_[data-flat-pack--accordion-target=trigger]]:px-6"
+    assert_includes group_partial, "[&_[data-flat-pack--accordion-target=trigger]]:py-6"
     assert_includes group_partial, "[&_[data-flat-pack--accordion-target=trigger]]:min-h-[54px]"
     assert_includes group_partial, "[&_[data-flat-pack--accordion-target=content][aria-expanded=true]]:!max-h-none"
     assert_includes group_partial, "!border-0"
     assert_includes group_partial, "group.notifications.first(group_notifications_per_page)"
     assert_includes group_partial, "notifications/group_next_page"
     refute_includes page_view, "<h2"
+    assert_includes notification_partial, "class: \"mb-0 p-6 py-6 px-6\""
+    assert_includes notification_partial, "active: false"
+    refute_includes notification_partial, "active: notification.unread?"
+    assert_includes notification_partial, 'notification.unread? ? "font-semibold" : "font-normal"'
+    assert_includes notification_partial, "text-xs <%= weight %>"
+    assert_includes notification_partial, 'class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"'
+    refute_includes notification_partial, "font-medium"
+    refute_includes notification_partial, "class_name:"
+    assert_includes group_partial, "unread = group.unread_count.positive?"
+    assert_includes group_partial, 'unread ? "font-semibold" : "font-normal"'
+    assert_includes group_partial, "text-xs <%= weight %>"
+    assert_includes group_partial, 'class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"'
     assert_includes notification_partial, "FlatPack::Timestamp::Component.new("
     assert_includes notification_partial, "shorten_timestamp: true"
     assert_includes notifications_helper, "notification_group_badge_text"
     assert_includes notifications_helper, "notifications_t("
     assert_includes notifications_helper, '"inbox.unread_aria"'
     assert_includes notifications_helper, "bg-red-600"
-    assert_includes notifications_helper, "fp-red-dot"
+    assert_includes notifications_helper, "-left-2 -top-2"
+    refute_includes notifications_helper, "-right-2 -top-2"
+    assert_includes notifications_helper, "UNREAD_DOT_CLASSES"
+    assert_includes notifications_helper, "absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-600"
+    refute_includes notifications_helper, "fp-red-dot"
     assert_includes notifications_helper, "def notification_group_next_page_dom_id(group, page)"
     assert_includes notifications_helper, "NotificationsController::GROUP_NOTIFICATIONS_PER_PAGE"
     assert_includes index_view, "notification_sections"
@@ -351,13 +376,19 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, "Array(submitted[type.key.to_s]).flatten.map(&:to_s).reject(&:blank?)"
     assert_includes controller, "selected_channels = [] if selected_channels.include?(\"__none__\")"
     assert_includes controller, "disabled: type.required_channels.include?(channel)"
-    assert_includes controller, "channel_settings_help_text"
+    refute_includes controller, "channel_settings_help_text"
     assert_includes controller, "required_channels_by_type"
     assert_includes controller, 'Copy.t("channels.none"'
     refute_includes settings, "(required)"
     assert_includes settings, "rsn-required-channel-chip"
     assert_includes controller_js, "removeRequiredOptions"
     assert_includes settings, "recording-studio-notifications--notification-settings"
+    assert_includes settings, "recording-studio-notifications--accordion-open"
+    accordion_open = File.read(File.expand_path(
+                                 "../app/javascript/recording_studio_notifications/controllers/accordion_open_controller.js", __dir__
+                               ))
+    assert_includes accordion_open, "[data-flat-pack--accordion-open='true']"
+    assert_includes accordion_open, "dataset.flatPackAccordionOpen"
     assert_includes settings, "recording_studio_notifications__notification_settings_required_channels_value"
     assert_includes settings, "recording_studio_notifications__notification_settings_required_channel_tooltip_value"
     assert_includes controller_js, "requiredChannelTooltipValue"
@@ -371,22 +402,25 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes settings, 'notifications_t("categories.#{category}"'
     assert_includes settings, 'notifications_t("settings.placeholder_required")'
     assert_includes settings, "disabled: type.optional_channels.empty?"
-    assert_includes settings, "channel_settings_help_text(type)"
+    refute_includes settings, "help_text:"
     assert_includes settings, "multiple: true"
     assert_includes settings, "searchable: true"
     assert_includes settings, 'name: "cadences[#{type.key}]"'
     assert_includes settings, 'notifications_t("settings.channel")'
     assert_includes settings, 'notifications_t("settings.frequency")'
-    assert_includes settings, 'notifications_t("settings.cadence_help")'
+    refute_includes settings, 'notifications_t("settings.cadence_help")'
     assert_includes settings, "mt-3 grid gap-4 md:grid-cols-2"
     assert_includes settings, "class: \"w-full\""
-    assert_includes settings, 'notifications_t("settings.cadence_required"'
+    refute_includes settings, 'notifications_t("settings.cadence_required"'
     assert_includes views, "FlatPack::"
     refute_includes views, "notification_bell"
     refute_includes settings, "check_box_tag"
     refute_includes settings, "hidden_field_tag"
     assert_includes settings, ".rsn-settings-accordion"
     assert_includes settings, "overflow: visible"
+    assert_includes settings, "flex w-full flex-col gap-6"
+    refute_includes settings, "max-w-3xl"
+    refute_includes settings, "mx-auto"
   end
 
   def test_dummy_top_nav_uses_flatpack_notification_component

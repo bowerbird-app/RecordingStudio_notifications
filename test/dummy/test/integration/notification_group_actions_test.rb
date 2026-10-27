@@ -23,6 +23,46 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     sign_in @user
   end
 
+  test "unread titles are semibold and read titles are regular weight" do
+    RecordingStudioNotifications.notification_types.register(
+      :read_group_weight,
+      label: "Read group",
+      scope: :global,
+      default_channels: [:in_app],
+      available_channels: [:in_app],
+      allowed_cadences: [:daily],
+      default_cadence: :daily
+    )
+    create_notification(title: "Bold unread title", created_at: Time.current, body: "A note under the bold title")
+    create_notification(
+      title: "Regular read title",
+      created_at: 1.minute.ago,
+      read_at: Time.current,
+      body: "A note under the regular title"
+    )
+    RecordingStudioNotifications::Notification.create!(
+      recipient: @user,
+      notification_type: :read_group_weight,
+      title: "Already read rollup item",
+      created_at: Time.current,
+      updated_at: Time.current,
+      read_at: Time.current
+    )
+
+    get "/notifications"
+
+    assert_response :success
+    assert_includes response.body, 'class="truncate text-sm font-semibold text-(--surface-content-color)">Bold unread title'
+    assert_includes response.body, 'class="line-clamp-2 text-xs font-semibold text-(--surface-muted-content-color)">A note under the bold title'
+    assert_includes response.body, 'class="truncate text-sm font-normal text-(--surface-content-color)">Regular read title'
+    assert_includes response.body, 'class="line-clamp-2 text-xs font-normal text-(--surface-muted-content-color)">A note under the regular title'
+    assert_includes response.body, 'class="truncate text-sm font-normal text-(--surface-content-color)">Already read rollup item'
+    assert_includes response.body, 'class="block truncate font-semibold">Group action test'
+    assert_includes response.body, 'class="block truncate font-normal">Read group'
+    assert_includes response.body, "text-sm font-semibold text-(--surface-muted-content-color) whitespace-nowrap"
+    assert_includes response.body, "text-sm font-normal text-(--surface-muted-content-color) whitespace-nowrap"
+  end
+
   test "digest groups do not render a mark-all-read control" do
     create_notification(title: "Unread in group", created_at: Time.current)
     create_notification(title: "Another unread notification", created_at: 1.minute.ago)
@@ -32,13 +72,21 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Group action test"
     assert_includes response.body, ">Settings</span>"
-    assert_includes response.body, "grid-cols-1 md:grid-cols-2"
+    assert_includes response.body, "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+    assert_includes response.body, "lg:col-span-2"
+    assert_includes response.body, "grid-column: span 2"
+    assert_includes response.body, "padding: 1.5rem"
+    assert_includes response.body, "p-6"
+    assert_includes response.body, "[&amp;_[data-flat-pack--accordion-target=trigger]]:px-6"
+    assert_includes response.body, "[&amp;_[data-flat-pack--accordion-target=trigger]]:py-6"
+    refute_includes response.body, "list-item-active-background-color"
     assert_includes response.body, "border-2 border-[var(--card-border-color)]"
     assert_includes response.body, "p-[var(--card-padding-md)] flex-1 overflow-hidden"
     assert_includes response.body, "aria-label=\"2 unread notifications\""
     assert_includes response.body, "bg-red-600"
     assert_includes response.body, "relative inline-flex shrink-0"
-    assert_includes response.body, "absolute -right-2 -top-2"
+    assert_includes response.body, "absolute -left-2 -top-2"
+    refute_includes response.body, "absolute -right-2 -top-2"
     assert_includes response.body, "inline-flex h-4 min-w-4 shrink-0"
     assert_includes response.body, "block shrink-0 w-5 h-5"
     assert_includes response.body, "flex shrink-0 items-center gap-4"
@@ -69,7 +117,8 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Settings</span>"
     assert_operator response.body.index("Clear all"), :<, response.body.index(">Settings</span>")
     assert_includes response.body, "fp-button-raised"
-    assert_includes response.body, "fp-red-dot"
+    assert_includes response.body, "absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-600"
+    refute_includes response.body, "fp-red-dot"
 
     patch "/notifications/notifications/clear_all", as: :turbo_stream
 
@@ -81,6 +130,7 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Clear all"
     assert_includes response.body, ">Settings</span>"
     refute_includes response.body, "unread notifications\""
+    refute_includes response.body, "absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-600"
     refute_includes response.body, "fp-red-dot"
     assert unread_notification.reload.cleared_at.present?
     assert_nil unread_notification.read_at
@@ -93,6 +143,7 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     refute_includes response.body, "Clear all"
+    refute_includes response.body, "absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-600"
     refute_includes response.body, "fp-red-dot"
   end
 
@@ -164,11 +215,12 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
 
   private
 
-  def create_notification(title:, created_at:, read_at: nil, recipient: @user)
+  def create_notification(title:, created_at:, read_at: nil, recipient: @user, body: nil)
     RecordingStudioNotifications::Notification.create!(
       recipient: recipient,
       notification_type: :group_action_test,
       title: title,
+      body: body,
       created_at: created_at,
       updated_at: created_at,
       read_at: read_at

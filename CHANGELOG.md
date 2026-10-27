@@ -8,6 +8,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-26
+
+### Changed
+- Requires `recording_studio` `>= 6.1.0` and `flat_pack` `>= 0.1.315`. Development Gemfiles pin Recording Studio tag `v6.1.0`, Flatpack commit `1fcbafe94f8eb118f0a22182f63f5110fcc97a56` (`0.1.319`), and `view_component` `4.19.0` (`>= 4.14, < 5`).
+- Inbox, notification, settings, and unsubscribe screens use `recording_studio_layout`. `config.layout` defaults to `nil`, which follows `RecordingStudio.configuration.layout` and then `"recording_studio/default_layout"`.
+- Page titles come from `content_for :title` and `content_for :subtitle` through `notifications_page_heading`, so an apostrophe in a title stays an apostrophe. Back and close use `flat_pack_page_nav`. Show actions use `register_page_nav`. Inbox clear and settings stay in `recording_studio_page_nav_right` so clear-all can replace them.
+- `FlatPack::Card` calls drop `style:`. Inbox cards keep `border: :strong`.
+- The settings form fills the default layout width. It no longer sits in a centered `max-w-3xl` column.
+- Settings categories and the first inbox group start expanded. Flatpack's accordion reads `dataset.flatPackAccordionOpen`, which does not see `data-flat-pack--accordion-open`, so `open: true` was closed on connect.
+- The Frequency label for cadence `:individual` is Instant. French in the dummy app is Instantané. The stored key stays `individual`.
+- Channel and Frequency fields no longer show help text under the control.
+- Settings type rows leave 2.5rem (40px) above and below the divider between notification types. The last type in a category has no extra bottom padding. The spacing is a style rule in the settings view, so it does not depend on a host Tailwind rebuild.
+- The inbox card spans 2 of 3 grid columns. It stays left-aligned at about two thirds of the width on a wide screen and full width below that.
+- Unread inbox rows and rollup headers no longer use the active list background. The red unread mark stays. On an unread row, the title, the note, and the time are `font-semibold`. On a read row, all three are `font-normal`. A rollup header uses the same weights for its label, period, and time. The bell menu is Flatpack's notification dropdown, which uses one title weight for every row.
+- Rollup unread counts sit on the top-left of the type icon. An individual unread row shows a larger red dot on the top-left of that icon. It no longer uses Flatpack's top-right `fp-red-dot`.
+- Inbox rows and rollup headers use 1.5rem (24px) of padding on every side. The rule is in the inbox view, so it does not depend on a host Tailwind rebuild.
+
+### Fixed
+- Tailwind scans this gem's `app/helpers`, so the unread rollup badge classes in `NotificationsHelper` (`text-white`, `bg-red-600`, and the rest) are compiled. A views-only `@source` left the count in the inherited text color.
+
+### Removed
+- `app/views/layouts/recording_studio_notifications/blank.html.erb`.
+
+### Upgrade notes
+- Bump to `0.14.0`. No migration.
+- Require Recording Studio `>= 6.1.0` and Flatpack `>= 0.1.315`. `view_component` must be `>= 4.14` and `< 5`.
+- Set `RecordingStudioNotifications.configuration.layout` when these screens should not use the host's `RecordingStudio.configuration.layout`. `nil` falls through. `false` renders no layout. A callable must be `->(controller:) { ... }`.
+- Remove `style:` from `FlatPack::Card::Component.new`. Use `border:`.
+- Remove `anchor_href:` and `back_href:` from `FlatPack::PageNav::Component.new`. Pass them to `flat_pack_page_nav`.
+- Do not render a second page title in the view body. The default layout already renders one `h1`.
+- `"recording_studio/default_layout"` does not set `lang` or `dir`. Host layouts that call `recording_studio_locale_attributes` still do. Inbox, settings, notification, and unsubscribe use that default layout when `config.layout` is nil.
+- Sibling gems that still cap `recording_studio` below 5 need the same gemspec widen used in `test/support/widen_recording_studio_requirement.rb` until those gems allow 6.1.0.
+- Admin 2.4 still calls `recording_studio_page_nav` and, when `engine_layout` is not the default layout, renders page nav with removed Flatpack keywords. The dummy app defines that method and replaces `recording_studio_admin/shared/_page_nav` until Admin ships a Flatpack 0.1.315 nav.
+- The dummy app pins Root Switchable `v0.10.0`. `v0.9.0` passes `anchor_label` to `PageNav` and raises on Flatpack 0.1.315. That 0.10 dropdown template still calls `button_attributes`, which Flatpack 0.1.319 removed, so the dummy renders the trigger with the current button.
+- Frequency copy for `:individual` is Instant. Existing rows stay `individual`. No migration.
+- Settings type rows have 2.5rem (40px) of space around the divider. The last type in a category has no extra bottom padding. No host markup change.
+- Inbox overrides that still use `cols: 2` should use `cols: 3` and span the card 2 columns. Unread rows no longer take the active list background. On an unread row, the title, the note, and the time are semibold. On a read row, all three are regular weight. A rollup header follows the same rule for its label, period, and time. Row and rollup-header padding is 1.5rem (24px) on every side. Rollup unread counts and individual unread dots sit on the top-left of the type icon. Individual rows no longer use Flatpack's top-right `fp-red-dot`. No migration.
+- Add a Tailwind `@source` for this gem's `app/helpers/**/*.rb` next to the views source (`app/{views,helpers}/**/*.{erb,rb}`), then run `bin/rails tailwindcss:build`. Re-running the install generator adds the helper line when it is missing. The unread count badge uses `text-white` from `NotificationsHelper`.
+- No compatibility shim.
+
 ## [0.13.2] - 2026-10-27
 
 ### Changed
@@ -378,7 +418,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.2...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.12.1...v0.13.0
