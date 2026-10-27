@@ -181,10 +181,10 @@ The settings page keeps channel preferences and notification cadence separate:
 
 - A **Notification cadence** selector appears when a type permits more than one cadence and does not require one.
 - Selecting the default cadence removes the recipient override; selecting another allowed value saves an override.
-- Types with `required_cadence` show a non-editable explanation instead of a selector.
+- Types with `required_cadence` show a disabled Frequency select.
 - Channel selections and cadence submissions are independent, so updating cadence does not change channel preferences.
 
-Selector help text explains the combined effect: it controls when the type is delivered through enabled channels and how its source notifications are grouped in the inbox.
+Channel and Frequency fields do not show help text under the control. Cadence still decides when the type is delivered through enabled channels and how its source notifications are grouped in the inbox.
 
 ### Inbox Grouping
 

@@ -84,7 +84,6 @@
                         options: @channel_select_options.fetch(type.key),
                         label: notifications_t("settings.channel"),
                         placeholder: (type.optional_channels.any? ? notifications_t("settings.placeholder_search") : notifications_t("settings.placeholder_required")),
-                        help_text: type.description.presence || channel_settings_help_text(type),
                         searchable: true,
                         multiple: true,
                         disabled: type.optional_channels.empty?,
@@ -98,7 +97,6 @@
                         name: "cadences[#{type.key}]",
                         options: @cadence_select_options.fetch(type.key),
                         label: notifications_t("settings.frequency"),
-                        help_text: notifications_t("settings.cadence_help"),
                         searchable: false,
                         value: @selected_cadences.fetch(type.key),
                         class: "w-full"
@@ -108,7 +106,6 @@
                         name: "cadences[#{type.key}]",
                         options: type.allowed_cadences.map { |cadence| [cadence_option_label(cadence), cadence.to_s] },
                         label: notifications_t("settings.frequency"),
-                        help_text: notifications_t("settings.cadence_required", label: type.label.downcase),
                         disabled: true,
                         searchable: false,
                         value: type.required_cadence.to_s,

@@ -2,8 +2,7 @@
 
 module RecordingStudioNotifications
   class SettingsController < ApplicationController
-    helper_method :channel_configurable?, :cadence_selectable?, :rollup_delivery_enabled?, :channel_settings_help_text,
-                  :cadence_option_label
+    helper_method :channel_configurable?, :cadence_selectable?, :rollup_delivery_enabled?, :cadence_option_label
 
     before_action :set_recipient
     before_action :authorize_settings
@@ -148,25 +147,6 @@ module RecordingStudioNotifications
 
     def cadence_option_label(cadence)
       Copy.t("cadences.#{cadence}", default: cadence.to_s.humanize)
-    end
-
-    def channel_settings_help_text(type)
-      if type.required_channels.any? && type.optional_channels.any?
-        Copy.t(
-          "settings.help_required_and_optional",
-          default: "Required channels stay enabled and optional channels can be added or removed."
-        )
-      elsif type.required_channels.any?
-        Copy.t(
-          "settings.help_required_only",
-          default: "This notification type has required channels only."
-        )
-      else
-        Copy.t(
-          "settings.help_optional",
-          default: "Choose which channels to receive notifications on."
-        )
-      end
     end
 
     def required_channels_by_type

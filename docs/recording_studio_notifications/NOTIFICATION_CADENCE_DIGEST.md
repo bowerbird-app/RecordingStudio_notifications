@@ -256,19 +256,9 @@ Use `rollup_key` as the provider idempotency key where supported. Since external
 
 ### Phase 7: Settings UI and Documentation
 
-For notification types without `required_cadence`, show a **Notification cadence** selector only when more than one cadence is allowed.
+For notification types without `required_cadence`, show a Frequency selector only when more than one cadence is allowed. Channel and Frequency fields do not show help text under the control.
 
-Help text:
-
-> Controls when this notification type is delivered and how it is grouped in your inbox.
-
-For grouped values, make the outcome explicit:
-
-> Weekly: receive one weekly rollup through enabled channels and view the week's notifications as an expandable inbox group.
-
-For required cadence, display a non-editable explanation, for example:
-
-> Notification cadence: Weekly. This cadence is required for page comments.
+For required cadence, show a disabled Frequency select. The stored cadence stays visible and cannot be changed.
 
 **Acceptance criteria**
 

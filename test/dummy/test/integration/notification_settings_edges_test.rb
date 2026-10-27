@@ -25,11 +25,12 @@ class NotificationSettingsEdgesTest < ActionDispatch::IntegrationTest
     sign_in @user
   end
 
-  test "mixed channels without a description explain required and optional channels" do
+  test "mixed channels without a description still render the type" do
     get "/notifications/settings"
 
     assert_response :success
-    assert_includes response.body, "Required channels stay enabled and optional channels can be added or removed."
+    assert_includes response.body, "Settings edge mixed"
+    refute_includes response.body, "Required channels stay enabled and optional channels can be added or removed."
   end
 
   test "a cadence preference with a blank channel is skipped in the preference map" do

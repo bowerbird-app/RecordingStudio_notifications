@@ -356,7 +356,7 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes controller, "Array(submitted[type.key.to_s]).flatten.map(&:to_s).reject(&:blank?)"
     assert_includes controller, "selected_channels = [] if selected_channels.include?(\"__none__\")"
     assert_includes controller, "disabled: type.required_channels.include?(channel)"
-    assert_includes controller, "channel_settings_help_text"
+    refute_includes controller, "channel_settings_help_text"
     assert_includes controller, "required_channels_by_type"
     assert_includes controller, 'Copy.t("channels.none"'
     refute_includes settings, "(required)"
@@ -382,16 +382,16 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes settings, 'notifications_t("categories.#{category}"'
     assert_includes settings, 'notifications_t("settings.placeholder_required")'
     assert_includes settings, "disabled: type.optional_channels.empty?"
-    assert_includes settings, "channel_settings_help_text(type)"
+    refute_includes settings, "help_text:"
     assert_includes settings, "multiple: true"
     assert_includes settings, "searchable: true"
     assert_includes settings, 'name: "cadences[#{type.key}]"'
     assert_includes settings, 'notifications_t("settings.channel")'
     assert_includes settings, 'notifications_t("settings.frequency")'
-    assert_includes settings, 'notifications_t("settings.cadence_help")'
+    refute_includes settings, 'notifications_t("settings.cadence_help")'
     assert_includes settings, "mt-3 grid gap-4 md:grid-cols-2"
     assert_includes settings, "class: \"w-full\""
-    assert_includes settings, 'notifications_t("settings.cadence_required"'
+    refute_includes settings, 'notifications_t("settings.cadence_required"'
     assert_includes views, "FlatPack::"
     refute_includes views, "notification_bell"
     refute_includes settings, "check_box_tag"

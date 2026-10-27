@@ -71,13 +71,8 @@ fr:
         frequency: Fréquence
         placeholder_search: Chercher et choisir des canaux…
         placeholder_required: Canaux obligatoires seulement
-        cadence_help: Changer la fréquence des notifications.
-        cadence_required: Cette fréquence est obligatoire pour %{label}.
         save: Enregistrer
         empty: Aucun canal optionnel n’est disponible.
-        help_required_and_optional: Les canaux obligatoires restent activés. Vous pouvez ajouter ou retirer les autres.
-        help_required_only: Ce type n’a que des canaux obligatoires.
-        help_optional: Choisissez les canaux où recevoir les notifications.
         required_channel_tooltip: Ce canal ne peut pas être retiré
       unsubscribe:
         confirm_title: Arrêter ces e-mails ?
