@@ -5,17 +5,18 @@
     <% end %>
   <% else %>
     <% unread = group.unread_count.positive? %>
+    <% weight = unread ? "font-semibold" : "font-normal" %>
     <% title = content_tag(:span, class: "flex w-full items-center justify-between gap-4 #{'unread' if unread}") do %>
       <span class="min-w-0 space-y-0.5 text-left">
-        <span class="block truncate <%= group.unread_count.positive? ? "font-semibold" : "font-normal" %>"><%= group.notification_type_label %></span>
-        <span class="block truncate text-xs font-normal text-(--surface-muted-content-color)"><%= group.period_label %></span>
+        <span class="block truncate <%= weight %>"><%= group.notification_type_label %></span>
+        <span class="block truncate text-xs <%= weight %> text-(--surface-muted-content-color)"><%= group.period_label %></span>
       </span>
       <span class="flex shrink-0 items-center gap-4">
         <%= render FlatPack::Timestamp::Component.new(
           timestamp: group.latest_notification.created_at,
           shorten_timestamp: true,
           fallback_text: "",
-          class_name: "text-sm font-normal text-(--surface-muted-content-color) whitespace-nowrap"
+          class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"
         ) %>
       </span>
     <% end %>

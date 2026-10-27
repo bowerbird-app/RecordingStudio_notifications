@@ -311,9 +311,14 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes notification_partial, "active: false"
     refute_includes notification_partial, "active: notification.unread?"
     assert_includes notification_partial, 'notification.unread? ? "font-semibold" : "font-normal"'
-    assert_includes notification_partial, "font-normal text-(--surface-muted-content-color)"
+    assert_includes notification_partial, "text-xs <%= weight %>"
+    assert_includes notification_partial, 'class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"'
     refute_includes notification_partial, "font-medium"
-    assert_includes group_partial, 'group.unread_count.positive? ? "font-semibold" : "font-normal"'
+    refute_includes notification_partial, "class_name:"
+    assert_includes group_partial, "unread = group.unread_count.positive?"
+    assert_includes group_partial, 'unread ? "font-semibold" : "font-normal"'
+    assert_includes group_partial, "text-xs <%= weight %>"
+    assert_includes group_partial, 'class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"'
     assert_includes notification_partial, "FlatPack::Timestamp::Component.new("
     assert_includes notification_partial, "shorten_timestamp: true"
     assert_includes notifications_helper, "notification_group_badge_text"

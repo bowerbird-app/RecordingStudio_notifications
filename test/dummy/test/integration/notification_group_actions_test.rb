@@ -34,7 +34,12 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
       default_cadence: :daily
     )
     create_notification(title: "Bold unread title", created_at: Time.current, body: "A note under the bold title")
-    create_notification(title: "Regular read title", created_at: 1.minute.ago, read_at: Time.current)
+    create_notification(
+      title: "Regular read title",
+      created_at: 1.minute.ago,
+      read_at: Time.current,
+      body: "A note under the regular title"
+    )
     RecordingStudioNotifications::Notification.create!(
       recipient: @user,
       notification_type: :read_group_weight,
@@ -48,11 +53,14 @@ class NotificationGroupActionsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, 'class="truncate text-sm font-semibold text-(--surface-content-color)">Bold unread title'
+    assert_includes response.body, 'class="line-clamp-2 text-xs font-semibold text-(--surface-muted-content-color)">A note under the bold title'
     assert_includes response.body, 'class="truncate text-sm font-normal text-(--surface-content-color)">Regular read title'
+    assert_includes response.body, 'class="line-clamp-2 text-xs font-normal text-(--surface-muted-content-color)">A note under the regular title'
     assert_includes response.body, 'class="truncate text-sm font-normal text-(--surface-content-color)">Already read rollup item'
     assert_includes response.body, 'class="block truncate font-semibold">Group action test'
     assert_includes response.body, 'class="block truncate font-normal">Read group'
-    assert_includes response.body, "line-clamp-2 text-xs font-normal"
+    assert_includes response.body, "text-sm font-semibold text-(--surface-muted-content-color) whitespace-nowrap"
+    assert_includes response.body, "text-sm font-normal text-(--surface-muted-content-color) whitespace-nowrap"
   end
 
   test "digest groups do not render a mark-all-read control" do

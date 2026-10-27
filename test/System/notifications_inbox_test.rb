@@ -11,16 +11,18 @@ class NotificationsInboxTest < Minitest::Test
     menu_helper = File.read(helper("menu_helper.rb"))
 
     assert_includes index, "notifications/page"
-    assert_includes notification, 'notification.unread? ? "font-semibold" : "font-normal"'
-    assert_includes notification, "truncate text-sm"
-    assert_includes notification, "line-clamp-2 text-xs font-normal"
-    assert_includes notification, "font-normal text-(--surface-muted-content-color) whitespace-nowrap"
+    assert_includes notification, 'weight = notification.unread? ? "font-semibold" : "font-normal"'
+    assert_includes notification, "truncate text-sm <%= weight %>"
+    assert_includes notification, "line-clamp-2 text-xs <%= weight %>"
+    assert_includes notification, 'class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"'
     refute_includes notification, "font-medium"
-    refute_includes notification, "font-semibold text-xs"
+    refute_includes notification, "class_name:"
 
-    assert_includes group, 'group.unread_count.positive? ? "font-semibold" : "font-normal"'
-    assert_includes group, "text-xs font-normal text-(--surface-muted-content-color)"
-    assert_includes group, "text-sm font-normal text-(--surface-muted-content-color) whitespace-nowrap"
+    assert_includes group, "unread = group.unread_count.positive?"
+    assert_includes group, 'weight = unread ? "font-semibold" : "font-normal"'
+    assert_includes group, "block truncate <%= weight %>"
+    assert_includes group, "text-xs <%= weight %> text-(--surface-muted-content-color)"
+    assert_includes group, 'class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"'
     assert_includes group, "notifications/notification"
 
     refute_includes menu, "font-semibold"
