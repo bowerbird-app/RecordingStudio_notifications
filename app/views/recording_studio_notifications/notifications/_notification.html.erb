@@ -1,4 +1,5 @@
 <% weight = notification.unread? ? "font-semibold" : "font-normal" %>
+<% title_color = notification.unread? ? "text-(--surface-content-color)" : "text-(--surface-muted-content-color)" %>
 <%= render FlatPack::List::Item.new(
   leading: notification_leading_icon(notification),
   href: open_notification_path(notification),
@@ -15,7 +16,7 @@
   class: "mb-0 p-6 py-6 px-6"
 ) do %>
   <div class="space-y-0.5 text-left">
-    <div class="truncate text-sm <%= weight %> text-(--surface-content-color)"><%= notification.title %></div>
+    <div class="truncate text-sm <%= weight %> <%= title_color %>"><%= notification.title %></div>
     <% if notification.body.present? %>
       <div class="line-clamp-2 text-xs <%= weight %> text-(--surface-muted-content-color)"><%= notification.body %></div>
     <% end %>

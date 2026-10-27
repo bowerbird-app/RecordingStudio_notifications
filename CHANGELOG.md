@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.1] - 2026-10-28
+
+### Changed
+- Read inbox rows use `text-(--surface-muted-content-color)` and `font-normal` on the title, the note, and the time. Unread rows keep `font-semibold` and `text-(--surface-content-color)` on the title. The note and the time stay muted. A rollup header with unread items uses `font-semibold` and `text-(--surface-content-color)` on the type label. A rollup header with `unread_count` at zero uses `font-normal` and `text-(--surface-muted-content-color)` on that label. Rollup child rows follow the same title rule as individual rows. The inbox view sets both colors in a style rule, so a host does not need a Tailwind rebuild for them.
+
+### Upgrade notes
+- Bump to `0.14.1`. No migration.
+- Read notification titles and read rollup type labels render in `var(--surface-muted-content-color)`. Unread titles stay `var(--surface-content-color)` and semibold. No host markup change.
+
 ## [0.14.0] - 2026-10-26
 
 ### Changed
@@ -418,7 +427,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.1...HEAD
+[0.14.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.0...v0.13.1
