@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Settings type rows leave 2.5rem (40px) above and below the divider between notification types. The last type in a category has no extra bottom padding. The spacing is a style rule in the settings view, so it does not depend on a host Tailwind rebuild.
 - The inbox card spans 2 of 3 grid columns. It stays left-aligned at about two thirds of the width on a wide screen and full width below that.
 - Unread inbox rows and rollup headers no longer use the active list background. The red unread mark stays.
-- Inbox rows and rollup headers use 1rem of vertical padding and 1.25rem of horizontal padding. The rule is in the inbox view, so it does not depend on a host Tailwind rebuild.
+- Inbox rows and rollup headers use 1.5rem (24px) of padding on every side. The rule is in the inbox view, so it does not depend on a host Tailwind rebuild.
 
 ### Fixed
 - Tailwind scans this gem's `app/helpers`, so the unread rollup badge classes in `NotificationsHelper` (`text-white`, `bg-red-600`, and the rest) are compiled. A views-only `@source` left the count in the inherited text color.
@@ -43,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The dummy app pins Root Switchable `v0.10.0`. `v0.9.0` passes `anchor_label` to `PageNav` and raises on Flatpack 0.1.315. That 0.10 dropdown template still calls `button_attributes`, which Flatpack 0.1.319 removed, so the dummy renders the trigger with the current button.
 - Frequency copy for `:individual` is Instant. Existing rows stay `individual`. No migration.
 - Settings type rows have 2.5rem (40px) of space around the divider. The last type in a category has no extra bottom padding. No host markup change.
-- Inbox overrides that still use `cols: 2` should use `cols: 3` and span the card 2 columns. Unread rows no longer take the active list background. Row padding is 1rem by 1.25rem. No migration.
+- Inbox overrides that still use `cols: 2` should use `cols: 3` and span the card 2 columns. Unread rows no longer take the active list background. Row and rollup-header padding is 1.5rem (24px) on every side. No migration.
 - Add a Tailwind `@source` for this gem's `app/helpers/**/*.rb` next to the views source (`app/{views,helpers}/**/*.{erb,rb}`), then run `bin/rails tailwindcss:build`. Re-running the install generator adds the helper line when it is missing. The unread count badge uses `text-white` from `NotificationsHelper`.
 - No compatibility shim.
 
