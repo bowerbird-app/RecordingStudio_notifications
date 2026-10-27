@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.13.1", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.13.2", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -30,6 +30,9 @@ class RecordingStudioNotificationsTest < Minitest::Test
     refute_includes spec.dependencies.map(&:name), "recording_studio_internationalization"
     refute_includes spec.dependencies.map(&:name), "recording_studio_admin"
     assert_includes spec.dependencies.map(&:name), "recording_studio_metrics"
+    recording_studio = spec.dependencies.find { |dependency| dependency.name == "recording_studio" }
+    assert_equal ">= 4.2, < 7", recording_studio.requirement.to_s
+    assert recording_studio.requirement.satisfied_by?(Gem::Version.new("6.1.0"))
     flat_pack = spec.dependencies.find { |dependency| dependency.name == "flat_pack" }
     assert_equal "~> 0.1.254", flat_pack.requirement.to_s
   end

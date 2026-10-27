@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.2] - 2026-10-27
+
+### Changed
+- Runtime dependency `recording_studio` is now `>= 4.2, < 7` so hosts and sibling gems on 6.x (including 6.1.0) can resolve this gem. 4.x and 5.x still match.
+
+### Upgrade notes
+- Bump to `0.13.2`. No migration. No host code change.
+
 ## [0.13.1] - 2026-10-22
 
 ### Changed
@@ -370,7 +378,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.2...HEAD
+[0.13.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.12.0...v0.12.1
