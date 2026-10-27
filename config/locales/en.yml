@@ -70,7 +70,7 @@ en:
         in_app: In app
         email: Email
       cadences:
-        individual: Individual
+        individual: Instant
         daily: Daily
         every_other_day: Every other day
         weekly: Weekly

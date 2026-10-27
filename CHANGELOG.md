@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `FlatPack::Card` calls drop `style:`. Inbox cards keep `border: :strong`.
 - The settings form fills the default layout width. It no longer sits in a centered `max-w-3xl` column.
 - Settings categories and the first inbox group start expanded. Flatpack's accordion reads `dataset.flatPackAccordionOpen`, which does not see `data-flat-pack--accordion-open`, so `open: true` was closed on connect.
+- The Frequency label for cadence `:individual` is Instant. French in the dummy app is Instantané. The stored key stays `individual`.
 
 ### Removed
 - `app/views/layouts/recording_studio_notifications/blank.html.erb`.
@@ -32,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sibling gems that still cap `recording_studio` below 5 need the same gemspec widen used in `test/support/widen_recording_studio_requirement.rb` until those gems allow 6.1.0.
 - Admin 2.4 still calls `recording_studio_page_nav` and, when `engine_layout` is not the default layout, renders page nav with removed Flatpack keywords. The dummy app defines that method and replaces `recording_studio_admin/shared/_page_nav` until Admin ships a Flatpack 0.1.315 nav.
 - The dummy app pins Root Switchable `v0.10.0`. `v0.9.0` passes `anchor_label` to `PageNav` and raises on Flatpack 0.1.315. That 0.10 dropdown template still calls `button_attributes`, which Flatpack 0.1.319 removed, so the dummy renders the trigger with the current button.
+- Frequency copy for `:individual` is Instant. Existing rows stay `individual`. No migration.
 - No compatibility shim.
 
 ## [0.13.2] - 2026-10-27

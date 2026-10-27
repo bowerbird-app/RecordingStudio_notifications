@@ -106,7 +106,7 @@ fr:
         in_app: Dans l’app
         email: E-mail
       cadences:
-        individual: Individuelle
+        individual: Instantané
         daily: Quotidienne
         every_other_day: Tous les deux jours
         weekly: Hebdomadaire

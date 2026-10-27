@@ -56,6 +56,8 @@ class NotificationCadenceSettingsTest < ActionDispatch::IntegrationTest
     refute_includes settings_section, 'disabled="disabled" data-action="flat-pack--select#toggle"'
     refute_includes settings_section, 'name="preferences[settings_cadence_test][]" value="in_app" disabled'
     assert_includes response.body, 'value="daily" selected="selected">Daily</option>'
+    assert_includes settings_section, 'value="individual">Instant</option>'
+    refute_includes settings_section, ">Individual</option>"
     required_section = response.body[/Required settings cadence test.*?<\/section>/m, 0]
     assert required_section
     assert_includes required_section, 'name="preferences[required_settings_cadence_test][]" value="in_app"'
