@@ -3,34 +3,25 @@
 require_relative "cadence_period"
 require_relative "channel_applicability"
 require_relative "inbox_flag"
+require_relative "notify_attributes"
+require_relative "notify_persistence"
+require_relative "notify_validation"
 
 module RecordingStudioNotifications
   module Services
     class Notify
       include ChannelApplicability
       include InboxFlag
+      include NotifyAttributes
+      include NotifyPersistence
+      include NotifyValidation
 
       def self.call(...)
         new(...).call
       end
 
-      def initialize(notification_type:, recipient:, title:, body: nil, url: nil, metadata: {}, actor: nil, # rubocop:disable Metrics/ParameterLists
-                     notifiable: nil, recording: nil, root_recording: nil, channels: nil, idempotency_key: nil,
-                     deliver_later: nil, inbox: nil)
-        @notification_type = notification_type.to_s
-        @recipient = recipient
-        @title = title
-        @body = body
-        @url = url
-        @metadata = metadata.presence || {}
-        @actor = actor || RecordingStudioNotifications.configuration.resolve_actor
-        @notifiable = notifiable
-        @recording = recording
-        @root_recording = root_recording
-        @requested_channels = channels
-        @idempotency_key = idempotency_key.presence
-        @deliver_later = deliver_later
-        @inbox_override = inbox.nil? ? nil : ActiveModel::Type::Boolean.new.cast(inbox)
+      def initialize(**attributes)
+        apply_notify_attributes(attributes)
       end
 
       def call
@@ -50,60 +41,6 @@ module RecordingStudioNotifications
       end
 
       private
-
-      def create_and_deliver!(existing)
-        notification = nil
-        should_deliver_immediately = false
-
-        ActiveSupport::Notifications.instrument(
-          "notify.recording_studio_notifications",
-          notification_type: @notification_type,
-          recipient: @recipient,
-          channels: channel_keys,
-          root_recording_id: resolved_root_recording&.id
-        ) do
-          Notification.transaction do
-            notification = existing || create_notification!
-            create_deliveries!(notification) if notification.previously_new_record?
-            should_deliver_immediately = notification.deliveries.pending.any? { |delivery| !delivery.deferred_rollup? }
-
-            notification
-          end
-        end
-
-        enqueue_or_deliver!(notification) if should_deliver_immediately
-        notification
-      end
-
-      def validate_inputs!
-        raise ArgumentError, "recipient is required" unless @recipient
-        raise ArgumentError, "title is required" if @title.to_s.blank?
-        raise ArgumentError, "notification_type is not registered" unless type_definition
-        raise ArgumentError, "root_recording is required" if type_definition.scope == :root && resolved_root_recording.blank?
-        raise ArgumentError, "root_recording does not match recording or notifiable" unless consistent_root_scope?
-
-        validate_required_channels_available!(channel_keys)
-
-        unregistered_channel = channel_keys.find do |channel|
-          !RecordingStudioNotifications.channels.registered?(channel)
-        end
-        raise ArgumentError, "channel is not registered: #{unregistered_channel}" if unregistered_channel
-
-        if type_definition.available_channels
-          unavailable_channel = channel_keys.find { |channel| !type_definition.available_channels.include?(channel) }
-          if unavailable_channel
-            raise ArgumentError,
-                  "channel is not available for #{@notification_type}: #{unavailable_channel}"
-          end
-        end
-
-        unsupported_rollup_channel = channel_keys.find do |channel|
-          deferred_rollup_channel?(channel) && !RecordingStudioNotifications.channels.fetch(channel).respond_to?(:deliver_rollup)
-        end
-        raise ArgumentError, "channel does not support grouped delivery: #{unsupported_rollup_channel}" if unsupported_rollup_channel
-
-        UrlSafety.sanitize!(@url)
-      end
 
       def authorize_creation!
         return unless type_definition.creation_action
@@ -156,27 +93,6 @@ module RecordingStudioNotifications
         Notification.find_by(recipient: @recipient, idempotency_key: @idempotency_key)
       end
 
-      def create_notification!
-        Notification.create!(
-          notification_type: @notification_type,
-          recipient: @recipient,
-          actor: @actor,
-          notifiable: @notifiable,
-          recording: type_definition.scope == :global ? nil : @recording,
-          root_recording: type_definition.scope == :global ? nil : resolved_root_recording,
-          title: @title,
-          body: @body,
-          url: @url,
-          metadata: @metadata,
-          idempotency_key: @idempotency_key,
-          inbox: inbox?
-        )
-      rescue ActiveRecord::RecordNotUnique
-        retry unless (existing = find_idempotent_notification)
-
-        existing
-      end
-
       def resolved_root_recording
         return nil if type_definition&.scope == :global
 
@@ -185,40 +101,6 @@ module RecordingStudioNotifications
           recording: @recording,
           recordable: @notifiable
         )
-      end
-
-      def create_deliveries!(notification)
-        channel_keys.each do |channel|
-          notification.deliveries.find_or_create_by!(channel: channel.to_s) do |delivery|
-            delivery.status = "pending"
-            delivery.metadata = rollup_metadata_for(notification, channel) || {}
-          end
-        end
-      end
-
-      def rollup_metadata_for(notification, channel)
-        return unless deferred_rollup_channel?(channel)
-
-        period = CadencePeriod.for(
-          timestamp: notification.created_at,
-          cadence: effective_cadence,
-          time_zone: recipient_time_zone
-        )
-        starts_at = period.starts_at.utc.iso8601
-
-        {
-          "rollup" => true,
-          "rollup_key" => [
-            "#{@recipient.class.name}:#{@recipient.id}",
-            @notification_type,
-            channel,
-            effective_cadence,
-            starts_at
-          ].join("/"),
-          "cadence" => effective_cadence.to_s,
-          "period_starts_at" => starts_at,
-          "period_ends_at" => period.ends_at.utc.iso8601
-        }
       end
 
       def deferred_rollup_channel?(_channel)
@@ -267,18 +149,6 @@ module RecordingStudioNotifications
           recording: @recording,
           recordable: @notifiable
         )
-      end
-
-      def enqueue_or_deliver!(notification)
-        if deliver_later?
-          DeliveryJob.perform_later(notification.id)
-        else
-          DeliveryJob.perform_now(notification.id)
-        end
-      end
-
-      def deliver_later?
-        @deliver_later.nil? ? RecordingStudioNotifications.configuration.deliver_later : @deliver_later
       end
     end
   end

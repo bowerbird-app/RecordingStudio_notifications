@@ -21,6 +21,10 @@ module RecordingStudioNotifications
         new(actor: actor, notification: notification, controller: controller).visible_notification?
       end
 
+      def self.accessible
+        RecordingStudioAccessible if defined?(RecordingStudioAccessible)
+      end
+
       def initialize(actor:, recipient: nil, notification: nil, recording: nil, controller: nil,
                      action: VIEW_NOTIFICATIONS_ACTION)
         @actor = actor
@@ -52,11 +56,11 @@ module RecordingStudioNotifications
       end
 
       def accessible_action_available?
-        defined?(RecordingStudioAccessible) && RecordingStudioAccessible.respond_to?(:authorized_action?)
+        self.class.accessible&.respond_to?(:authorized_action?)
       end
 
       def accessible_action_allowed?
-        RecordingStudioAccessible.authorized_action?(
+        self.class.accessible.authorized_action?(
           actor: @actor,
           action: @action,
           recording: @recording,
@@ -68,7 +72,7 @@ module RecordingStudioNotifications
       def accessible_view_allowed?
         return true unless accessible_action_available?
 
-        RecordingStudioAccessible.authorized_action?(
+        self.class.accessible.authorized_action?(
           actor: @actor,
           action: VIEW_RECORDING_ACTION,
           recording: @notification.root_recording,

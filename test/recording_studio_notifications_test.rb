@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.14.1", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.14.2", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -36,6 +36,8 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_equal ">= 6.1.0", studio.requirement.to_s
     view_component = spec.dependencies.find { |dependency| dependency.name == "view_component" }
     assert_equal ">= 4.14, < 5", view_component.requirement.to_s
+    accessible = spec.dependencies.find { |dependency| dependency.name == "recording_studio_accessible" }
+    assert_equal ">= 0", accessible.requirement.to_s
   end
 
   def test_engine_routes_notifications_as_root
@@ -85,9 +87,11 @@ class RecordingStudioNotificationsTest < Minitest::Test
     views = Dir[File.expand_path("../app/views/recording_studio_notifications/**/*.erb", __dir__)].map do |path|
       File.read(path)
     end.join("\n")
+    menu_helper = File.read(File.expand_path("../app/helpers/recording_studio_notifications/menu_helper.rb", __dir__))
 
     assert_includes views, "FlatPack::"
-    assert_includes views, "FlatPack::Notification::Component"
+    assert_includes menu_helper, "FlatPack::Notification::Component"
+    assert_includes views, "recording_studio_notifications_flatpack_notification_component"
     assert_includes views, "FlatPack::Grid::Component.new(cols: 3"
     assert_includes views, "lg:col-span-2"
     refute_includes views, "list-item-active-background-color"
@@ -106,5 +110,28 @@ class RecordingStudioNotificationsTest < Minitest::Test
     refute_includes views, "url: see_all_href"
     assert_includes views, ".rsn-settings-accordion"
     assert_includes views, "overflow: visible"
+  end
+
+  def test_template_leftovers_are_gone
+    root = File.expand_path("..", __dir__)
+
+    refute File.exist?(File.join(root, "bin/rename_gem"))
+    refute File.exist?(File.join(root, "docs/recording_studio_notifications/RENAMING.md"))
+    refute File.exist?(File.join(root, "test/rename_verification_test.rb"))
+    refute File.exist?(File.join(root, "test/dummy/app/javascript/controllers/hello_controller.js"))
+    refute File.exist?(File.join(root, "test/dummy/.github/workflows/ci.yml"))
+  end
+
+  def test_docs_match_accessible_gemspec_and_gemfile_pin
+    readme = File.read(File.expand_path("../README.md", __dir__))
+    installing = File.read(File.expand_path("../docs/recording_studio_notifications/INSTALLING.md", __dir__))
+    root_gemfile = File.read(File.expand_path("../Gemfile", __dir__))
+
+    refute_includes readme, "Accessible `>= 0.20.0`"
+    refute_includes readme, "recording_studio_accessible` `>= 0.20.0"
+    refute_includes installing, "Accessible `>= 0.20.0`"
+    assert_includes readme, "Accessible to `v0.18.0`"
+    assert_includes installing, "v0.18.0"
+    assert_match(/recording_studio_accessible.*, tag: "v0.18.0"/, root_gemfile)
   end
 end

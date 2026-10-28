@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** October 26, 2026
+> *   **Last Updated:** October 28, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -19,7 +19,7 @@ This guide explains how to install the RecordingStudioNotifications engine in yo
 - `recording_studio` `>= 6.1.0` (git tag `v6.1.0`)
 - `flat_pack` `>= 0.1.315`. Development pins commit `1fcbafe94f8eb118f0a22182f63f5110fcc97a56` (`0.1.319`).
 - `view_component` `>= 4.14, < 5` (development pins `4.19.0`)
-- Accessible `>= 0.20.0` and Admin `>= 2.4.0`
+- Accessible as required by the gemspec (no version floor; development and dummy Gemfiles pin `v0.18.0`) and Admin `>= 2.4.0`
 - A card drops `style:` and sets `border:` (`border: :strong` on an inbox card, `border: :default` otherwise)
 - TailwindCSS (optional, for styling engine views)
 

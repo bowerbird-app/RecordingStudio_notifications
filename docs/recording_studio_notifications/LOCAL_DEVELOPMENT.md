@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** October 5, 2026
+> *   **Last Updated:** October 28, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -229,7 +229,6 @@ recording_studio_notifications/
 
 ## Next Steps
 
-- [Rename the gem](RENAMING.md) to your own name
 - [Configure the gem](CONFIGURATION.md) with your settings
 - [Understand Tailwind setup](CSS_JS_ASSETS_ARCHITECTURE.md)
 - [Install in a host app](INSTALLING.md)

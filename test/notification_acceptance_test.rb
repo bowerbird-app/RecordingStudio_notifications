@@ -12,7 +12,6 @@ class NotificationAcceptanceTest < Minitest::Test
   end
 
   def teardown
-    Object.send(:remove_const, :RecordingStudioAccessible) if defined?(RecordingStudioAccessible)
     RecordingStudioNotifications.instance_variable_set(:@configuration, @original_configuration)
   end
 
@@ -153,7 +152,7 @@ class NotificationAcceptanceTest < Minitest::Test
   end
 
   def test_notify_applies_required_channels_preferences_creation_auth_and_instrumentation
-    source = %w[notify.rb inbox_flag.rb].map do |name|
+    source = %w[notify.rb notify_persistence.rb notify_validation.rb inbox_flag.rb].map do |name|
       File.read(File.expand_path("../lib/recording_studio_notifications/services/#{name}", __dir__))
     end.join
 
@@ -187,22 +186,23 @@ class NotificationAcceptanceTest < Minitest::Test
         kwargs[:action] == :view
       end
     end
-    Object.const_set(:RecordingStudioAccessible, fake_accessible)
-
     actor = FakeActor.new("1")
     notification = FakeNotification.new(actor, Object.new, nil)
+    authorization = RecordingStudioNotifications::Services::NotificationAuthorization
 
-    assert RecordingStudioNotifications::Services::NotificationAuthorization.visible_notification?(
-      actor: actor,
-      notification: notification
-    )
-    assert_equal :view, calls.last.fetch(:action)
+    authorization.stub(:accessible, fake_accessible) do
+      assert authorization.visible_notification?(
+        actor: actor,
+        notification: notification
+      )
+      assert_equal :view, calls.last.fetch(:action)
 
-    refute RecordingStudioNotifications::Services::NotificationAuthorization.preferences_allowed?(
-      actor: actor,
-      recipient: actor
-    )
-    assert_equal :"recording_studio_notifications.manage_preferences", calls.last.fetch(:action)
+      refute authorization.preferences_allowed?(
+        actor: actor,
+        recipient: actor
+      )
+      assert_equal :"recording_studio_notifications.manage_preferences", calls.last.fetch(:action)
+    end
   end
 
   def test_inbox_is_current_root_only_with_rootless_notifications
@@ -451,7 +451,8 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes menu_helper, "recording-studio-notifications--notification-polling-url-value"
     assert_includes menu_helper, "recording-studio-notifications--notification-polling-interval-value"
     assert_includes menu_helper, "recording-studio-notifications--notification-polling-limit-value"
-    assert_includes menu_partial, "FlatPack::Notification::Component"
+    assert_includes menu_helper, "FlatPack::Notification::Component"
+    assert_includes menu_partial, "recording_studio_notifications_flatpack_notification_component"
     assert_includes menu_partial, "href: see_all_href"
     refute_includes menu_partial, "url: see_all_href"
     assert_includes helper, "href: recording_studio_accessible.recording_accesses_path(recording)"
