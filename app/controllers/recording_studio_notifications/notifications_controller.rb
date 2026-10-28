@@ -4,9 +4,6 @@ require "recording_studio_notifications/services/inbox_grouping"
 
 module RecordingStudioNotifications
   class NotificationsController < ApplicationController
-    include Inbox
-    include MenuJson
-
     PER_PAGE = 25
     GROUP_NOTIFICATIONS_PER_PAGE = 20
 
@@ -32,7 +29,29 @@ module RecordingStudioNotifications
       @inbox_scope = notifications_inbox_scope
       @current_root_recording = current_notifications_root_recording
 
-      render json: menu_json
+      visible = visible_notifications(scoped_notifications)
+      limit = normalized_menu_limit
+      groups = grouped_notification_sections(visible).flat_map(&:groups)
+      recent_groups = groups.sort_by { |group| [group.latest_notification.created_at, group.id] }.reverse.first(limit)
+      payload = recent_groups.map { |group| menu_group_payload(group) }
+      unread_count = visible.count(&:unread?)
+
+      render json: {
+        unread_count: unread_count,
+        notifications: payload,
+        polling_interval_seconds: RecordingStudioNotifications.configuration.polling_interval_seconds,
+        menu_html: render_to_string(
+          partial: "recording_studio_notifications/notifications/menu_component",
+          formats: [:html],
+          locals: {
+            unread_count: unread_count,
+            notifications: payload,
+            see_all_href: notifications_path,
+            bell_label: Copy.t("menu.title", default: "Notifications"),
+            empty_text: Copy.t("menu.empty", default: "No recent notifications")
+          }
+        )
+      }
     end
 
     def group_page
@@ -141,6 +160,102 @@ module RecordingStudioNotifications
 
     def require_inbox_notification
       head :not_found unless @notification.inbox?
+    end
+
+    def scoped_notifications
+      notifications = Notification.for_recipient(@recipient).active.visible_in_inbox.in_inbox
+      notifications = notifications.for_current_root_inbox(@current_root_recording) if @inbox_scope == "current_root"
+      notifications.newest_first
+    end
+
+    def prepare_inbox
+      @inbox_scope = notifications_inbox_scope
+      @current_root_recording = current_notifications_root_recording
+      @page = current_page
+      @visible_notifications = visible_notifications(scoped_notifications)
+      @has_unread_notifications = @visible_notifications.any?(&:unread?)
+      @notification_sections, @has_next_page = visible_notification_sections_page(@visible_notifications)
+    end
+
+    def visible_notifications(notifications)
+      notifications.select { |notification| visible_notification?(notification) }
+    end
+
+    def visible_notification_sections_page(notifications_scope)
+      all_sections = grouped_notification_sections(visible_notifications(notifications_scope))
+      groups = all_sections.flat_map(&:groups)
+      page_groups = groups.slice((@page - 1) * PER_PAGE, PER_PAGE) || []
+      sections = page_groups.group_by(&:notification_type).map do |type, section_groups|
+        original_section = all_sections.find { |section| section.notification_type == type }
+        Services::InboxGrouping::Section.new(
+          notification_type: type,
+          label: original_section.label,
+          groups: section_groups
+        )
+      end
+
+      [sections, groups.size > @page * PER_PAGE]
+    end
+
+    def visible_notification?(notification)
+      Services::NotificationAuthorization.visible_notification?(
+        actor: current_notifications_actor,
+        notification: notification,
+        controller: self
+      )
+    end
+
+    # Keep notification list filtering separate from root-switch scope selection.
+    def notifications_inbox_scope
+      "current_root"
+    end
+
+    def normalized_menu_limit
+      requested_limit = params[:limit].to_i
+      return 5 if requested_limit <= 0
+
+      [requested_limit, 25].min
+    end
+
+    def current_page
+      page = params[:page].to_i
+      page.positive? ? page : 1
+    end
+
+    def current_group_page
+      page = params[:page].to_i
+      page.positive? ? page : 1
+    end
+
+    def menu_notification_payload(notification)
+      MenuPayload.serialize(
+        notification: notification,
+        href: open_notification_path(notification)
+      )
+    end
+
+    def menu_group_payload(group)
+      return menu_notification_payload(group.latest_notification) if group.individual?
+
+      menu_notification_payload(group.latest_notification).merge(
+        title: group.notification_type_label,
+        body: group.period_label,
+        href: nil,
+        unread: group.unread_count.positive?,
+        rollup: true,
+        children: group.notifications.map { |notification| menu_notification_payload(notification) }
+      )
+    end
+
+    def grouped_notification_sections(notifications)
+      Services::InboxGrouping.new(recipient: @recipient, notifications: notifications).call
+    end
+
+    def visible_notification_group(group_id)
+      return if group_id.blank?
+
+      visible = visible_notifications(scoped_notifications)
+      grouped_notification_sections(visible).flat_map(&:groups).find { |group| group.id == group_id }
     end
 
     def notification_group_dom_id(group)

@@ -33,8 +33,7 @@ class NotificationsInboxTest < Minitest::Test
 
     refute_includes menu, "font-semibold"
     refute_includes menu, "font-normal"
-    assert_includes menu, "recording_studio_notifications_flatpack_notification_component"
-    assert_includes menu, "component.new"
+    assert_includes menu, "FlatPack::Notification::Component.new"
     refute_includes menu_helper, "font-semibold"
     refute_includes menu_helper, "font-normal"
   end

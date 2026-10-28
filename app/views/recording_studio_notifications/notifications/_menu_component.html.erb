@@ -6,9 +6,8 @@
      local_assigns.fetch(:empty_text, RecordingStudioNotifications::Copy::UNSET),
      "menu.empty"
    ) %>
-<% component = recording_studio_notifications_flatpack_notification_component %>
-<% if component %>
-  <%= render component.new(
+<% if defined?(FlatPack::Notification::Component) %>
+  <%= render FlatPack::Notification::Component.new(
     unread_count: unread_count,
     see_all_href: see_all_href,
     notifications: notifications,

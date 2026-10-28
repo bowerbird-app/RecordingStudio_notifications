@@ -21,7 +21,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 
 - Ruby 3.3 or newer
 - Rails 8.1
-- `recording_studio` `>= 6.1.0`, `recording_studio_accessible` (gemspec has no version floor), `flat_pack` `>= 0.1.315`, and `view_component` `>= 4.14, < 5`
+- `recording_studio` `>= 6.1.0`, `recording_studio_accessible` (gemspec has no version floor; inbox, preferences, and `creation_action` pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth), `flat_pack` `>= 0.1.315`, and `view_component` `>= 4.14, < 5`
 - `recording_studio_metrics` for operations metrics registration
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus
 
@@ -29,7 +29,7 @@ Development and dummy Gemfiles pin Recording Studio to GitHub tag `v6.1.0` and A
 
 Root and dummy Gemfiles pin Trashable `v0.11.0` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.4.0` and Metrics `v0.5.0`. Both Gemfiles pin Flatpack to commit `1fcbafe94f8eb118f0a22182f63f5110fcc97a56` (`FlatPack::VERSION` `0.1.319`) and `view_component` `4.19.0`. Inbox cards use `border: :strong`. `Card` no longer takes `style:`.
 
-Hosts need Recording Studio `>= 6.1.0`, Flatpack `>= 0.1.315`, `view_component` `>= 4.14, < 5`, Accessible as required by the gemspec (development pin `v0.18.0`), and Admin `>= 2.4.0`. A card that still passes `style:` drops that keyword and sets `border:` instead.
+Hosts need Recording Studio `>= 6.1.0`, Flatpack `>= 0.1.315`, `view_component` `>= 4.14, < 5`, and Admin `>= 2.4.0`. The gemspec requires Accessible with no version floor. Passing `controller:` into Accessible `authorized_action?` (inbox, preferences, `creation_action`) needs Accessible `0.18` ControllerAuth. Development pins `v0.18.0`. A card that still passes `style:` drops that keyword and sets `border:` instead.
 
 ## Installation
 

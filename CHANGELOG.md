@@ -11,15 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.14.2] - 2026-10-28
 
 ### Changed
-- README and INSTALLING describe Accessible as the gemspec does: a runtime dependency with no version floor. Development and dummy Gemfiles still pin GitHub tag `v0.18.0`. Those docs no longer say Accessible `>= 0.20.0`.
-- `Notify` takes the same public keywords through `Notify.call` / `RecordingStudioNotifications.notify`. The constructor stores them from a keyword hash so it no longer needs a ParameterLists disable.
-- Inbox menu HTML asks `recording_studio_notifications_flatpack_notification_component` whether Flatpack's notification component is present, instead of checking `defined?` in the ERB.
+- README and INSTALLING no longer say Accessible `>= 0.20.0`. The gemspec still requires `recording_studio_accessible` with no version floor. Inbox, preference, and `creation_action` checks pass `controller:` into Accessible `authorized_action?`, which is ControllerAuth from Accessible `0.18`. Development and dummy Gemfiles still pin `v0.18.0`.
 
 ### Removed
-- Gem-template leftovers: `bin/rename_gem`, `docs/recording_studio_notifications/RENAMING.md`, `test/rename_verification_test.rb`, dummy `hello_controller.js`, and nested `test/dummy/.github/workflows/ci.yml`. Copilot and Rails Architect notes now name `RecordingStudioNotifications` instead of `GemTemplate`.
-
-### Fixed
-- Authorization and menu fallback tests stub Accessible and the Flatpack component. They no longer use `remove_const` / `const_set`.
+- Gem-template leftovers: `bin/rename_gem`, `docs/recording_studio_notifications/RENAMING.md`, `test/rename_verification_test.rb`, dummy `hello_controller.js`, and nested `test/dummy/.github/workflows/ci.yml`. Copilot and Rails Architect notes name `RecordingStudioNotifications` instead of `GemTemplate`.
 
 ### Upgrade notes
 - Bump to `0.14.2`. No migration. No host code change.

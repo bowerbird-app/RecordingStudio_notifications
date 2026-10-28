@@ -97,51 +97,41 @@ module RecordingStudioNotifications
     end
 
     def build_notification_type(key, label, parsed)
-      channels = normalized_register_channels(parsed)
-      cadences = normalized_register_cadences(parsed)
+      normalized_key = normalize_key!(key)
+      normalized_required = normalize_channels(parsed[:required_channels])
+      default_channels_provided = !parsed[:default_channels].nil?
+      normalized_default = default_channels_provided ? normalize_channels(parsed[:default_channels]) : nil
+      available_source = if parsed[:available_channels].nil?
+                           default_available_channels(normalized_default, normalized_required)
+                         else
+                           parsed[:available_channels]
+                         end
+      normalized_available = available_source.nil? ? nil : normalize_channels(available_source)
+      normalized_allowed_cadences = normalize_cadences!(parsed[:allowed_cadences])
+      normalized_default_cadence = normalize_cadence!(parsed[:default_cadence])
+      normalized_required_cadence = parsed[:required_cadence].nil? ? nil : normalize_cadence!(parsed[:required_cadence])
+      validate_cadences!(normalized_allowed_cadences, normalized_default_cadence, normalized_required_cadence)
+      validate_required_channels!(normalized_required, normalized_available)
       inbox = normalize_inbox!(parsed[:inbox])
-      validate_inbox!(inbox, channels.fetch(:required))
+      validate_inbox!(inbox, normalized_required)
 
       NotificationType.new(
-        key: normalize_key!(key),
+        key: normalized_key,
         label: label.to_s,
         category: normalize_category(parsed[:category]),
         description: parsed[:description]&.to_s,
         icon: normalize_icon(parsed[:icon]),
-        default_channels: channels.fetch(:default),
-        required_channels: channels.fetch(:required),
-        available_channels: channels.fetch(:available),
-        allowed_cadences: cadences.fetch(:allowed),
-        default_cadence: cadences.fetch(:default),
-        required_cadence: cadences.fetch(:required),
+        default_channels: normalized_default,
+        required_channels: normalized_required,
+        available_channels: normalized_available,
+        allowed_cadences: normalized_allowed_cadences,
+        default_cadence: normalized_default_cadence,
+        required_cadence: normalized_required_cadence,
         scope: normalize_scope!(parsed[:scope]),
         creation_action: parsed[:creation_action]&.to_sym,
         visible_to: normalize_visible_to!(parsed[:visible_to]),
         inbox: inbox
       ).freeze
-    end
-
-    def normalized_register_channels(parsed)
-      required = normalize_channels(parsed[:required_channels])
-      default = parsed[:default_channels].nil? ? nil : normalize_channels(parsed[:default_channels])
-      available_source = if parsed[:available_channels].nil?
-                           default_available_channels(default, required)
-                         else
-                           parsed[:available_channels]
-                         end
-      available = available_source.nil? ? nil : normalize_channels(available_source)
-      validate_required_channels!(required, available)
-
-      { default: default, required: required, available: available }
-    end
-
-    def normalized_register_cadences(parsed)
-      allowed = normalize_cadences!(parsed[:allowed_cadences])
-      default = normalize_cadence!(parsed[:default_cadence])
-      required = parsed[:required_cadence].nil? ? nil : normalize_cadence!(parsed[:required_cadence])
-      validate_cadences!(allowed, default, required)
-
-      { allowed: allowed, default: default, required: required }
     end
 
     def normalize_inbox!(inbox)

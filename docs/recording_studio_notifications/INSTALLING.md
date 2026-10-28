@@ -19,7 +19,7 @@ This guide explains how to install the RecordingStudioNotifications engine in yo
 - `recording_studio` `>= 6.1.0` (git tag `v6.1.0`)
 - `flat_pack` `>= 0.1.315`. Development pins commit `1fcbafe94f8eb118f0a22182f63f5110fcc97a56` (`0.1.319`).
 - `view_component` `>= 4.14, < 5` (development pins `4.19.0`)
-- Accessible as required by the gemspec (no version floor; development and dummy Gemfiles pin `v0.18.0`) and Admin `>= 2.4.0`
+- Accessible: gemspec has no version floor. Inbox, preference, and `creation_action` checks pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth. Development and dummy Gemfiles pin `v0.18.0`. Admin `>= 2.4.0`
 - A card drops `style:` and sets `border:` (`border: :strong` on an inbox card, `border: :default` otherwise)
 - TailwindCSS (optional, for styling engine views)
 
