@@ -206,9 +206,9 @@ class NotificationAcceptanceTest < Minitest::Test
   end
 
   def test_inbox_is_current_root_only_with_rootless_notifications
-    controller = File.read(File.expand_path(
-                             "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
-                           ))
+    controller = %w[notifications_controller.rb inbox.rb menu_json.rb].map do |name|
+      File.read(File.expand_path("../app/controllers/recording_studio_notifications/#{name}", __dir__))
+    end.join
     routes = File.read(File.expand_path("../config/routes.rb", __dir__))
     application_controller = File.read(File.expand_path(
                                          "../app/controllers/recording_studio_notifications/application_controller.rb", __dir__

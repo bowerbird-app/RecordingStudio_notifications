@@ -28,12 +28,14 @@ class MenuFallbackI18nTest < ActionDispatch::IntegrationTest
   private
 
   def render_menu_without_flatpack_component(**locals)
-    view = ApplicationController.view_context
-    view.stub(:recording_studio_notifications_flatpack_notification_component, nil) do
-      view.render(
-        partial: "recording_studio_notifications/notifications/menu_component",
-        locals: locals
-      )
-    end
+    helper = RecordingStudioNotifications::MenuHelper
+    original = helper.method(:flatpack_notification_component)
+    helper.define_singleton_method(:flatpack_notification_component) { nil }
+    ApplicationController.render(
+      partial: "recording_studio_notifications/notifications/menu_component",
+      locals: locals
+    )
+  ensure
+    helper.define_singleton_method(:flatpack_notification_component, original)
   end
 end

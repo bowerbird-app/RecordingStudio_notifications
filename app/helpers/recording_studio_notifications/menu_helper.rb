@@ -2,10 +2,14 @@
 
 module RecordingStudioNotifications
   module MenuHelper
-    def recording_studio_notifications_flatpack_notification_component
+    def self.flatpack_notification_component
       return unless defined?(::FlatPack::Notification::Component)
 
       ::FlatPack::Notification::Component
+    end
+
+    def recording_studio_notifications_flatpack_notification_component
+      MenuHelper.flatpack_notification_component
     end
 
     def recording_studio_notifications_async_menu(recipient:, limit: 5)
