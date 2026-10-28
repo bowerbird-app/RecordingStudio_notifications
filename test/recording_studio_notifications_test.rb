@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.14.1", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.14.2", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -36,6 +36,8 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_equal ">= 6.1.0", studio.requirement.to_s
     view_component = spec.dependencies.find { |dependency| dependency.name == "view_component" }
     assert_equal ">= 4.14, < 5", view_component.requirement.to_s
+    accessible = spec.dependencies.find { |dependency| dependency.name == "recording_studio_accessible" }
+    assert_equal ">= 0", accessible.requirement.to_s
   end
 
   def test_engine_routes_notifications_as_root
@@ -106,5 +108,15 @@ class RecordingStudioNotificationsTest < Minitest::Test
     refute_includes views, "url: see_all_href"
     assert_includes views, ".rsn-settings-accordion"
     assert_includes views, "overflow: visible"
+  end
+
+  def test_template_leftovers_are_gone
+    root = File.expand_path("..", __dir__)
+
+    refute File.exist?(File.join(root, "bin/rename_gem"))
+    refute File.exist?(File.join(root, "docs/recording_studio_notifications/RENAMING.md"))
+    refute File.exist?(File.join(root, "test/rename_verification_test.rb"))
+    refute File.exist?(File.join(root, "test/dummy/app/javascript/controllers/hello_controller.js"))
+    refute File.exist?(File.join(root, "test/dummy/.github/workflows/ci.yml"))
   end
 end

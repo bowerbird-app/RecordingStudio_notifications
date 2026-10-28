@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** May 5, 2026
+> *   **Last Updated:** October 28, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -169,15 +169,6 @@ cd test/dummy
 bin/rails db:migrate
 bin/rails db:rollback
 ```
-
----
-
-## After Renaming the Gem
-
-When you rename the gem using `bin/rename_gem`, the migration files are automatically updated:
-
-- Class names change (e.g., `CreateRecordingStudioNotificationsPages` → `CreateMyEnginePages`)
-- Table names change (e.g., `recording_studio_notifications_pages` → `my_engine_pages`)
 
 ---
 

@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.2] - 2026-10-28
+
+### Changed
+- README and INSTALLING no longer say Accessible `>= 0.20.0`. The gemspec still requires `recording_studio_accessible` with no version floor. Inbox, preference, and `creation_action` checks pass `controller:` into Accessible `authorized_action?`, which is ControllerAuth from Accessible `0.18`. Development and dummy Gemfiles still pin `v0.18.0`.
+
+### Removed
+- Gem-template leftovers: `bin/rename_gem`, `docs/recording_studio_notifications/RENAMING.md`, `test/rename_verification_test.rb`, dummy `hello_controller.js`, and nested `test/dummy/.github/workflows/ci.yml`. Copilot and Rails Architect notes name `RecordingStudioNotifications` instead of `GemTemplate`.
+
+### Upgrade notes
+- Bump to `0.14.2`. No migration. No host code change.
+- Do not run `bin/rename_gem`. That script is gone.
+
 ## [0.14.1] - 2026-10-28
 
 ### Changed
@@ -427,7 +439,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.2...HEAD
+[0.14.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.1...v0.14.2
 [0.14.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.1...v0.13.2
