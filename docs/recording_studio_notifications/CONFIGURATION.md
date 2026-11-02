@@ -34,7 +34,7 @@ This does the following:
 |---|---|---|---|
 | `actor_resolver` | Proc | resolves `Current.actor` when available | Resolves the acting user when `actor:` is omitted from `notify`. |
 | `current_root_resolver` | Proc | controller-based root resolver | Resolves the active root recording used by inbox visibility/scoping logic. |
-| `allowed_url_hosts` | Array | `[]` | Allowlist for absolute notification URLs. Relative paths are always allowed. A non-blank URL containing `\`, `\x00`–`\x1F`, or `\x7F` is rejected. |
+| `allowed_url_hosts` | Array | `[]` | Allowlist for absolute notification URLs. Relative paths are always allowed. A non-blank URL containing `\`, `\x00`–`\x1F`, `\x7F`, `U+0080`–`U+009F`, `U+2028`, or `U+2029` is rejected. Percent-encoded controls in the path, query, or fragment (`%0A`, `%00`) are rejected. `%5C` stays allowed. |
 | `default_channels` | Array | `[:in_app]` | Default channels for type registration and delivery fallback. |
 | `deliver_later` | Boolean | `true` | Whether deliveries enqueue via ActiveJob by default. |
 | `queue_name` | Symbol/String | `:default` | Queue used by notification delivery jobs. |

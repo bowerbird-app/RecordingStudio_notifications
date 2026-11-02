@@ -11,11 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.14.6] - 2026-11-02
 
 ### Changed
-- `UrlSafety.safe?` now rejects any non-blank URL that contains a backslash (`\`) or an ASCII control character (`\x00`–`\x1F` or `\x7F`). `sanitize!` raises `ArgumentError` (`unsafe notification URL`) for the same strings. Rejected examples: `"/a\nb"`, `"/\\evil"`, and `"\x00"`. Blank values, including whitespace-only strings, stay safe. Relative paths and allowed http(s) hosts that do not contain those characters stay safe.
+- `UrlSafety.safe?` now rejects any non-blank URL that contains a backslash (`\`), an ASCII control character (`\x00`–`\x1F` or `\x7F`, including tab and carriage return), a C1 control (`U+0080`–`U+009F`), or a Unicode line separator (`U+2028`, `U+2029`). `sanitize!` raises `ArgumentError` (`unsafe notification URL`) for the same strings. Rejected examples: `"/a\nb"`, `"/\\evil"`, `"\x00"`, `"/a\tb"`, `"/a\rb"`, `"/a\u0090b"`, and `"/a\u2028b"`. Percent-encoded controls in the path, query, or fragment are rejected after one decode, including `%0A`, `%0a`, and `%00`. Percent-encoded backslash `%5C` stays allowed. Blank values, including whitespace-only strings, stay safe. Relative paths and allowed http(s) hosts that do not contain those characters stay safe.
 
 ### Upgrade notes
 - Bump to `0.14.6`. No migration.
-- A notification `url` that contains `\`, a byte from `\x00` to `\x1F`, or `\x7F` is now rejected. Percent-encoded `%5C` is unchanged. Blank URLs stay allowed.
+- A notification `url` that contains `\`, a byte from `\x00` to `\x1F`, `\x7F`, `U+0080`–`U+009F`, `U+2028`, or `U+2029` is now rejected. So is a path, query, or fragment that decodes to one of those controls (`%0A`, `%00`). Percent-encoded `%5C` stays allowed. Blank URLs stay allowed.
 
 ## [0.14.5] - 2026-11-02
 

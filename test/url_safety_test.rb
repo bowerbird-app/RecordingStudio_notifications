@@ -33,6 +33,16 @@ class UrlSafetyTest < Minitest::Test
     refute RecordingStudioNotifications::UrlSafety.safe?("\x00")
     refute RecordingStudioNotifications::UrlSafety.safe?("https://example.com/a\\b", allowed_hosts: ["example.com"])
     refute RecordingStudioNotifications::UrlSafety.safe?("/path\x7F")
+    refute RecordingStudioNotifications::UrlSafety.safe?("/a\tb")
+    refute RecordingStudioNotifications::UrlSafety.safe?("/a\rb")
+    refute RecordingStudioNotifications::UrlSafety.safe?("/a\u0090b")
+    refute RecordingStudioNotifications::UrlSafety.safe?("/a\u2028b")
+    refute RecordingStudioNotifications::UrlSafety.safe?("/a\u2029b")
+    refute RecordingStudioNotifications::UrlSafety.safe?("/a%0Ab")
+    refute RecordingStudioNotifications::UrlSafety.safe?("/a%00b")
+    refute RecordingStudioNotifications::UrlSafety.safe?("/a%0ab")
+    refute RecordingStudioNotifications::UrlSafety.safe?("https://example.com/a%0A", allowed_hosts: ["example.com"])
+    refute RecordingStudioNotifications::UrlSafety.safe?("https://example.com/path?next=%00", allowed_hosts: ["example.com"])
 
     error = assert_raises(ArgumentError) do
       RecordingStudioNotifications::UrlSafety.sanitize!("/\\evil")
