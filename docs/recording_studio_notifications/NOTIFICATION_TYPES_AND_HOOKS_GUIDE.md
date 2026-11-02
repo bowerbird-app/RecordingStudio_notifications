@@ -52,6 +52,13 @@ Scope options supported by the engine:
 
 `visible_to:` is an optional proc that receives the settings recipient. Omit it so every recipient sees the type. Settings and preference writes honor it. `notify` does not.
 
+`channel_options:` is an optional per-channel hash, stored frozen with symbol keys. Omit it and the type returns `{}`.
+
+```ruby
+channel_options: { email: { individual_mailer: "PageCommentMailer", rollup_mailer: "PageCommentRollupMailer" } }
+# definition.channel_options.dig(:email, :individual_mailer)
+```
+
 ## 3) How comment creation triggers notifications via hook
 
 The hook is in:

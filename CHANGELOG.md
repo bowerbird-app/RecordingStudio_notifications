@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.3] - 2026-11-02
+
+### Added
+- `NotificationTypeRegistry#register` accepts `channel_options:`. The hash is stored on `NotificationType#channel_options` with symbol keys, and the stored hashes are frozen. An omitted `channel_options` is `{}`. Unknown top-level register keys still raise `ArgumentError`. A `channel_options` key that is not in `available_channels` raises `ArgumentError` (a typo such as `:emial` fails).
+
+### Upgrade notes
+- Bump to `0.14.3`. No migration. No host code change.
+- Pass per-channel settings as `channel_options: { email: { individual_mailer:, rollup_mailer: } }`. Read them with `channel_options.dig(:email, :individual_mailer)`. Existing registrations stay the same and return `{}`.
+
 ## [0.14.2] - 2026-10-28
 
 ### Changed

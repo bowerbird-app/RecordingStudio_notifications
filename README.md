@@ -107,7 +107,7 @@ The default template draws one page title from `content_for :title` and `content
 
 ### Notification types
 
-Each type has a `label`, optional `description`, `category`, Heroicons v2 `icon`, channels, scope, optional `creation_action`, and optional `visible_to`. Valid scopes are:
+Each type has a `label`, optional `description`, `category`, Heroicons v2 `icon`, channels, scope, optional `creation_action`, optional `visible_to`, and optional `channel_options`. Valid scopes are:
 
 - `:global`: always rootless.
 - `:root`: requires a root recording.
@@ -140,6 +140,24 @@ config.notification_types.register(
   default_cadence: :daily,
   visible_to: ->(recipient) { recipient.staff? }
 )
+```
+
+`channel_options:` stores per-channel settings on the type. Keys are symbols, the hashes are frozen, and leaving it out stores `{}`. Each key must be one of that type's `available_channels`. A typo such as `:emial` raises `ArgumentError`. Unknown top-level keys still raise `ArgumentError`.
+
+```ruby
+config.notification_types.register(
+  :page_comment,
+  label: "Page comment",
+  default_channels: [:in_app, :email],
+  available_channels: [:in_app, :email],
+  channel_options: {
+    email: {
+      individual_mailer: "PageCommentMailer",
+      rollup_mailer: "PageCommentRollupMailer"
+    }
+  }
+)
+# type.channel_options.dig(:email, :individual_mailer)
 ```
 
 A type with `required_channels: []` can be saved with no channel. Settings shows a None option. `notify` then creates nothing and raises nothing. Recipients who pick channels still get those deliveries.

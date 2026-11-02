@@ -19,6 +19,7 @@ module RecordingStudioNotifications
     :creation_action,
     :visible_to,
     :inbox,
+    :channel_options,
     keyword_init: true
   ) do
     def optional_channels
@@ -89,7 +90,8 @@ module RecordingStudioNotifications
         default_cadence: options.delete(:default_cadence) { :individual },
         required_cadence: options.delete(:required_cadence),
         visible_to: options.delete(:visible_to),
-        inbox: options.delete(:inbox) { true }
+        inbox: options.delete(:inbox) { true },
+        channel_options: options.delete(:channel_options)
       }
       raise ArgumentError, "unknown register option: #{options.keys.join(', ')}" if options.any?
 
@@ -114,6 +116,8 @@ module RecordingStudioNotifications
       validate_required_channels!(normalized_required, normalized_available)
       inbox = normalize_inbox!(parsed[:inbox])
       validate_inbox!(inbox, normalized_required)
+      channel_options = normalize_channel_options!(parsed[:channel_options])
+      validate_channel_options!(channel_options, normalized_available)
 
       NotificationType.new(
         key: normalized_key,
@@ -130,8 +134,44 @@ module RecordingStudioNotifications
         scope: normalize_scope!(parsed[:scope]),
         creation_action: parsed[:creation_action]&.to_sym,
         visible_to: normalize_visible_to!(parsed[:visible_to]),
-        inbox: inbox
+        inbox: inbox,
+        channel_options: channel_options
       ).freeze
+    end
+
+    def validate_channel_options!(channel_options, available_channels)
+      available = Array(available_channels)
+      channel_options.each_key do |channel|
+        next if available.include?(channel)
+
+        raise ArgumentError, "channel_options channel #{channel.inspect} must be available"
+      end
+    end
+
+    def normalize_channel_options!(channel_options)
+      return {}.freeze if channel_options.nil?
+      raise ArgumentError, "channel_options must be a Hash" unless channel_options.is_a?(Hash)
+
+      channel_options.each_with_object({}) do |(channel, options_for_channel), normalized|
+        name = channel.to_s.strip
+        raise ArgumentError, "channel_options channel is required" if name.empty?
+        raise ArgumentError, "channel_options for #{name} must be a Hash" unless options_for_channel.is_a?(Hash)
+
+        normalized[name.to_sym] = freeze_channel_options(options_for_channel)
+      end.freeze
+    end
+
+    def freeze_channel_options(value)
+      case value
+      when Hash
+        value.each_with_object({}) do |(key, nested), copy|
+          copy[key.to_s.to_sym] = freeze_channel_options(nested)
+        end.freeze
+      when Array
+        value.map { |nested| freeze_channel_options(nested) }.freeze
+      else
+        value
+      end
     end
 
     def normalize_inbox!(inbox)
