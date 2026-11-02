@@ -6,6 +6,14 @@ module RecordingStudioNotifications
 
     STATUSES = %w[pending processing delivered failed].freeze
     GENERIC_FAILURE_MESSAGE = "Delivery failed"
+    EMAIL_EVENT_TIMESTAMP_KEYS = {
+      opened: "email_opened_at",
+      clicked: "email_clicked_at",
+      bounced: "email_bounced_at",
+      complained: "email_complained_at",
+      unsubscribed: "email_unsubscribed_at"
+    }.freeze
+    private_constant :EMAIL_EVENT_TIMESTAMP_KEYS
 
     belongs_to :notification, class_name: "RecordingStudioNotifications::Notification"
 
@@ -90,10 +98,35 @@ module RecordingStudioNotifications
       remember_email_timestamp!("email_complained_at", at)
     end
 
+    def email_event_applied?(type)
+      email_event_at(type).present?
+    end
+
+    def email_event_at(type)
+      key = EMAIL_EVENT_TIMESTAMP_KEYS[email_event_name!(type)]
+      raw = metadata[key]
+      return if raw.blank?
+
+      parse_email_event_time(raw)
+    end
+
     private
 
+    def parse_email_event_time(raw)
+      Time.zone.iso8601(raw.to_s)
+    rescue ArgumentError
+      nil
+    end
+
+    def email_event_name!(type)
+      name = type.to_s.strip.to_sym
+      return name if EMAIL_EVENT_TIMESTAMP_KEYS.key?(name)
+
+      raise ArgumentError, "unknown email event: #{type}"
+    end
+
     def remember_email_timestamp!(key, at)
-      return self if metadata[key].present?
+      return self if parse_email_event_time(metadata[key])
 
       update!(metadata: metadata.merge(key => at.iso8601))
     end
