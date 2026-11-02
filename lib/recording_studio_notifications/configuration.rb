@@ -6,10 +6,12 @@ require_relative "channel_registry"
 
 module RecordingStudioNotifications
   class Configuration
+    INBOX_SCOPES = %w[all current_root].freeze
+
     attr_accessor :actor_resolver, :current_root_resolver, :allowed_url_hosts, :default_channels,
                   :deliver_later, :queue_name, :raise_on_delivery_error, :polling_interval_seconds,
                   :rollup_reservation_timeout, :rollup_delivery_enabled, :unsubscribe_expires_in
-    attr_reader :hooks, :notification_types, :channels, :layout
+    attr_reader :hooks, :notification_types, :channels, :layout, :default_inbox_scope
 
     def initialize
       @actor_resolver = -> { Current.actor if defined?(Current) && Current.respond_to?(:actor) }
@@ -23,6 +25,7 @@ module RecordingStudioNotifications
       @rollup_reservation_timeout = 15.minutes
       @rollup_delivery_enabled = false
       @unsubscribe_expires_in = 1.year
+      @default_inbox_scope = "current_root"
       @layout = nil
       @hooks = Hooks.new
       @notification_types = NotificationTypeRegistry.new
@@ -43,6 +46,20 @@ module RecordingStudioNotifications
       @layout = RecordingStudio::Layout.accept(value)
     end
 
+    def default_inbox_scope=(value)
+      normalized = value.to_s
+      raise ArgumentError, "default_inbox_scope must be one of: all, current_root" unless INBOX_SCOPES.include?(normalized)
+
+      @default_inbox_scope = normalized
+    end
+
+    def inbox_scope_for(requested)
+      candidate = requested.to_s
+      return candidate if INBOX_SCOPES.include?(candidate)
+
+      default_inbox_scope
+    end
+
     def to_h
       {
         allowed_url_hosts: allowed_url_hosts,
@@ -53,6 +70,7 @@ module RecordingStudioNotifications
         rollup_reservation_timeout: rollup_reservation_timeout,
         rollup_delivery_enabled: rollup_delivery_enabled,
         unsubscribe_expires_in: unsubscribe_expires_in,
+        default_inbox_scope: default_inbox_scope,
         raise_on_delivery_error: raise_on_delivery_error,
         notification_types: notification_types.keys,
         channels: channels.keys,
