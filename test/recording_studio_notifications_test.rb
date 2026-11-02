@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.14.6", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.14.7", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -13,6 +13,7 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_respond_to RecordingStudioNotifications, :notify_each
     assert_respond_to RecordingStudioNotifications, :register_notification_type
     assert_respond_to RecordingStudioNotifications, :register_channel
+    assert_respond_to RecordingStudioNotifications, :notification_url
     assert_respond_to RecordingStudioNotifications, :unsubscribe_url
     assert_respond_to RecordingStudioNotifications, :list_unsubscribe_headers
   end

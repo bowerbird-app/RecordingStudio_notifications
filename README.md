@@ -206,6 +206,15 @@ Pass `channels:` to request a subset of a type's available channels. Required ch
 
 Pass `inbox: false` to keep the notification and its email (and any other non-in-app) deliveries without listing it in the inbox, menu, unread count, or clear-all. The type can default `inbox:` too. A per-call value wins. `inbox: false` does not create an `:in_app` delivery, and it raises `ArgumentError` when `:in_app` is required. The default is `true`, so existing rows stay in the inbox. A retry with the same `idempotency_key` keeps the first `inbox` flag and the first set of channels. `open` still marks a hidden notification read and redirects. `show`, mark read, mark unread, archive, and unarchive return 404.
 
+## Open link
+
+```ruby
+RecordingStudioNotifications.notification_url(notification)
+# "https://example.com/notifications/notifications/ID/open" when mounted at /notifications
+```
+
+The link is absolute. Set `config.action_mailer.default_url_options[:host]` first. A blank mailer host or protocol does not replace `routes.default_url_options`. `unsubscribe_url` still merges the mailer hash as stored. If neither host is set, `notification_url` raises `ArgumentError`. Add that host to `config.allowed_url_hosts`, or `UrlSafety` rejects the link. The path is the engine open route under the mount.
+
 ## Unsubscribe
 
 ```ruby

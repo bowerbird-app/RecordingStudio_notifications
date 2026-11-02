@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.7] - 2026-11-02
+
+### Added
+- `RecordingStudioNotifications.notification_url(notification)` returns the absolute open URL. It uses the same host options as `unsubscribe_url`: route `default_url_options` merged with the mailer `default_url_options`. The path is the engine `open` route under the mount, for example `https://example.com/notifications/notifications/:id/open` when the engine is mounted at `/notifications`. The mailer host must be listed in `allowed_url_hosts` or `UrlSafety` rejects the link. A missing host raises `ArgumentError` naming `config.action_mailer.default_url_options[:host]`.
+
+### Upgrade notes
+- Bump to `0.14.7`. No migration.
+- Set `config.action_mailer.default_url_options[:host]` (the same host mailers already use). `routes.default_url_options[:host]` is used when the mailer host is blank. Add that host to `config.allowed_url_hosts` so `UrlSafety` accepts the link.
+
 ## [0.14.6] - 2026-11-02
 
 ### Changed
