@@ -19,6 +19,8 @@ class ConfigurationTest < Minitest::Test
     assert_nil generic_type.visible_to
     assert generic_type.visible_to?(Object.new)
     assert_equal true, generic_type.inbox
+    assert_equal({}, generic_type.channel_options)
+    assert generic_type.channel_options.frozen?
     assert_equal 1.year, @configuration.unsubscribe_expires_in
     assert_equal 1.year, @configuration.to_h.fetch(:unsubscribe_expires_in)
     assert_equal true, @configuration.deliver_later

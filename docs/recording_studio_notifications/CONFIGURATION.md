@@ -130,6 +130,21 @@ end
 
 `visible_to` is an optional proc. It receives the signed-in settings recipient. `nil` keeps the type on every settings page. A falsey result hides the type from that recipient and ignores posted preferences for it. Delivery still accepts the type.
 
+`channel_options` is an optional hash of per-channel settings. The registry stores it on the type with symbol keys and freezes the hashes. Omitting it stores `{}`. A top-level key other than the documented register options still raises `ArgumentError`.
+
+```ruby
+config.notification_types.register(
+  :page_comment,
+  label: "Page comment",
+  channel_options: {
+    email: {
+      individual_mailer: "PageCommentMailer",
+      rollup_mailer: "PageCommentRollupMailer"
+    }
+  }
+)
+```
+
 ### Notification Cadence Rules
 
 Notification cadence controls when enabled channels deliver notifications and how source notifications are grouped in the in-app inbox.
