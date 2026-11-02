@@ -88,7 +88,7 @@ RecordingStudioNotifications.configure do |config|
 end
 ```
 
-The engine registers a default `:generic` type with `:in_app` delivery. `allowed_url_hosts` controls absolute HTTP(S) notification URLs; relative paths are always accepted.
+The engine registers a default `:generic` type with `:in_app` delivery. `allowed_url_hosts` controls absolute HTTP(S) notification URLs; relative paths are always accepted. A non-blank URL that contains a backslash or an ASCII control character (`\x00`–`\x1F` or `\x7F`) is rejected. Examples: `"/a\nb"`, `"/\\evil"`, and `"\x00"`.
 
 `config.default_inbox_scope` is `"current_root"` or `"all"`. It defaults to `"current_root"`, which keeps the inbox, bell menu, and group pages on the current root plus rootless rows. `"all"` lists every root. A request may pass `inbox_scope=all` or `inbox_scope=current_root`. Any other value falls back to the config. `inbox_scope=all` still hides a row the viewer cannot see. That check is `visible_notification?` in Ruby, one row at a time. Moving it into SQL is a follow-up. The root-switch dropdown still uses its own scope param.
 

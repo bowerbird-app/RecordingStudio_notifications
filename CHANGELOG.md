@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.6] - 2026-11-02
+
+### Changed
+- `UrlSafety.safe?` now rejects any non-blank URL that contains a backslash (`\`) or an ASCII control character (`\x00`–`\x1F` or `\x7F`). `sanitize!` raises `ArgumentError` (`unsafe notification URL`) for the same strings. Rejected examples: `"/a\nb"`, `"/\\evil"`, and `"\x00"`. Blank values, including whitespace-only strings, stay safe. Relative paths and allowed http(s) hosts that do not contain those characters stay safe.
+
+### Upgrade notes
+- Bump to `0.14.6`. No migration.
+- A notification `url` that contains `\`, a byte from `\x00` to `\x1F`, or `\x7F` is now rejected. Percent-encoded `%5C` is unchanged. Blank URLs stay allowed.
+
 ## [0.14.5] - 2026-11-02
 
 ### Added

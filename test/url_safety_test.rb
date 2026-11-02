@@ -27,6 +27,26 @@ class UrlSafetyTest < Minitest::Test
     refute RecordingStudioNotifications::UrlSafety.safe?("http://[")
   end
 
+  def test_control_characters_and_backslashes_are_rejected
+    refute RecordingStudioNotifications::UrlSafety.safe?("/a\nb")
+    refute RecordingStudioNotifications::UrlSafety.safe?("/\\evil")
+    refute RecordingStudioNotifications::UrlSafety.safe?("\x00")
+    refute RecordingStudioNotifications::UrlSafety.safe?("https://example.com/a\\b", allowed_hosts: ["example.com"])
+    refute RecordingStudioNotifications::UrlSafety.safe?("/path\x7F")
+
+    error = assert_raises(ArgumentError) do
+      RecordingStudioNotifications::UrlSafety.sanitize!("/\\evil")
+    end
+    assert_equal "unsafe notification URL", error.message
+  end
+
+  def test_blank_urls_and_existing_safe_urls_stay_safe
+    assert RecordingStudioNotifications::UrlSafety.safe?("\n")
+    assert RecordingStudioNotifications::UrlSafety.safe?(" ")
+    assert RecordingStudioNotifications::UrlSafety.safe?("/recordings/123")
+    assert RecordingStudioNotifications::UrlSafety.safe?("https://example.com/a%5C", allowed_hosts: ["example.com"])
+  end
+
   def test_absolute_urls_require_allowed_host
     assert RecordingStudioNotifications::UrlSafety.safe?("https://example.com/path", allowed_hosts: ["example.com"])
     refute RecordingStudioNotifications::UrlSafety.safe?("https://evil.example/path", allowed_hosts: ["example.com"])

@@ -9,8 +9,11 @@ module RecordingStudioNotifications
     def safe?(url, allowed_hosts: RecordingStudioNotifications.configuration.allowed_url_hosts)
       return true if url.blank?
 
-      uri = URI.parse(url.to_s)
-      return relative_path_safe?(url.to_s) if uri.relative?
+      value = url.to_s
+      return false if value.match?(/[\\\x00-\x1F\x7F]/)
+
+      uri = URI.parse(value)
+      return relative_path_safe?(value) if uri.relative?
       return false unless %w[http https].include?(uri.scheme)
 
       Array(allowed_hosts).map(&:to_s).include?(uri.host.to_s)
