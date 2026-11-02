@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.7] - 2026-11-02
+
+### Added
+- `RecordingStudioNotifications.notification_url(notification)` returns the absolute open URL. It uses the same host options as `unsubscribe_url`: route `default_url_options` merged with the mailer `default_url_options`. The path is the engine `open` route under the mount, for example `https://example.com/notifications/notifications/:id/open` when the engine is mounted at `/notifications`.
+
+### Upgrade notes
+- Bump to `0.14.7`. No migration. No host code change.
+- Set `default_url_options` the same way mailers already do. `notification_url` then returns an absolute `http` or `https` link.
+
 ## [0.14.6] - 2026-11-02
 
 ### Changed

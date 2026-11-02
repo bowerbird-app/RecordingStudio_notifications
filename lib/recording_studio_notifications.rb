@@ -76,6 +76,8 @@ module RecordingStudioNotifications
       ).to_s
     end
 
+    def notification_url(notification) = mounted_notification_routes.open_notification_url(notification, **absolute_url_options)
+
     def unsubscribe_url(recipient:, notification_type:, channel:)
       mounted_notification_routes.unsubscribe_url(
         notification_type.to_s,
