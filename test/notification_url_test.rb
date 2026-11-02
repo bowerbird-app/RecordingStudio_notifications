@@ -31,6 +31,22 @@ class NotificationUrlTest < Minitest::Test
     assert RecordingStudioNotifications::UrlSafety.safe?(url, allowed_hosts: ["routes.example"])
   end
 
+  def test_blank_mailer_host_does_not_override_the_route_host
+    url = with_application(routes: { host: "routes.example", protocol: "https" },
+                           mailer: { host: nil, protocol: "" }) do
+      RecordingStudioNotifications.notification_url(NotificationRef.new("notice-4"))
+    end
+
+    assert_equal "https://routes.example/notifications/notice-4/open", url
+
+    url = with_application(routes: { host: "routes.example", protocol: "https" },
+                           mailer: { host: "" }) do
+      RecordingStudioNotifications.notification_url(NotificationRef.new("notice-5"))
+    end
+
+    assert_equal "https://routes.example/notifications/notice-5/open", url
+  end
+
   def test_notification_url_requires_a_host
     error = assert_raises(ArgumentError) do
       with_application(routes: {}, mailer: {}) do
