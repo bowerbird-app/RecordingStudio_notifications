@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.4] - 2026-11-02
+
+### Added
+- `Delivery#email_event_applied?(type)` and `Delivery#email_event_at(type)` for `opened`, `clicked`, `bounced`, `complained`, and `unsubscribed`. The predicate is true after the matching `mark_email_*!` timestamp is stored. `email_event_at` returns that time, or `nil` when it is absent. An unknown type raises `ArgumentError`.
+
+### Upgrade notes
+- Bump to `0.14.4`. No migration. No host code change.
+- Read `delivery.email_event_applied?(:opened)` and `delivery.email_event_at(:opened)` instead of the `email_opened_at` metadata key. The `mark_email_*!` writers are unchanged.
+
 ## [0.14.3] - 2026-11-02
 
 ### Added

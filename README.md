@@ -224,6 +224,8 @@ The link is a signed GlobalID. Its purpose is that notification type and channel
 
 `Delivery#mark_email_unsubscribed!(at:)` stores `email_unsubscribed_at` and turns that type's email preference off. `mark_email_bounced!`, `mark_email_opened!`, `mark_email_clicked!`, and `mark_email_complained!` store their own timestamps. A bounce does not mark the delivery failed.
 
+`Delivery#email_event_applied?(type)` is true once that timestamp is stored. `email_event_at(type)` returns the time, or `nil`. `type` is `opened`, `clicked`, `bounced`, `complained`, or `unsubscribed`. Anything else raises `ArgumentError`. The first stored time stays put.
+
 ## Host UI integration
 
 The engine supplies an inbox, preferences screen, and async top-nav notification menu. Add the menu helper to a host layout:

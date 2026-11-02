@@ -51,6 +51,12 @@ class DeliveryEmailMarksTest < ActiveSupport::TestCase
     assert_equal opened_at.iso8601, @delivery.metadata["email_opened_at"]
     assert_equal clicked_at.iso8601, @delivery.metadata["email_clicked_at"]
     assert_equal complained_at.iso8601, @delivery.metadata["email_complained_at"]
+    assert @delivery.email_event_applied?(:opened)
+    assert @delivery.email_event_applied?("clicked")
+    assert @delivery.email_event_applied?(:complained)
+    refute @delivery.email_event_applied?(:bounced)
+    assert_equal opened_at.iso8601, @delivery.email_event_at(:opened).iso8601
+    assert_nil @delivery.email_event_at(:bounced)
     assert_equal "yes", @delivery.metadata["keep"]
     assert @delivery.delivered?
   end
@@ -61,6 +67,8 @@ class DeliveryEmailMarksTest < ActiveSupport::TestCase
     @delivery.mark_email_unsubscribed!(at: at)
 
     assert_equal at.iso8601, @delivery.reload.metadata["email_unsubscribed_at"]
+    assert @delivery.email_event_applied?(:unsubscribed)
+    assert_equal at.iso8601, @delivery.email_event_at(:unsubscribed).iso8601
     assert_not RecordingStudioNotifications::Preference.enabled_for?(
       recipient: @recipient,
       notification_type: :email_mark_optional,
@@ -75,6 +83,8 @@ class DeliveryEmailMarksTest < ActiveSupport::TestCase
     @delivery.mark_email_bounced!(at: at)
 
     assert_equal at.iso8601, @delivery.reload.metadata["email_bounced_at"]
+    assert @delivery.email_event_applied?(:bounced)
+    assert_equal at.iso8601, @delivery.email_event_at("bounced").iso8601
     assert @delivery.delivered?
     assert_nil @delivery.error_message
 
