@@ -213,7 +213,7 @@ RecordingStudioNotifications.notification_url(notification)
 # "https://example.com/notifications/notifications/ID/open" when mounted at /notifications
 ```
 
-The link is absolute. It uses the same `default_url_options` as `unsubscribe_url` (the host mailers already set). The path is the engine open route under the mount.
+The link is absolute. It uses the same `default_url_options` as `unsubscribe_url`. Set `config.action_mailer.default_url_options[:host]` first. `routes.default_url_options[:host]` fills in when the mailer host is blank. If neither host is set, `notification_url` raises `ArgumentError`. Add that host to `config.allowed_url_hosts`, or `UrlSafety` rejects the link. The path is the engine open route under the mount.
 
 ## Unsubscribe
 

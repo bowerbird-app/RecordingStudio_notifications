@@ -285,7 +285,7 @@ Benefits:
 
 ### Via engine routes (recommended UI flow)
 
-Mail and other off-site clients need an absolute URL. `RecordingStudioNotifications.notification_url(notification)` builds one from the same `default_url_options` as `unsubscribe_url`. Mounted at `/notifications`, it looks like `https://example.com/notifications/notifications/ID/open`.
+Mail and other off-site clients need an absolute URL. `RecordingStudioNotifications.notification_url(notification)` builds one from the same `default_url_options` as `unsubscribe_url`. Set `config.action_mailer.default_url_options[:host]` and list that host in `config.allowed_url_hosts`. Mounted at `/notifications`, it looks like `https://example.com/notifications/notifications/ID/open`.
 
 ```erb
 <%= link_to "Open", open_notification_path(notification), data: { turbo_method: :get } %>

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "recording_studio_notifications/version"
+require "recording_studio_notifications/notification_url"
 require "recording_studio_notifications/copy"
 require "recording_studio_notifications/engine"
 require "recording_studio_notifications/configuration"
@@ -76,7 +77,7 @@ module RecordingStudioNotifications
       ).to_s
     end
 
-    def notification_url(notification) = mounted_notification_routes.open_notification_url(notification, **absolute_url_options)
+    include NotificationUrl
 
     def unsubscribe_url(recipient:, notification_type:, channel:)
       mounted_notification_routes.unsubscribe_url(
