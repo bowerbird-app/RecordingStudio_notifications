@@ -41,6 +41,8 @@ class UrlSafetyTest < Minitest::Test
     refute RecordingStudioNotifications::UrlSafety.safe?("/a%0Ab")
     refute RecordingStudioNotifications::UrlSafety.safe?("/a%00b")
     refute RecordingStudioNotifications::UrlSafety.safe?("/a%0ab")
+    refute RecordingStudioNotifications::UrlSafety.safe?("/a%C2%85b")
+    refute RecordingStudioNotifications::UrlSafety.safe?("/a%E2%80%A8b")
     refute RecordingStudioNotifications::UrlSafety.safe?("https://example.com/a%0A", allowed_hosts: ["example.com"])
     refute RecordingStudioNotifications::UrlSafety.safe?("https://example.com/path?next=%00", allowed_hosts: ["example.com"])
 
@@ -55,6 +57,12 @@ class UrlSafetyTest < Minitest::Test
     assert RecordingStudioNotifications::UrlSafety.safe?(" ")
     assert RecordingStudioNotifications::UrlSafety.safe?("/recordings/123")
     assert RecordingStudioNotifications::UrlSafety.safe?("https://example.com/a%5C", allowed_hosts: ["example.com"])
+    assert RecordingStudioNotifications::UrlSafety.safe?("/files%FF")
+    assert RecordingStudioNotifications::UrlSafety.safe?("/caf%E9")
+    assert RecordingStudioNotifications::UrlSafety.safe?("/a%20b")
+    assert RecordingStudioNotifications::UrlSafety.safe?("/a+b")
+    assert RecordingStudioNotifications::UrlSafety.safe?("/caf%C3%A9")
+    assert RecordingStudioNotifications::UrlSafety.safe?("/a%250Ab")
   end
 
   def test_absolute_urls_require_allowed_host

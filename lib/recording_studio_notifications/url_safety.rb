@@ -40,14 +40,12 @@ module RecordingStudioNotifications
 
     def decoded_control_character?(uri)
       [uri.path, uri.query, uri.fragment].compact.any? do |part|
-        decoded = CGI.unescape(part)
+        decoded = CGI.unescape(part).b
         next true if decoded.match?(/[\x00-\x1F\x7F]/n)
 
         utf8 = decoded.dup.force_encoding(Encoding::UTF_8)
         utf8.valid_encoding? && utf8.match?(DECODED_CONTROL_CHARACTERS)
       end
-    rescue ArgumentError
-      true
     end
     private_class_method :decoded_control_character?
   end
