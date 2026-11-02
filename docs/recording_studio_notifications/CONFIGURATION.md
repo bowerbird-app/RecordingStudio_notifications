@@ -34,7 +34,7 @@ This does the following:
 |---|---|---|---|
 | `actor_resolver` | Proc | resolves `Current.actor` when available | Resolves the acting user when `actor:` is omitted from `notify`. |
 | `current_root_resolver` | Proc | controller-based root resolver | Resolves the active root recording used by inbox visibility/scoping logic. |
-| `allowed_url_hosts` | Array | `[]` | Allowlist for absolute notification URLs. Relative paths are always allowed. |
+| `allowed_url_hosts` | Array | `[]` | Allowlist for absolute notification URLs. Relative paths are always allowed. A non-blank URL containing `\`, `\x00`–`\x1F`, `\x7F`, `U+0080`–`U+009F`, `U+2028`, or `U+2029` is rejected. Percent-encoded controls in the path, query, or fragment (`%0A`, `%00`, `%C2%85`, `%E2%80%A8`) are rejected after one decode. `%5C` stays allowed. A byte that is not valid UTF-8 after that decode (`%FF`, `%E9`) stays allowed, as does a space (`%20`), a plus sign, and UTF-8 text (`%C3%A9`). `%250A` stays allowed because one decode leaves the characters `%0A`. |
 | `default_channels` | Array | `[:in_app]` | Default channels for type registration and delivery fallback. |
 | `deliver_later` | Boolean | `true` | Whether deliveries enqueue via ActiveJob by default. |
 | `queue_name` | Symbol/String | `:default` | Queue used by notification delivery jobs. |
