@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Upgrade notes
 - Bump to `0.14.5`. No migration.
 - Leave `default_inbox_scope` unset to keep the current-root inbox. Set it to `"all"` to list every root when the request omits `inbox_scope`. A request param of `all` or `current_root` overrides the config for that request. Any other param is ignored.
+- `inbox_scope=all` still drops rows the viewer cannot see through the per-row `visible_notification?` check in Ruby. Moving that filter into SQL is a follow-up.
 
 ## [0.14.4] - 2026-11-02
 

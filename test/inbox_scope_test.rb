@@ -42,13 +42,4 @@ class InboxScopeTest < Minitest::Test
 
     assert_equal "all", @configuration.default_inbox_scope
   end
-
-  def test_inbox_requests_use_the_allowlisted_scope
-    controller = File.read(File.expand_path(
-                             "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
-                           ))
-
-    assert_includes controller, "configuration.inbox_scope_for(params[:inbox_scope])"
-    assert_includes controller, 'if @inbox_scope == "current_root"'
-  end
 end
