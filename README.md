@@ -142,7 +142,7 @@ config.notification_types.register(
 )
 ```
 
-`channel_options:` stores per-channel settings on the type. Keys are symbols, the hashes are frozen, and leaving it out stores `{}`. Unknown top-level keys still raise `ArgumentError`.
+`channel_options:` stores per-channel settings on the type. Keys are symbols, the hashes are frozen, and leaving it out stores `{}`. Each key must be one of that type's `available_channels`. A typo such as `:emial` raises `ArgumentError`. Unknown top-level keys still raise `ArgumentError`.
 
 ```ruby
 config.notification_types.register(

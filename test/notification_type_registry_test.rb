@@ -51,6 +51,28 @@ class NotificationTypeRegistryTest < Minitest::Test
     refute @registry.registered?(:page_comment)
   end
 
+  def test_channel_options_channel_must_be_available
+    error = assert_raises(ArgumentError) do
+      @registry.register(
+        :page_comment,
+        label: "Page comment",
+        available_channels: [:in_app],
+        channel_options: { emial: { individual_mailer: "PageCommentMailer" } }
+      )
+    end
+
+    assert_equal "channel_options channel :emial must be available", error.message
+    refute @registry.registered?(:page_comment)
+
+    registered = @registry.register(
+      :page_comment,
+      label: "Page comment",
+      available_channels: [:email],
+      channel_options: { email: { individual_mailer: "PageCommentMailer" } }
+    )
+    assert_equal "PageCommentMailer", registered.channel_options.dig(:email, :individual_mailer)
+  end
+
   def test_channel_options_must_be_hashes
     error = assert_raises(ArgumentError) do
       @registry.register(:page_comment, label: "Page comment", channel_options: "email")

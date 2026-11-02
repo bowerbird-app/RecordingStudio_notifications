@@ -116,6 +116,8 @@ module RecordingStudioNotifications
       validate_required_channels!(normalized_required, normalized_available)
       inbox = normalize_inbox!(parsed[:inbox])
       validate_inbox!(inbox, normalized_required)
+      channel_options = normalize_channel_options!(parsed[:channel_options])
+      validate_channel_options!(channel_options, normalized_available)
 
       NotificationType.new(
         key: normalized_key,
@@ -133,8 +135,17 @@ module RecordingStudioNotifications
         creation_action: parsed[:creation_action]&.to_sym,
         visible_to: normalize_visible_to!(parsed[:visible_to]),
         inbox: inbox,
-        channel_options: normalize_channel_options!(parsed[:channel_options])
+        channel_options: channel_options
       ).freeze
+    end
+
+    def validate_channel_options!(channel_options, available_channels)
+      available = Array(available_channels)
+      channel_options.each_key do |channel|
+        next if available.include?(channel)
+
+        raise ArgumentError, "channel_options channel #{channel.inspect} must be available"
+      end
     end
 
     def normalize_channel_options!(channel_options)
