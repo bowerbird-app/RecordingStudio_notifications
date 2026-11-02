@@ -56,6 +56,7 @@ RecordingStudioNotifications.configure do |config|
   end
 
   config.allowed_url_hosts = [Rails.application.routes.default_url_options[:host]].compact
+  config.default_inbox_scope = "current_root" # or "all"
   config.default_channels = [:in_app]
   config.deliver_later = true
   config.queue_name = :default

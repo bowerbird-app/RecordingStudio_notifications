@@ -90,6 +90,8 @@ end
 
 The engine registers a default `:generic` type with `:in_app` delivery. `allowed_url_hosts` controls absolute HTTP(S) notification URLs; relative paths are always accepted.
 
+`config.default_inbox_scope` is `"current_root"` or `"all"`. It defaults to `"current_root"`, which keeps the inbox, bell menu, and group pages on the current root plus rootless rows. `"all"` lists every root. A request may pass `inbox_scope=all` or `inbox_scope=current_root`. Any other value falls back to the config. The root-switch dropdown still uses its own scope param.
+
 ### Layout
 
 `config.layout` chooses the shell for inbox, settings, notification, and unsubscribe. It defaults to `nil`. `"recording_studio/default_layout"` does not set `lang` or `dir`. A host layout that calls `recording_studio_locale_attributes` still does.

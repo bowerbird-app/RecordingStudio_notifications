@@ -206,8 +206,9 @@ module RecordingStudioNotifications
     end
 
     # Keep notification list filtering separate from root-switch scope selection.
+    # An allowlisted inbox_scope param wins. Anything else uses the config default.
     def notifications_inbox_scope
-      "current_root"
+      RecordingStudioNotifications.configuration.inbox_scope_for(params[:inbox_scope])
     end
 
     def normalized_menu_limit

@@ -21,6 +21,8 @@ class ConfigurationTest < Minitest::Test
     assert_equal true, generic_type.inbox
     assert_equal({}, generic_type.channel_options)
     assert generic_type.channel_options.frozen?
+    assert_equal "current_root", @configuration.default_inbox_scope
+    assert_equal "current_root", @configuration.to_h.fetch(:default_inbox_scope)
     assert_equal 1.year, @configuration.unsubscribe_expires_in
     assert_equal 1.year, @configuration.to_h.fetch(:unsubscribe_expires_in)
     assert_equal true, @configuration.deliver_later

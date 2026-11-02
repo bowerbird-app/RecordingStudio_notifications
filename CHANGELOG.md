@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.5] - 2026-11-02
+
+### Added
+- `config.default_inbox_scope` chooses the inbox filter when the request does not send an allowlisted `inbox_scope`. The default is `"current_root"`. `"all"` lists every root. `Configuration#inbox_scope_for` returns `params[:inbox_scope]` when it is `"all"` or `"current_root"`, and the config value otherwise. The inbox, the bell menu, and group pages use that result.
+
+### Upgrade notes
+- Bump to `0.14.5`. No migration.
+- Leave `default_inbox_scope` unset to keep the current-root inbox. Set it to `"all"` to list every root when the request omits `inbox_scope`. A request param of `all` or `current_root` overrides the config for that request. Any other param is ignored.
+
 ## [0.14.4] - 2026-11-02
 
 ### Added
