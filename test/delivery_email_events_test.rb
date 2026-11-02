@@ -56,6 +56,28 @@ class DeliveryEmailEventsTest < Minitest::Test
     refute @delivery.email_event_applied?(:opened)
   end
 
+  def test_mark_replaces_an_unparseable_timestamp_and_keeps_a_valid_one
+    @metadata["email_opened_at"] = "not-a-time"
+    @metadata["keep"] = "yes"
+    metadata = @metadata
+    @delivery.define_singleton_method(:update!) do |**attributes|
+      metadata.replace(attributes.fetch(:metadata))
+      self
+    end
+
+    at = Time.utc(2026, 3, 1, 12, 0, 0)
+    @delivery.mark_email_opened!(at: at)
+
+    assert_equal at.iso8601, @metadata["email_opened_at"]
+    assert_equal "yes", @metadata["keep"]
+    assert @delivery.email_event_applied?(:opened)
+
+    later = Time.utc(2026, 3, 2, 12, 0, 0)
+    @delivery.mark_email_opened!(at: later)
+
+    assert_equal at.iso8601, @metadata["email_opened_at"]
+  end
+
   def test_unknown_email_event_raises
     applied = assert_raises(ArgumentError) { @delivery.email_event_applied?(:sent) }
     at = assert_raises(ArgumentError) { @delivery.email_event_at("email_opened") }

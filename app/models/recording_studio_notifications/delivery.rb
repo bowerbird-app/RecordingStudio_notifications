@@ -126,7 +126,7 @@ module RecordingStudioNotifications
     end
 
     def remember_email_timestamp!(key, at)
-      return self if metadata[key].present?
+      return self if parse_email_event_time(metadata[key])
 
       update!(metadata: metadata.merge(key => at.iso8601))
     end
