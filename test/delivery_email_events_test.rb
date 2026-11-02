@@ -2,15 +2,22 @@
 
 require "test_helper"
 require "active_record"
+require "active_support/core_ext/time/zones"
 require_relative "../app/models/recording_studio_notifications/application_record"
 require_relative "../app/models/recording_studio_notifications/delivery"
 
 class DeliveryEmailEventsTest < Minitest::Test
   def setup
+    @previous_zone = Time.zone
+    Time.zone = "UTC"
     @delivery = RecordingStudioNotifications::Delivery.allocate
     @metadata = {}
     metadata = @metadata
     @delivery.define_singleton_method(:metadata) { metadata }
+  end
+
+  def teardown
+    Time.zone = @previous_zone
   end
 
   def test_predicate_is_false_before_a_timestamp_and_true_after
@@ -40,6 +47,13 @@ class DeliveryEmailEventsTest < Minitest::Test
       assert @delivery.email_event_applied?(type)
       assert_equal @metadata[key], @delivery.email_event_at(type.to_s).iso8601
     end
+  end
+
+  def test_malformed_metadata_is_not_applied
+    @metadata["email_opened_at"] = "not-a-time"
+
+    assert_nil @delivery.email_event_at(:opened)
+    refute @delivery.email_event_applied?(:opened)
   end
 
   def test_unknown_email_event_raises

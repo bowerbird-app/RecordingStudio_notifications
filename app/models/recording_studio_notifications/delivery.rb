@@ -107,10 +107,16 @@ module RecordingStudioNotifications
       raw = metadata[key]
       return if raw.blank?
 
-      Time.iso8601(raw.to_s)
+      parse_email_event_time(raw)
     end
 
     private
+
+    def parse_email_event_time(raw)
+      Time.zone.iso8601(raw.to_s)
+    rescue ArgumentError
+      nil
+    end
 
     def email_event_name!(type)
       name = type.to_s.strip.to_sym
