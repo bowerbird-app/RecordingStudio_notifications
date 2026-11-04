@@ -1,5 +1,5 @@
-<% notifications_page_heading :title, @notification.title %>
-<% notifications_page_heading :subtitle, @notification.notification_type.humanize %>
+<% notifications_page_heading :title, ERB::Util.html_escape(@notification.title) %>
+<% notifications_page_heading :subtitle, ERB::Util.html_escape(@notification.notification_type.humanize) %>
 <% flat_pack_page_nav(
      round: true,
      style: :default,

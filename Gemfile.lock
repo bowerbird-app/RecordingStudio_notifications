@@ -1,48 +1,48 @@
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio.git
-  revision: 403521dddc141ddb12d1ed8d8b30bd4105a9d6f8
-  tag: v6.1.0
+  revision: 6acc0377fa4c940a2ff7222bbcbdc3ee6d59c591
+  tag: v6.3.0
   specs:
-    recording_studio (6.1.0)
+    recording_studio (6.3.0)
       flat_pack (>= 0.1.315)
       rails (>= 8.1.0)
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_accessible.git
-  revision: 2cd0a0117a9018cf3a8374823b5bf58578fa6eb9
-  tag: v0.18.0
+  revision: 9e9bf29234ae14586dd28dd76abeb08363dd4c33
+  tag: v0.24.0
   specs:
-    recording_studio_accessible (0.18.0)
+    recording_studio_accessible (0.24.0)
       rails (~> 8.1.0)
-      recording_studio (>= 6.1.0)
+      recording_studio (~> 6.1, >= 6.1.0)
       recording_studio_trashable (~> 0.10)
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_metrics.git
-  revision: b3ff62dbee7e4e1107e3e41cdae7b2481893ca51
-  tag: v0.5.0
+  revision: cb87f3b47ec6825458e3f467f7b16a5cb407e96c
+  tag: v0.7.2
   specs:
-    recording_studio_metrics (0.5.0)
+    recording_studio_metrics (0.7.2)
       rails (~> 8.1.0)
       recording_studio (>= 6.1.0)
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_trashable.git
-  revision: 436cbb838e9d30b7a91b6d25c74fb3b749e8afe5
-  tag: v0.11.0
+  revision: 07d715d32bb44225b9482f6318a071f7c1876141
+  tag: v0.12.2
   specs:
-    recording_studio_trashable (0.11.0)
-      flat_pack (>= 0.1.74)
+    recording_studio_trashable (0.12.2)
+      flat_pack (>= 0.1.315)
       rails (~> 8.1.0)
       recording_studio (>= 6.1.0)
-      recording_studio_metrics (~> 0.2)
+      recording_studio_metrics (>= 0.3.0, < 1.0)
 
 GIT
   remote: https://github.com/bowerbird-app/flatpack.git
-  revision: 1fcbafe94f8eb118f0a22182f63f5110fcc97a56
-  ref: 1fcbafe94f8eb118f0a22182f63f5110fcc97a56
+  revision: 374c9b7f7130057954df596597ff75f139c72b50
+  tag: v0.1.341
   specs:
-    flat_pack (0.1.319)
+    flat_pack (0.1.341)
       pagy (~> 9.0)
       rails (>= 7.1, < 9)
       tailwind_merge (~> 0.13)
@@ -51,12 +51,12 @@ GIT
 PATH
   remote: .
   specs:
-    recording_studio_notifications (0.14.7)
-      flat_pack (>= 0.1.315)
+    recording_studio_notifications (0.14.8)
+      flat_pack (>= 0.1.341)
       rails (~> 8.1.0)
-      recording_studio (>= 6.1.0)
-      recording_studio_accessible
-      recording_studio_metrics (>= 0.3.0, < 1.0)
+      recording_studio (>= 6.3.0)
+      recording_studio_accessible (~> 0.18)
+      recording_studio_metrics (>= 0.7.2, < 1.0)
       view_component (>= 4.14, < 5)
 
 GEM
@@ -394,7 +394,7 @@ CHECKSUMS
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
   erb (6.0.5) sha256=858e63488cb796c9daba8b6e9ff4b3879c395022049be9a66a8e00980e612eac
   erubi (1.13.1) sha256=a082103b0885dbc5ecf1172fede897f9ebdb745a4b97a5e8dc63953db1ee4ad9
-  flat_pack (0.1.319)
+  flat_pack (0.1.341)
   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
@@ -442,11 +442,11 @@ CHECKSUMS
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
   rbs (4.0.3) sha256=5a7bf70e2628549d9a1f44eae447b2cfe55968a9c60cfff52693a4bdcc020e14
   rdoc (8.0.0) sha256=03bf8c08a9639658855a0cfd77c0abca8325c227693f7f33f82957811348c469
-  recording_studio (6.1.0)
-  recording_studio_accessible (0.18.0)
-  recording_studio_metrics (0.5.0)
-  recording_studio_notifications (0.14.7)
-  recording_studio_trashable (0.11.0)
+  recording_studio (6.3.0)
+  recording_studio_accessible (0.24.0)
+  recording_studio_metrics (0.7.2)
+  recording_studio_notifications (0.14.8)
+  recording_studio_trashable (0.12.2)
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4
   reline (0.6.3) sha256=1198b04973565b36ec0f11542ab3f5cfeeec34823f4e54cebde90968092b1835
   responders (3.2.0) sha256=89c2d6ac0ae16f6458a11524cae4a8efdceba1a3baea164d28ee9046bd3df55a

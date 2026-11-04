@@ -33,7 +33,8 @@ module RecordingStudioNotifications
           )
         end
       end
-    rescue StandardError
+    rescue StandardError => e
+      Rails.logger&.debug { "RecordingStudioNotifications menu skipped: #{e.class}: #{e.message}" }
       nil
     end
 

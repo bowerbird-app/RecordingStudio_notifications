@@ -16,7 +16,8 @@ module RecordingStudioNotifications
 
         begin
           resolver.call(ResolverContext.new(nil))
-        rescue StandardError
+        rescue StandardError => e
+          Rails.logger&.debug { "RecordingStudioNotifications admin root resolver skipped: #{e.class}: #{e.message}" }
           nil
         end
       end

@@ -43,6 +43,8 @@ class EngineTest < Minitest::Test
     assert_includes engine, "RecordingStudioAdmin.register_widget"
     assert_includes engine, "RecordingStudioNotifications::Admin::FailedDeliveriesScreen"
     refute_includes engine, "RecordingStudioMetrics::Api.register!"
+    assert_includes engine, "Rails.logger&.debug { \"RecordingStudioNotifications YAML config skipped:"
+    refute_match(/rescue StandardError\n            nil/, engine)
   end
 
   def test_engine_defines_default_view_action_without_overriding_a_host

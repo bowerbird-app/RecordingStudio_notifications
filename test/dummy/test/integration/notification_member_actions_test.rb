@@ -90,6 +90,27 @@ class NotificationMemberActionsTest < ActionDispatch::IntegrationTest
     assert_nil notification.read_at
   end
 
+  test "show escapes html in the title" do
+    notification = create_global(type: :member_action_global, title: "<script>alert(1)</script>")
+
+    get "/notifications/notifications/#{notification.id}"
+
+    assert_response :success
+    refute_includes response.body, "<script>alert(1)</script>"
+    assert_match(/&lt;script&gt;alert\(1\)&lt;\/script&gt;|&amp;lt;script&amp;gt;alert\(1\)&amp;lt;\/script&amp;gt;/,
+                 response.body)
+  end
+
+  test "open falls back when the stored url is unsafe" do
+    notification = create_global(type: :member_action_global, title: "Unsafe open", url: "/covered-open-target")
+    notification.mark_read!
+    notification.update_column(:url, "javascript:alert(1)")
+
+    get "/notifications/notifications/#{notification.id}/open"
+
+    assert_redirected_to "/notifications/notifications/#{notification.id}"
+  end
+
   test "another recipient's notification is not found" do
     notification = create_global(type: :member_action_global, title: "Someone else", recipient: @other)
 

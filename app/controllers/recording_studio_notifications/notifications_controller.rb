@@ -87,6 +87,7 @@ module RecordingStudioNotifications
       @notification.mark_read! if @notification.unread?
 
       destination = @notification.url.presence || notification_path(@notification)
+      destination = notification_path(@notification) unless UrlSafety.safe?(destination)
       redirect_to destination, allow_other_host: true
     end
 

@@ -109,6 +109,33 @@ class UnsubscribeTest < ActionDispatch::IntegrationTest
     assert_not_predicate preference(other, :digest_mail, :email), :enabled
   end
 
+  test "one click still works when forgery protection is on" do
+    previous = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = true
+    path = unsubscribe_path_for(@user, :digest_mail, :email)
+
+    post path, params: { "List-Unsubscribe" => "One-Click" }
+
+    assert_response :success
+    assert_equal "Unsubscribed.", response.body
+    assert_not_predicate preference(@user, :digest_mail, :email), :enabled
+  ensure
+    ActionController::Base.allow_forgery_protection = previous
+  end
+
+  test "a signed form post still unsubscribes when forgery protection is on" do
+    previous = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = true
+    path = unsubscribe_path_for(@user, :digest_mail, :email)
+
+    post path
+
+    assert_response :see_other
+    assert_not_predicate preference(@user, :digest_mail, :email), :enabled
+  ensure
+    ActionController::Base.allow_forgery_protection = previous
+  end
+
   test "a token for one type and channel leaves the others alone" do
     post unsubscribe_path_for(@user, :digest_mail, :email)
 

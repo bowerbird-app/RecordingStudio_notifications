@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.14.7", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.14.8", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -32,13 +32,15 @@ class RecordingStudioNotificationsTest < Minitest::Test
     refute_includes spec.dependencies.map(&:name), "recording_studio_admin"
     assert_includes spec.dependencies.map(&:name), "recording_studio_metrics"
     flat_pack = spec.dependencies.find { |dependency| dependency.name == "flat_pack" }
-    assert_equal ">= 0.1.315", flat_pack.requirement.to_s
+    assert_equal ">= 0.1.341", flat_pack.requirement.to_s
     studio = spec.dependencies.find { |dependency| dependency.name == "recording_studio" }
-    assert_equal ">= 6.1.0", studio.requirement.to_s
+    assert_equal ">= 6.3.0", studio.requirement.to_s
     view_component = spec.dependencies.find { |dependency| dependency.name == "view_component" }
     assert_equal ">= 4.14, < 5", view_component.requirement.to_s
     accessible = spec.dependencies.find { |dependency| dependency.name == "recording_studio_accessible" }
-    assert_equal ">= 0", accessible.requirement.to_s
+    assert_equal "~> 0.18", accessible.requirement.to_s
+    metrics = spec.dependencies.find { |dependency| dependency.name == "recording_studio_metrics" }
+    assert_equal ">= 0.7.2, < 1.0", metrics.requirement.to_s
   end
 
   def test_engine_routes_notifications_as_root
@@ -84,6 +86,23 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_includes engine_importmap, 'under: "controllers/recording_studio_notifications"'
   end
 
+  def test_unsubscribe_csrf_skip_is_limited_to_one_click
+    unsubscribes = File.read(File.expand_path("../app/controllers/recording_studio_notifications/unsubscribes_controller.rb",
+                                              __dir__))
+    menu_helper = File.read(File.expand_path("../app/helpers/recording_studio_notifications/menu_helper.rb", __dir__))
+    access = File.read(File.expand_path("../lib/recording_studio_notifications/api/access.rb", __dir__))
+
+    assert_includes unsubscribes, "include RecordingStudio::ControllerLayout"
+    assert_includes unsubscribes, "skip_forgery_protection only: :update, if: :one_click?"
+    refute_match(/^\s*skip_forgery_protection\s*$/, unsubscribes)
+    show_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/show.html.erb",
+                                           __dir__))
+    assert_includes show_view, "ERB::Util.html_escape(@notification.title)"
+    refute_includes show_view, "notifications_page_heading :title, @notification.title\n"
+    assert_includes menu_helper, "Rails.logger&.debug"
+    assert_includes access, "Rails.logger&.debug"
+  end
+
   def test_engine_views_use_flatpack_menu_component_and_scoped_settings_layering
     views = Dir[File.expand_path("../app/views/recording_studio_notifications/**/*.erb", __dir__)].map do |path|
       File.read(path)
@@ -119,5 +138,6 @@ class RecordingStudioNotificationsTest < Minitest::Test
     refute File.exist?(File.join(root, "test/rename_verification_test.rb"))
     refute File.exist?(File.join(root, "test/dummy/app/javascript/controllers/hello_controller.js"))
     refute File.exist?(File.join(root, "test/dummy/.github/workflows/ci.yml"))
+    refute File.exist?(File.join(root, "test/support/widen_recording_studio_requirement.rb"))
   end
 end

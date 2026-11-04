@@ -5,6 +5,7 @@ module RecordingStudioNotifications
 
   class ApplicationController < parent_controller
     include ::RecordingStudio::RootSwitchable::ControllerSupport if defined?(::RecordingStudio::RootSwitchable::ControllerSupport)
+    include RecordingStudio::ControllerLayout
 
     recording_studio_layout { RecordingStudioNotifications.configuration.layout }
 
