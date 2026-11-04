@@ -13,11 +13,8 @@ module RecordingStudioNotifications
       Copy.t(key, **)
     end
 
-    # The default layout strips the captured slot, which drops the safe flag
-    # after the buffer has already escaped the text. PageTitle then escapes it
-    # again. A safe string stays literal in the buffer so PageTitle escapes once.
     def notifications_page_heading(slot, text)
-      content_for(slot, text.to_s.html_safe)
+      content_for(slot, text.to_s, flush: true)
     end
 
     def notification_icon_for(notification)

@@ -8,6 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.8] - 2026-11-04
+
+### Added
+- GitHub Actions Security workflow (bundler-audit, Brakeman, importmap audit) on the dummy app.
+
+### Changed
+- Development and dummy Gemfiles pin Recording Studio `v6.3.0`, Flatpack `v0.1.341`, Accessible `v0.24.0`, Metrics `v0.7.2`, and Trashable `v0.12.2`. Dummy-only pins: Notifications Email `v0.5.1`, Commentable `v0.7.0`, Root Switchable `v0.11.4`, Cache `v0.6.2`, Internationalization `v0.2.0`, Admin `v2.5.1`.
+- Dummy lockfile: Rails `8.1.4.1`, Brakeman `8.1.0`, and patched `nokogiri`, `puma`, `rack`, `devise`, and `bcrypt` so bundler-audit and Brakeman `--ensure-latest` pass.
+- Gemspec floors: `recording_studio` `>= 6.3.0`, `flat_pack` `>= 0.1.341`, `recording_studio_metrics` `>= 0.7.2`, `recording_studio_accessible` `~> 0.18`. Rails and ViewComponent constraints are unchanged.
+- Inbox and unsubscribe controllers include `RecordingStudio::ControllerLayout` so a nil layout still falls through to core Default Layout.
+- `NotificationsController#open` checks `UrlSafety.safe?` before `redirect_to` with `allow_other_host: true`. An unsafe stored URL falls back to the notification show path.
+- Page headings pass raw text into `content_for`. Default Layout and Flatpack PageTitle escape once.
+- One-click unsubscribe is the only request that skips CSRF. Other unsubscribe POSTs use `null_session` and the signed SGID.
+
+### Removed
+- `test/support/widen_recording_studio_requirement.rb`. Current sibling pins allow Recording Studio 6.3.0 without widening gemspec requirements. Dummy Root Switchable layout is a callable that returns `flat_pack_sidebar` (0.11.4 rejects the old `:application_layout` symbol).
+
+### Upgrade notes
+- Bump to `0.14.8`. No migration.
+- Hosts need Recording Studio `>= 6.3.0` and Flatpack `>= 0.1.341`. Accessible must satisfy `~> 0.18` (ControllerAuth). Metrics must be `>= 0.7.2`.
+
 ## [0.14.7] - 2026-11-02
 
 ### Added
@@ -485,7 +506,13 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.2...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.8...HEAD
+[0.14.8]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.7...v0.14.8
+[0.14.7]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.6...v0.14.7
+[0.14.6]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.5...v0.14.6
+[0.14.5]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.4...v0.14.5
+[0.14.4]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.3...v0.14.4
+[0.14.3]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.2...v0.14.3
 [0.14.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.1...v0.14.2
 [0.14.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.13.2...v0.14.0

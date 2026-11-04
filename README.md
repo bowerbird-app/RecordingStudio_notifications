@@ -21,15 +21,15 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 
 - Ruby 3.3 or newer
 - Rails 8.1
-- `recording_studio` `>= 6.1.0`, `recording_studio_accessible` (gemspec has no version floor; inbox, preferences, and `creation_action` pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth), `flat_pack` `>= 0.1.315`, and `view_component` `>= 4.14, < 5`
+- `recording_studio` `>= 6.3.0`, `recording_studio_accessible` `~> 0.18` (inbox, preferences, and `creation_action` pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth), `flat_pack` `>= 0.1.341`, and `view_component` `>= 4.14, < 5`
 - `recording_studio_metrics` for operations metrics registration
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus
 
-Development and dummy Gemfiles pin Recording Studio to GitHub tag `v6.1.0` and Accessible to `v0.18.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
+Development and dummy Gemfiles pin Recording Studio to GitHub tag `v6.3.0` and Accessible to `v0.24.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
 
-Root and dummy Gemfiles pin Trashable `v0.11.0` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.4.0` and Metrics `v0.5.0`. Both Gemfiles pin Flatpack to commit `1fcbafe94f8eb118f0a22182f63f5110fcc97a56` (`FlatPack::VERSION` `0.1.319`) and `view_component` `4.19.0`. Inbox cards use `border: :strong`. `Card` no longer takes `style:`.
+Root and dummy Gemfiles pin Trashable `v0.12.2` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.5.1` and Metrics `v0.7.2`. Both Gemfiles pin Flatpack to GitHub tag `v0.1.341` and `view_component` `4.19.0`. Inbox cards use `border: :strong`. `Card` no longer takes `style:`.
 
-Hosts need Recording Studio `>= 6.1.0`, Flatpack `>= 0.1.315`, `view_component` `>= 4.14, < 5`, and Admin `>= 2.4.0`. The gemspec requires Accessible with no version floor. Passing `controller:` into Accessible `authorized_action?` (inbox, preferences, `creation_action`) needs Accessible `0.18` ControllerAuth. Development pins `v0.18.0`. A card that still passes `style:` drops that keyword and sets `border:` instead.
+Hosts need Recording Studio `>= 6.3.0`, Flatpack `>= 0.1.341`, `view_component` `>= 4.14, < 5`, and Admin `>= 2.5.1`. The gemspec requires Accessible `~> 0.18`. Passing `controller:` into Accessible `authorized_action?` (inbox, preferences, `creation_action`) needs Accessible `0.18` ControllerAuth. Development pins `v0.24.0`. A card that still passes `style:` drops that keyword and sets `border:` instead.
 
 ## Installation
 
@@ -37,8 +37,8 @@ Add the gem to the host application's `Gemfile`:
 
 ```ruby
 gem "recording_studio_notifications"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.1.0"
-gem "flat_pack", github: "bowerbird-app/flatpack", ref: "1fcbafe94f8eb118f0a22182f63f5110fcc97a56"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.3.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.341"
 ```
 
 Install the engine, copy migrations, and migrate:
@@ -408,8 +408,8 @@ Add the gem and install it in your host app:
 
 ```ruby
 gem "recording_studio_notifications"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.1.0"
-gem "flat_pack", github: "bowerbird-app/flatpack", ref: "1fcbafe94f8eb118f0a22182f63f5110fcc97a56"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.3.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.341"
 ```
 
 ```bash
@@ -527,7 +527,7 @@ The engine registers Accessible actions for viewing notifications and managing p
 
 ## Operations metrics
 
-The engine registers site-wide notification metrics with Recording Studio Metrics (`notifications.sent_over_time`, `notifications.by_type`, `notifications.read_vs_unread`, `notification_deliveries.by_status`, `notification_deliveries.by_channel`). Staff with AdminRoot `:view` can read them via `Api::Access.can_view?`. `read_vs_unread` uses `Notification.read` / `Notification.unread`. `notification_deliveries.failed_by_channel_over_time` (Metrics `>= 0.3.0, < 0.6`, unit `count`) counts deliveries in the `failed` state bucketed by `updated_at` (set by `mark_failed!`; there is no separate failed_at column), with `from` / `to` / `interval` and `group_by=channel` (groups under `min_group_size` 5 fold into `other`). A delivery retried successfully since then is no longer counted. When Recording Studio Admin is present, All notifications shows a compact chart of that metric. Chart series use `{ x:, y: }` hashes (numeric `y`) so the Flatpack line chart can draw. The linked `recording_studio_notifications_failed_deliveries` screen lists those stored failed delivery rows with inline date, group-by, channel, and kind filters. The screen chart buckets the same filtered rows. Recipient shows email when the recipient record responds to `email`. This gem does not call `RecordingStudioMetrics::Api.register!`. Admin is optional and is not a gemspec dependency.
+The engine registers site-wide notification metrics with Recording Studio Metrics (`notifications.sent_over_time`, `notifications.by_type`, `notifications.read_vs_unread`, `notification_deliveries.by_status`, `notification_deliveries.by_channel`). Staff with AdminRoot `:view` can read them via `Api::Access.can_view?`. `read_vs_unread` uses `Notification.read` / `Notification.unread`. `notification_deliveries.failed_by_channel_over_time` (Metrics `>= 0.7.2`, unit `count`) counts deliveries in the `failed` state bucketed by `updated_at` (set by `mark_failed!`; there is no separate failed_at column), with `from` / `to` / `interval` and `group_by=channel` (groups under `min_group_size` 5 fold into `other`). A delivery retried successfully since then is no longer counted. When Recording Studio Admin is present, All notifications shows a compact chart of that metric. Chart series use `{ x:, y: }` hashes (numeric `y`) so the Flatpack line chart can draw. The linked `recording_studio_notifications_failed_deliveries` screen lists those stored failed delivery rows with inline date, group-by, channel, and kind filters. The screen chart buckets the same filtered rows. Recipient shows email when the recipient record responds to `email`. This gem does not call `RecordingStudioMetrics::Api.register!`. Admin is optional and is not a gemspec dependency.
 
 ## UI
 

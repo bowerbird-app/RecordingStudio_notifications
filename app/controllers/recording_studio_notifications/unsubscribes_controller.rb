@@ -2,6 +2,7 @@
 
 module RecordingStudioNotifications
   class UnsubscribesController < ActionController::Base
+    include RecordingStudio::ControllerLayout
     include NotificationsHelper
 
     helper NotificationsHelper
@@ -9,7 +10,8 @@ module RecordingStudioNotifications
 
     recording_studio_layout { RecordingStudioNotifications.configuration.layout }
 
-    skip_forgery_protection
+    protect_from_forgery with: :null_session
+    skip_forgery_protection only: :update, if: :one_click?
     before_action :skip_session_cookie
 
     def show

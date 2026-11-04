@@ -30,7 +30,7 @@ class NotificationMetricsTest < ActiveSupport::TestCase
     @workspace = Workspace.create!(name: "Metrics #{SecureRandom.hex(4)}")
     @root = RecordingStudio.root_recording_for(@workspace)
     @admin_root = RecordingStudio.root_recording_for(AdminRoot.first_or_create!)
-    grant!(@admin_root, @staff, :admin)
+    bootstrap_owner!(@admin_root, @staff)
     bootstrap_owner!(@root, @staff)
     seed_notifications!
     Current.actor = nil
@@ -318,11 +318,26 @@ class NotificationMetricsTest < ActiveSupport::TestCase
   end
 
   def bootstrap_owner!(recording, actor)
+    return if RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :view)
+
     result = RecordingStudioAccessible.bootstrap_owner_access!(
       recording: recording,
       actor: actor
     )
-    raise result.error if result.failure?
+    return unless result.failure?
+
+    manager = User.find_by(email: "admin@admin.com")
+    original = RecordingStudioAccessible.configuration.access_management_authorizer
+    RecordingStudioAccessible.configuration.access_management_authorizer = ->(**) { true }
+    granted = RecordingStudioAccessible.grant_access(
+      recording: recording,
+      actor: actor,
+      role: :admin,
+      manager_actor: manager
+    )
+    raise granted.error if granted.failure?
+  ensure
+    RecordingStudioAccessible.configuration.access_management_authorizer = original if defined?(original) && original
   end
 
   def grant!(recording, actor, role)
