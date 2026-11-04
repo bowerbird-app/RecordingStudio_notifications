@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Development and dummy Gemfiles pin Recording Studio `v6.3.0`, Flatpack `v0.1.341`, Accessible `v0.24.0`, Metrics `v0.7.2`, and Trashable `v0.12.2`. Dummy-only pins: Notifications Email `v0.5.1`, Commentable `v0.7.0`, Root Switchable `v0.11.4`, Cache `v0.6.2`, Internationalization `v0.2.0`, Admin `v2.5.1`.
+- Dummy lockfile: Rails `8.1.4.1`, Brakeman `8.1.0`, and patched `nokogiri`, `puma`, `rack`, `devise`, and `bcrypt` so bundler-audit and Brakeman `--ensure-latest` pass.
 - Gemspec floors: `recording_studio` `>= 6.3.0`, `flat_pack` `>= 0.1.341`, `recording_studio_metrics` `>= 0.7.2`, `recording_studio_accessible` `~> 0.18`. Rails and ViewComponent constraints are unchanged.
 - Inbox and unsubscribe controllers include `RecordingStudio::ControllerLayout` so a nil layout still falls through to core Default Layout.
 - `NotificationsController#open` checks `UrlSafety.safe?` before `redirect_to` with `allow_other_host: true`. An unsafe stored URL falls back to the notification show path.
