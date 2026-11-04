@@ -15,9 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Gemspec floors: `recording_studio` `>= 6.3.0`, `flat_pack` `>= 0.1.341`, `recording_studio_metrics` `>= 0.7.2`, `recording_studio_accessible` `~> 0.18`. Rails and ViewComponent constraints are unchanged.
 - Inbox and unsubscribe controllers include `RecordingStudio::ControllerLayout` so a nil layout still falls through to core Default Layout.
 - `NotificationsController#open` checks `UrlSafety.safe?` before `redirect_to` with `allow_other_host: true`. An unsafe stored URL falls back to the notification show path.
-- Page headings pass escaped text. Notification titles are no longer marked `html_safe`.
+- Page headings pass raw text into `content_for`. Default Layout and Flatpack PageTitle escape once.
 - One-click unsubscribe is the only request that skips CSRF. Other unsubscribe POSTs use `null_session` and the signed SGID.
-- Silent `rescue StandardError` in engine config load, the async menu helper, and `Api::Access.admin_root_recording` now logs at debug. Engine YAML and `config.x` conversion use narrower exception classes.
 
 ### Removed
 - `test/support/widen_recording_studio_requirement.rb`. Current sibling pins allow Recording Studio 6.3.0 without widening gemspec requirements. Dummy Root Switchable layout is a callable that returns `flat_pack_sidebar` (0.11.4 rejects the old `:application_layout` symbol).

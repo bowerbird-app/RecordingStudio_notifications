@@ -89,18 +89,19 @@ class RecordingStudioNotificationsTest < Minitest::Test
   def test_unsubscribe_csrf_skip_is_limited_to_one_click
     unsubscribes = File.read(File.expand_path("../app/controllers/recording_studio_notifications/unsubscribes_controller.rb",
                                               __dir__))
-    menu_helper = File.read(File.expand_path("../app/helpers/recording_studio_notifications/menu_helper.rb", __dir__))
-    access = File.read(File.expand_path("../lib/recording_studio_notifications/api/access.rb", __dir__))
 
     assert_includes unsubscribes, "include RecordingStudio::ControllerLayout"
     assert_includes unsubscribes, "skip_forgery_protection only: :update, if: :one_click?"
     refute_match(/^\s*skip_forgery_protection\s*$/, unsubscribes)
     show_view = File.read(File.expand_path("../app/views/recording_studio_notifications/notifications/show.html.erb",
                                            __dir__))
-    assert_includes show_view, "ERB::Util.html_escape(@notification.title)"
-    refute_includes show_view, "notifications_page_heading :title, @notification.title\n"
-    assert_includes menu_helper, "Rails.logger&.debug"
-    assert_includes access, "Rails.logger&.debug"
+    helper = File.read(File.expand_path("../app/helpers/recording_studio_notifications/notifications_helper.rb",
+                                        __dir__))
+    assert_includes show_view, "notifications_page_heading :title, @notification.title"
+    refute_includes show_view, "ERB::Util.html_escape"
+    refute_includes show_view, "html_safe"
+    assert_includes helper, "content_for(slot, text.to_s, flush: true)"
+    refute_includes helper, "html_safe"
   end
 
   def test_engine_views_use_flatpack_menu_component_and_scoped_settings_layering

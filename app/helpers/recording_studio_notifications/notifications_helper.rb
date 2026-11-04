@@ -13,11 +13,8 @@ module RecordingStudioNotifications
       Copy.t(key, **)
     end
 
-    # Layout captures then PageTitle escape once. Trusted Copy is marked safe so
-    # it is not escaped in the buffer. Callers that pass untrusted text must
-    # escape first.
     def notifications_page_heading(slot, text)
-      content_for(slot, text.to_s.html_safe)
+      content_for(slot, text.to_s, flush: true)
     end
 
     def notification_icon_for(notification)

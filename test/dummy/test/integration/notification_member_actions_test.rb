@@ -97,8 +97,22 @@ class NotificationMemberActionsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     refute_includes response.body, "<script>alert(1)</script>"
-    assert_match(/&lt;script&gt;alert\(1\)&lt;\/script&gt;|&amp;lt;script&amp;gt;alert\(1\)&amp;lt;\/script&amp;gt;/,
-                 response.body)
+    assert_includes response.body, "&lt;script&gt;"
+    refute_includes response.body, "&amp;lt;"
+  end
+
+  test "show keeps apostrophes in the title" do
+    notification = create_global(type: :member_action_global, title: "Don't")
+
+    get "/notifications/notifications/#{notification.id}"
+
+    assert_response :success
+    assert_select "h1" do |elements|
+      heading = elements.first.text
+      assert_includes heading, "Don't"
+      refute_includes heading, "&#39;"
+      refute_includes heading, "&amp;#39;"
+    end
   end
 
   test "open falls back when the stored url is unsafe" do
