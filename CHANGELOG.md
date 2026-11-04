@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.14.8] - 2026-11-04
 
+### Added
+- GitHub Actions Security workflow (bundler-audit, Brakeman, importmap audit) on the dummy app.
+
 ### Changed
 - Development and dummy Gemfiles pin Recording Studio `v6.3.0`, Flatpack `v0.1.341`, Accessible `v0.24.0`, Metrics `v0.7.2`, and Trashable `v0.12.2`. Dummy-only pins: Notifications Email `v0.5.1`, Commentable `v0.7.0`, Root Switchable `v0.11.4`, Cache `v0.6.2`, Internationalization `v0.2.0`, Admin `v2.5.1`.
 - Gemspec floors: `recording_studio` `>= 6.3.0`, `flat_pack` `>= 0.1.341`, `recording_studio_metrics` `>= 0.7.2`, `recording_studio_accessible` `~> 0.18`. Rails and ViewComponent constraints are unchanged.
