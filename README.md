@@ -20,7 +20,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 ## Requirements
 
 - Ruby 3.3 or newer
-- Rails 8.1
+- Rails 8.1 (development and dummy locks: `8.1.4.1`)
 - `recording_studio` `>= 6.3.0`, `recording_studio_accessible` `~> 0.18` (inbox, preferences, and `creation_action` pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth), `flat_pack` `>= 0.1.341`, and `view_component` `>= 4.14, < 5`
 - `recording_studio_metrics` for operations metrics registration
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus

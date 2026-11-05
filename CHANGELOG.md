@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.9] - 2026-11-05
+
+### Changed
+- Development Gemfile.lock now matches dummy on Rails `8.1.4.1`. Rack `3.2.8`, nokogiri `1.19.7`, loofah `2.25.3`, and rails-html-sanitizer `1.7.2` stay at the patched floors. Dummy lock was already on this set.
+
+### Upgrade notes
+- Bump to `0.14.9`. No migration. Hosts should use Rails `8.1.4.1` (or newer 8.1.x).
+
 ## [0.14.8] - 2026-11-04
 
 ### Added
@@ -506,7 +514,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.8...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.9...HEAD
+[0.14.9]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.8...v0.14.9
 [0.14.8]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.7...v0.14.8
 [0.14.7]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.6...v0.14.7
 [0.14.6]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.5...v0.14.6
