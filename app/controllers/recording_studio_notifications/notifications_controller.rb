@@ -85,6 +85,7 @@ module RecordingStudioNotifications
       return head :forbidden unless visible_notification?(@notification)
 
       @notification.mark_read! if @notification.unread?
+      switch_current_root_for_open
 
       destination = @notification.url.presence || notification_path(@notification)
       destination = notification_path(@notification) unless UrlSafety.safe?(destination)
@@ -262,6 +263,31 @@ module RecordingStudioNotifications
 
     def notification_group_dom_id(group)
       "#{group.id}-container"
+    end
+
+    def switch_current_root_for_open
+      return unless defined?(::RecordingStudio::RootSwitchable)
+      return unless ::RecordingStudio::RootSwitchable.respond_to?(:switch_root)
+
+      target_id = @notification.root_recording_id
+      return if target_id.blank?
+      return if current_notifications_root_recording&.id == target_id
+
+      scope_key = current_root_scope_key if respond_to?(:current_root_scope_key, true)
+      return if scope_key.blank?
+
+      device_key = ::RecordingStudio::RootSwitchable.current_device_key
+      return if device_key.blank?
+
+      ::RecordingStudio::RootSwitchable.switch_root(
+        controller: self,
+        actor: ::RecordingStudio::RootSwitchable::Current.actor || current_notifications_actor,
+        device_key: device_key,
+        root_recording_id: target_id,
+        scope_key: scope_key
+      )
+    rescue StandardError
+      nil
     end
 
     # Override root-switch scope extraction so `scope=current_root` in the

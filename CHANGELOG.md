@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.10] - 2026-11-11
+
+### Added
+- `NotificationsController#open` switches the current Root Switchable selection to the notification's `root_recording` before redirecting, when Root Switchable is loaded and that root is not already current. Same-root and rootless notifications do not switch. A refused or failed switch still redirects.
+
+### Upgrade notes
+- Bump to `0.14.10`. No migration. No host code change.
+- Hosts that load Root Switchable get this on open (inbox and bell). Hosts without it are unchanged. There is no config toggle.
+
 ## [0.14.9] - 2026-11-05
 
 ### Changed
@@ -514,7 +523,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.9...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.10...HEAD
+[0.14.10]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.9...v0.14.10
 [0.14.9]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.8...v0.14.9
 [0.14.8]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.7...v0.14.8
 [0.14.7]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.6...v0.14.7
