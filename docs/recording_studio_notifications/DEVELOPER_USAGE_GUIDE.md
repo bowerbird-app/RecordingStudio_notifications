@@ -60,7 +60,7 @@ Once mounted, engine-internal routes include:
 - `GET /notifications` (index)
 - `GET /notifications/menu` (async menu JSON payload)
 - `GET /notifications/:id` (show)
-- `GET /notifications/:id/open` (mark read + redirect)
+- `GET /notifications/:id/open` (mark read, switch current root when Root Switchable is loaded and the row belongs to another root, then redirect)
 - `PATCH /notifications/:id/mark_read`
 - `PATCH /notifications/:id/mark_unread`
 - `PATCH /notifications/:id/archive`
@@ -339,6 +339,12 @@ Menu behavior:
 - The top-nav polling endpoint returns recent notifications across accessible scope.
 - Endpoint (under mount path): `GET /notifications/menu.json?limit=5`
 - Response includes unread count, recent items, and rendered menu HTML.
+
+Open behavior:
+
+- `GET /notifications/:id/open` marks the row read and redirects to the stored URL, or to the show page when the URL is blank or unsafe.
+- When `RecordingStudio::RootSwitchable` is loaded and the row has a `root_recording` other than the current selection, open calls `RecordingStudio::RootSwitchable.switch_root` with the current actor, device key, and `current_root_scope_key` (the host top-nav scope, not the inbox `inbox_scope` param). Then it redirects.
+- A rootless row does not switch. A failed or refused switch still redirects. Hosts without Root Switchable are unchanged.
 
 ## 11. Channel Preferences
 

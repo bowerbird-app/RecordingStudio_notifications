@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** October 17, 2026
+> *   **Last Updated:** November 11, 2026
 >
 > *Maintainers: Update the date above when modifying this file.*
 
@@ -33,7 +33,7 @@ This does the following:
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `actor_resolver` | Proc | resolves `Current.actor` when available | Resolves the acting user when `actor:` is omitted from `notify`. |
-| `current_root_resolver` | Proc | controller-based root resolver | Resolves the active root recording used by inbox visibility/scoping logic. |
+| `current_root_resolver` | Proc | controller-based root resolver | Resolves the active root recording used by inbox visibility/scoping logic. Opening a notification from another root also writes that root through Root Switchable `switch_root` when that gem is loaded. |
 | `allowed_url_hosts` | Array | `[]` | Allowlist for absolute notification URLs. Relative paths are always allowed. A non-blank URL containing `\`, `\x00`–`\x1F`, `\x7F`, `U+0080`–`U+009F`, `U+2028`, or `U+2029` is rejected. Percent-encoded controls in the path, query, or fragment (`%0A`, `%00`, `%C2%85`, `%E2%80%A8`) are rejected after one decode. `%5C` stays allowed. A byte that is not valid UTF-8 after that decode (`%FF`, `%E9`) stays allowed, as does a space (`%20`), a plus sign, and UTF-8 text (`%C3%A9`). `%250A` stays allowed because one decode leaves the characters `%0A`. |
 | `default_channels` | Array | `[:in_app]` | Default channels for type registration and delivery fallback. |
 | `deliver_later` | Boolean | `true` | Whether deliveries enqueue via ActiveJob by default. |
