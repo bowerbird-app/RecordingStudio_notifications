@@ -31,9 +31,21 @@ class NotificationsInboxTest < Minitest::Test
     assert_includes group, 'class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"'
     assert_includes group, "notifications/notification"
 
-    refute_includes menu, "font-semibold"
-    refute_includes menu, "font-normal"
+    assert_includes menu, "style: :plain"
+    assert_includes menu, "divider: true"
+    assert_includes menu, 'unread = n[:unread] == true || n["unread"] == true'
+    assert_includes menu, 'weight = unread ? "font-semibold" : "font-normal"'
+    assert_includes menu, 'title_color = unread ? "text-(--surface-content-color)" : "text-(--surface-muted-content-color)"'
+    assert_includes menu, "line-clamp-2 text-xs <%= weight %>"
+    assert_includes menu, 'class: "text-sm #{weight} text-(--surface-muted-content-color) whitespace-nowrap"'
+    assert_includes menu, "notification_menu_leading_icon(n)"
     assert_includes menu, "FlatPack::Notification::Component.new"
+    refute_includes menu, "<style"
+    refute_includes menu, "rsn-notification-menu"
+    refute_includes menu, "fp-red-dot"
+    refute_includes menu, "fp-rollup-counter-badge"
+    refute_includes menu, "flat-pack-list"
+    refute_includes menu, "list-item-active-background-color"
     refute_includes menu_helper, "font-semibold"
     refute_includes menu_helper, "font-normal"
   end

@@ -37,7 +37,42 @@ module RecordingStudioNotifications
       nil
     end
 
+    def notification_menu_leading_icon(notification)
+      name = notification_menu_value(notification, :icon).presence || :bell
+      if notification_menu_rollup?(notification)
+        return notification_count_badge(
+          notification_named_leading_icon(name),
+          notification_menu_rollup_unread_count(notification)
+        )
+      end
+
+      notification_named_leading_icon(name, unread: notification_menu_unread?(notification))
+    end
+
+    def notification_menu_value(notification, key)
+      return unless notification.respond_to?(:[])
+
+      value = notification[key]
+      value.nil? ? notification[key.to_s] : value
+    end
+
+    def notification_menu_unread?(notification)
+      notification_menu_value(notification, :unread) == true
+    end
+
     private
+
+    def notification_menu_rollup?(notification)
+      notification_menu_value(notification, :rollup) == true && notification_menu_children(notification).any?
+    end
+
+    def notification_menu_rollup_unread_count(notification)
+      notification_menu_children(notification).count { |child| notification_menu_unread?(child) }
+    end
+
+    def notification_menu_children(notification)
+      Array(notification_menu_value(notification, :children)).select { |child| child.respond_to?(:[]) }
+    end
 
     def normalized_polling_interval
       interval = RecordingStudioNotifications.configuration.polling_interval_seconds.to_i

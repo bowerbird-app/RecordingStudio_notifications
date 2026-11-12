@@ -37,28 +37,10 @@ module RecordingStudioNotifications
     end
 
     def notification_group_leading_icon(group)
-      unread_count = group.unread_count
-      return notification_type_leading_icon(group.notification_type) unless unread_count.positive?
-
-      content_tag(:span, class: "relative inline-flex shrink-0") do
-        safe_join([
-                    notification_type_leading_icon(group.notification_type),
-                    content_tag(
-                      :span,
-                      notification_group_badge_text(unread_count),
-                      class: UNREAD_BADGE_CLASSES,
-                      aria: {
-                        # rubocop:disable Style/FormatStringToken -- I18n uses %{name} tokens
-                        label: notifications_t(
-                          "inbox.unread_aria",
-                          count: unread_count,
-                          default: "%{count} unread notifications"
-                        )
-                        # rubocop:enable Style/FormatStringToken
-                      }
-                    )
-                  ])
-      end
+      notification_count_badge(
+        notification_type_leading_icon(group.notification_type),
+        group.unread_count
+      )
     end
 
     def notification_group_dom_id(group)
@@ -78,8 +60,16 @@ module RecordingStudioNotifications
     end
 
     def notification_type_leading_icon(notification_type, unread: false, size: :md)
+      notification_named_leading_icon(
+        notification_type_icon_for(notification_type),
+        unread: unread,
+        size: size
+      )
+    end
+
+    def notification_named_leading_icon(name, unread: false, size: :md)
       icon = render FlatPack::Shared::IconComponent.new(
-        name: notification_type_icon_for(notification_type),
+        name: name.presence || :bell,
         size: size,
         class: "text-[var(--surface-muted-content-color)]"
       )
@@ -89,6 +79,30 @@ module RecordingStudioNotifications
         safe_join([
                     icon,
                     content_tag(:span, "", class: UNREAD_DOT_CLASSES, aria: { hidden: true })
+                  ])
+      end
+    end
+
+    def notification_count_badge(icon, count)
+      return icon unless count.to_i.positive?
+
+      content_tag(:span, class: "relative inline-flex shrink-0") do
+        safe_join([
+                    icon,
+                    content_tag(
+                      :span,
+                      notification_group_badge_text(count),
+                      class: UNREAD_BADGE_CLASSES,
+                      aria: {
+                        # rubocop:disable Style/FormatStringToken -- I18n uses %{name} tokens
+                        label: notifications_t(
+                          "inbox.unread_aria",
+                          count: count,
+                          default: "%{count} unread notifications"
+                        )
+                        # rubocop:enable Style/FormatStringToken
+                      }
+                    )
                   ])
       end
     end

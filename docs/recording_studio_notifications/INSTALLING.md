@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** November 4, 2026
+> *   **Last Updated:** November 12, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -17,7 +17,7 @@ This guide explains how to install the RecordingStudioNotifications engine in yo
 - Rails 8.1+ application
 - PostgreSQL (recommended for UUID compatibility)
 - `recording_studio` `>= 6.3.0` (git tag `v6.3.0`)
-- `flat_pack` `>= 0.1.341`. Development pins GitHub tag `v0.1.341`.
+- `flat_pack` `>= 0.1.353`. Development pins GitHub tag `v0.1.353`. The bell menu uses `style: :plain` and `divider: true`, which need that Flatpack release.
 - `view_component` `>= 4.14, < 5` (development pins `4.19.0`)
 - Accessible: gemspec `~> 0.18`. Inbox, preference, and `creation_action` checks pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth. Development and dummy Gemfiles pin `v0.24.0`. Dummy Admin `v2.5.1`
 - A card drops `style:` and sets `border:` (`border: :strong` on an inbox card, `border: :default` otherwise)
@@ -41,7 +41,7 @@ gem "recording_studio_notifications", path: "../recording_studio_notifications"
 # Or from RubyGems (after publishing)
 gem "recording_studio_notifications"
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.3.0"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.341"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.353"
 ```
 
 ### 2. Install Dependencies
