@@ -7,13 +7,70 @@
      "menu.empty"
    ) %>
 <% if defined?(FlatPack::Notification::Component) %>
-  <%= render FlatPack::Notification::Component.new(
-    unread_count: unread_count,
-    see_all_href: see_all_href,
-    notifications: notifications,
-    bell_label: bell_label,
-    empty_text: empty_text
-  ) %>
+  <div class="rsn-notification-menu">
+    <style>
+      .rsn-notification-menu .flat-pack-list {
+        gap: 0;
+      }
+
+      .rsn-notification-menu .flat-pack-list > li {
+        background-color: transparent;
+        border-radius: 0;
+      }
+
+      .rsn-notification-menu .flat-pack-list > li:hover {
+        background-color: var(--list-item-hover-background-color);
+      }
+
+      .rsn-notification-menu .flat-pack-list > li:has(.flat-pack-list):hover {
+        background-color: transparent;
+      }
+
+      .rsn-notification-menu .flat-pack-list > li + li {
+        position: relative;
+      }
+
+      .rsn-notification-menu .flat-pack-list > li + li::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 1px;
+        background-color: var(--surface-border-color);
+        border-radius: 0;
+        pointer-events: none;
+      }
+
+      .rsn-notification-menu .flat-pack-list .truncate,
+      .rsn-notification-menu .flat-pack-list .line-clamp-2,
+      .rsn-notification-menu .flat-pack-list time.flat-pack-timestamp {
+        font-weight: 400;
+        color: var(--surface-muted-content-color);
+      }
+
+      .rsn-notification-menu li:has(.fp-red-dot) .truncate,
+      .rsn-notification-menu li:has(.fp-rollup-counter-badge) .truncate {
+        font-weight: 600;
+        color: var(--surface-content-color);
+      }
+
+      .rsn-notification-menu li:has(.fp-red-dot) .line-clamp-2,
+      .rsn-notification-menu li:has(.fp-red-dot) time.flat-pack-timestamp,
+      .rsn-notification-menu li:has(.fp-rollup-counter-badge) .line-clamp-2,
+      .rsn-notification-menu li:has(.fp-rollup-counter-badge) time.flat-pack-timestamp {
+        font-weight: 600;
+        color: var(--surface-muted-content-color);
+      }
+    </style>
+    <%= render FlatPack::Notification::Component.new(
+      unread_count: unread_count,
+      see_all_href: see_all_href,
+      notifications: notifications,
+      bell_label: bell_label,
+      empty_text: empty_text
+    ) %>
+  </div>
 <% else %>
   <% label = unread_count.to_i.positive? ? RecordingStudioNotifications::Copy.t("menu.title_with_count", count: unread_count, default: "Notifications (%{count})") : bell_label %>
 

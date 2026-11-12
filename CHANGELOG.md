@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.11] - 2026-11-12
+
+### Fixed
+- Bell menu rows match the inbox. Unread rows and rollup rows sit on the plain dropdown surface, with no shaded fill. A 1px `--surface-border-color` line separates rows, and the gap between rows is gone. An unread title is semibold in `--surface-content-color`. Its note and time are semibold in `--surface-muted-content-color`. A read title, note, and time are regular weight in `--surface-muted-content-color`. The red dot and the rollup count badge stay. The See all notifications footer stays.
+
+### Upgrade notes
+- Bump to `0.14.11`. No migration. No host code change. Menu JSON keys are unchanged. `notify` and `notify_each` are unchanged.
+
 ## [0.14.10] - 2026-11-11
 
 ### Added
@@ -523,7 +531,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.10...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.11...HEAD
+[0.14.11]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.10...v0.14.11
 [0.14.10]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.9...v0.14.10
 [0.14.9]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.8...v0.14.9
 [0.14.8]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.7...v0.14.8
