@@ -18,8 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Upgrade notes
 - Bump to `0.15.0`. No migration. No new gemspec runtime dependency. `recording_studio_api` is a development/dummy pin (`v0.21.3`). Hosts that already load that gem get the endpoints. Hosts without it are unchanged.
 - Dummy also pins Logs `v0.7.4`, Moveable `v4.1.1`, Icons `v0.2.0`, Redis `~> 5.3`, and keeps Admin `v2.5.1` plus Flatpack `v0.1.353` (API's floor is Flatpack `>= 0.1.341`).
-- Authorization stays Accessible: `access_grant.authorize!` on the request root, then the existing named actions. `register_endpoint` on API `v0.21.3` has no `required_role`. Registration uses `defined?(::RecordingStudioApi)` and `configuration.each_api`, skip-if-registered per `api.name`. Handlers read params through `RecordingStudioApi::RequestPayload`.
-- Inbox lists are offset-paged with `page` / `per_page`, using the same positive-page default as the HTML inbox. `notify` and `notify_each` stay host emit. UI, SGID unsubscribe, registries, jobs, and admin are unchanged. Per-notification `clear` is HTML-only.
+- Authorization stays Accessible: `access_grant.authorize!` on the request root, then the existing named actions. `register_endpoint` on API `v0.21.3` has no `required_role`. Registration uses `defined?(::RecordingStudioApi)` and `configuration.each_api`. A second load skips only when the existing handler is this gem's. A foreign handler with the same name is left for Recording Studio API to reject. Handlers read `context.params.with_indifferent_access`.
+- Inbox lists are offset-paged with `page` / `per_page`. Default and max page size are `NotificationsController::PER_PAGE` (25), the same cap as the HTML inbox. `notify` and `notify_each` stay host emit. UI, SGID unsubscribe, registries, jobs, and admin are unchanged. Per-notification `clear` is HTML-only.
 
 ## [0.14.11] - 2026-11-12
 

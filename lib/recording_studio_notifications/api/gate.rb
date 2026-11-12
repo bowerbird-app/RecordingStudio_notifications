@@ -49,14 +49,11 @@ module RecordingStudioNotifications
       end
 
       def param(context, key)
-        request_payload(context)[key]
+        context.params.with_indifferent_access[key]
       end
 
       def request_payload(context)
-        payload_context = context
-        payload_context = Struct.new(:request_params, :params).new(nil, context.params) unless payload_context.respond_to?(:request_params)
-
-        RecordingStudioApi::RequestPayload.call(payload_context).with_indifferent_access
+        context.params.with_indifferent_access
       end
 
       def forbidden!

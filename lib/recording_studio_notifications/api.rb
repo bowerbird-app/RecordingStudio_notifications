@@ -69,12 +69,9 @@ module RecordingStudioNotifications
         true
       end
 
-      def already_registered?(name, api:)
-        RecordingStudioApi.registered_endpoint(name, api: api).present?
-      end
-
       def register_endpoint!(endpoint, api:)
-        return if already_registered?(endpoint.fetch(:name), api: api)
+        existing = RecordingStudioApi.registered_endpoint(endpoint.fetch(:name), api: api)
+        return if existing && existing.handler == endpoint.fetch(:handler)
 
         RecordingStudioApi.register_endpoint(
           endpoint.fetch(:name),

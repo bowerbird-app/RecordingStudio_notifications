@@ -3,9 +3,6 @@
 module RecordingStudioNotifications
   module Api
     module Query
-      DEFAULT_PER_PAGE = 50
-      MAX_PER_PAGE = 100
-
       module_function
 
       def paginate(items, page:, per_page:)
@@ -26,9 +23,10 @@ module RecordingStudioNotifications
       end
 
       def normalize_per_page(per_page)
+        cap = ::RecordingStudioNotifications::NotificationsController::PER_PAGE
         requested = per_page.to_i
-        requested = DEFAULT_PER_PAGE if requested <= 0
-        [requested, MAX_PER_PAGE].min
+        requested = cap if requested <= 0
+        [requested, cap].min
       end
     end
   end

@@ -543,7 +543,7 @@ When Recording Studio API is loaded, this engine registers public endpoints with
 | `notifications.preferences` | GET | `notifications/preferences` |
 | `notifications.update_preferences` | PATCH | `notifications/preferences` |
 
-Inbox index matches the HTML inbox: `active.visible_in_inbox.in_inbox`, then `visible_notification?` under `:view_notifications`. Index pages with `page` and `per_page`. Member actions call the existing bang methods on a visible inbox row. A missing, archived, or `inbox: false` row is 404. A row the actor cannot see is 403. Preference get and update use `Preference.for_recipient` / `set!` / `set_cadence!` under `:manage_preferences`. Handlers also call `access_grant.authorize!` on the request root. `notify` and `notify_each` stay host emit. HTML `clear_all` is not an API endpoint.
+Inbox index matches the HTML inbox: `active.visible_in_inbox.in_inbox`, then `visible_notification?` under `:view_notifications`. Index pages with `page` and `per_page`, defaulting to and capped at `NotificationsController::PER_PAGE`. Member actions call the existing bang methods on a visible inbox row. A missing, archived, or `inbox: false` row is 404. A row the actor cannot see is 403. Preference get and update use `Preference.for_recipient` / `set!` / `set_cadence!` under `:manage_preferences`. Handlers also call `access_grant.authorize!` on the request root. `notify` and `notify_each` stay host emit. HTML `clear_all` is not an API endpoint.
 
 ## Operations metrics
 

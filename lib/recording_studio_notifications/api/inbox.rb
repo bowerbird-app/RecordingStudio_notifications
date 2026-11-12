@@ -24,7 +24,7 @@ module RecordingStudioNotifications
             name: "per_page",
             in: "query",
             required: false,
-            description: "Rows per page. Defaults to #{Query::DEFAULT_PER_PAGE}, max #{Query::MAX_PER_PAGE}.",
+            description: "Rows per page. Same default and cap as the HTML inbox.",
             schema: { type: "integer" }
           }
         ]
@@ -40,7 +40,7 @@ module RecordingStudioNotifications
           per_page: {
             type: :integer,
             required: false,
-            description: "Rows per page. Defaults to #{Query::DEFAULT_PER_PAGE}, max #{Query::MAX_PER_PAGE}."
+            description: "Rows per page. Same default and cap as the HTML inbox."
           }
         }
       }.freeze

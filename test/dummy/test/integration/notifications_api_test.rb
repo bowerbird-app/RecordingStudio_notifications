@@ -129,35 +129,43 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "inbox pages do not overlap and cover the full inbox" do
-    extras = 3.times.map do |index|
+  test "inbox pages default, clamp, and the next page is disjoint" do
+    cap = RecordingStudioNotifications::NotificationsController::PER_PAGE
+    extras = cap.times.map do |index|
       notify!(recipient: @actor, title: "Page row #{index} #{SecureRandom.hex(4)}")
     end
     inbox_ids = ([@notification] + extras).map(&:id)
-    per_page = 2
 
     get "#{API_ROOT}/notifications",
-        params: { page: 1, per_page: per_page },
         headers: bearer_headers(@issued.fetch(:token)),
         as: :json
     assert_response :success
-    page_one = response.parsed_body
-    page_one_ids = page_one.fetch("records").map { |row| row.fetch("id") }
+    default_page = response.parsed_body
+    default_ids = default_page.fetch("records").map { |row| row.fetch("id") }
+    assert_equal cap, default_page.fetch("meta").fetch("per_page")
+    assert_equal cap, default_ids.size
+    assert_equal inbox_ids.size, default_page.fetch("meta").fetch("total_count")
 
     get "#{API_ROOT}/notifications",
-        params: { page: 2, per_page: per_page },
+        params: { per_page: cap + 50 },
         headers: bearer_headers(@issued.fetch(:token)),
         as: :json
     assert_response :success
-    page_two = response.parsed_body
-    page_two_ids = page_two.fetch("records").map { |row| row.fetch("id") }
+    clamped = response.parsed_body
+    assert_equal cap, clamped.fetch("meta").fetch("per_page")
+    assert_equal cap, clamped.fetch("records").size
 
-    assert_equal per_page, page_one_ids.size
-    assert_equal per_page, page_two_ids.size
-    assert_empty page_one_ids & page_two_ids
-    assert_equal inbox_ids.sort, (page_one_ids + page_two_ids).sort
-    assert_equal inbox_ids.size, page_one.fetch("meta").fetch("total_count")
-    assert_equal inbox_ids.size, page_two.fetch("meta").fetch("total_count")
+    get "#{API_ROOT}/notifications",
+        params: { page: 2 },
+        headers: bearer_headers(@issued.fetch(:token)),
+        as: :json
+    assert_response :success
+    next_page = response.parsed_body
+    next_ids = next_page.fetch("records").map { |row| row.fetch("id") }
+    assert_equal cap, next_page.fetch("meta").fetch("per_page")
+    assert_equal inbox_ids.size - cap, next_ids.size
+    assert_empty default_ids & next_ids
+    assert_equal inbox_ids.sort, (default_ids + next_ids).sort
   end
 
   test "preferences get and update work for the current actor" do
