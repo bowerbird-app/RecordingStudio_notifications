@@ -57,8 +57,8 @@ module RecordingStudioNotifications
 
       def self.call(context)
         recipient = Gate.authorize_preferences!(context)
-        attributes = request_hash(context)
-        notification_type = attributes[:notification_type] || attributes["notification_type"]
+        attributes = Gate.request_payload(context)
+        notification_type = attributes[:notification_type]
         raise RecordingStudioApi::InvalidActionInputError, "notification_type is required" if notification_type.blank?
 
         write_channel!(recipient, notification_type, attributes)
@@ -71,19 +71,19 @@ module RecordingStudioNotifications
       end
 
       def self.write_channel!(recipient, notification_type, attributes)
-        channel = attributes[:channel] || attributes["channel"]
+        channel = attributes[:channel]
         return if channel.blank?
 
         Preference.set!(
           recipient: recipient,
           notification_type: notification_type,
           channel: channel,
-          enabled: attributes.key?(:enabled) ? attributes[:enabled] : attributes["enabled"]
+          enabled: attributes[:enabled]
         )
       end
 
       def self.write_cadence!(recipient, notification_type, attributes)
-        cadence = attributes[:cadence] || attributes["cadence"]
+        cadence = attributes[:cadence]
         return if cadence.blank?
 
         Preference.set_cadence!(
@@ -92,16 +92,7 @@ module RecordingStudioNotifications
           cadence: cadence
         )
       end
-
-      def self.request_hash(context)
-        raw = context.params
-        return {} if raw.blank?
-        return raw.to_unsafe_h if raw.respond_to?(:to_unsafe_h)
-        return raw.to_h if raw.respond_to?(:to_h)
-
-        {}
-      end
-      private_class_method :write_channel!, :write_cadence!, :request_hash
+      private_class_method :write_channel!, :write_cadence!
     end
   end
 end

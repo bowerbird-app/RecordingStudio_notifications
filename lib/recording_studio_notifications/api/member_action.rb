@@ -87,18 +87,5 @@ module RecordingStudioNotifications
         :unarchive!
       end
     end
-
-    class Clear < MemberAction
-      TITLE = "Notifications - Clear"
-      OPENAPI = openapi(
-        TITLE,
-        "Calls Notification#clear! on a notification the current actor can see."
-      ).freeze
-      INPUT_CONTRACT = id_contract.freeze
-
-      def self.mutation
-        :clear!
-      end
-    end
   end
 end

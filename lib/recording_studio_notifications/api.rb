@@ -18,7 +18,6 @@ module RecordingStudioNotifications
     MARK_UNREAD_NAME = "notifications.mark_unread"
     ARCHIVE_NAME = "notifications.archive"
     UNARCHIVE_NAME = "notifications.unarchive"
-    CLEAR_NAME = "notifications.clear"
     PREFERENCES_NAME = "notifications.preferences"
     UPDATE_PREFERENCES_NAME = "notifications.update_preferences"
     INDEX_PATH = "notifications"
@@ -51,10 +50,6 @@ module RecordingStudioNotifications
         openapi: Unarchive::OPENAPI, input_contract: Unarchive::INPUT_CONTRACT
       },
       {
-        name: CLEAR_NAME, http_verb: :post, path: "#{MEMBER_PATH}/clear", handler: Clear,
-        openapi: Clear::OPENAPI, input_contract: Clear::INPUT_CONTRACT
-      },
-      {
         name: PREFERENCES_NAME, http_verb: :get, path: PREFERENCES_PATH, handler: Preferences,
         openapi: Preferences::OPENAPI
       },
@@ -66,29 +61,24 @@ module RecordingStudioNotifications
 
     class << self
       def register!
-        return unless available?
+        return unless defined?(::RecordingStudioApi)
 
-        ENDPOINTS.each { |endpoint| register_endpoint!(endpoint) }
+        RecordingStudioApi.configuration.each_api do |api|
+          ENDPOINTS.each { |endpoint| register_endpoint!(endpoint, api: api.name) }
+        end
         true
       end
 
-      def available?
-        defined?(RecordingStudioApi) &&
-          RecordingStudioApi.respond_to?(:register_endpoint) &&
-          RecordingStudioApi.respond_to?(:registered_endpoint)
+      def already_registered?(name, api:)
+        RecordingStudioApi.registered_endpoint(name, api: api).present?
       end
 
-      def already_registered?(name)
-        return false unless available?
-
-        RecordingStudioApi.registered_endpoint(name).present?
-      end
-
-      def register_endpoint!(endpoint)
-        return if already_registered?(endpoint.fetch(:name))
+      def register_endpoint!(endpoint, api:)
+        return if already_registered?(endpoint.fetch(:name), api: api)
 
         RecordingStudioApi.register_endpoint(
           endpoint.fetch(:name),
+          api: api,
           http_verb: endpoint.fetch(:http_verb),
           path: endpoint.fetch(:path),
           handler: endpoint.fetch(:handler),

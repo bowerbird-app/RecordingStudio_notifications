@@ -22,6 +22,11 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
       password: "Password123!",
       password_confirmation: "Password123!"
     )
+    RecordingStudioNotifications::Preference.set_cadence!(
+      recipient: @actor,
+      notification_type: :page_comment,
+      cadence: :individual
+    )
     @notification = notify!(recipient: @actor, title: "API inbox #{SecureRandom.hex(4)}")
     @foreign = notify!(recipient: @other, title: "Someone else #{SecureRandom.hex(4)}")
   end
@@ -74,23 +79,85 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert @notification.reload.unread?
 
-    post "#{API_ROOT}/notifications/#{@notification.id}/archive",
-         headers: bearer_headers(@issued.fetch(:token)),
-         as: :json
-    assert_response :success
-    assert @notification.reload.archived?
-
     post "#{API_ROOT}/notifications/#{@notification.id}/unarchive",
          headers: bearer_headers(@issued.fetch(:token)),
          as: :json
     assert_response :success
     refute @notification.reload.archived?
 
-    post "#{API_ROOT}/notifications/#{@notification.id}/clear",
+    post "#{API_ROOT}/notifications/#{@notification.id}/archive",
          headers: bearer_headers(@issued.fetch(:token)),
          as: :json
     assert_response :success
-    assert_not_nil @notification.reload.cleared_at
+    assert @notification.reload.archived?
+  end
+
+  test "archived and delivery-only notifications are omitted and not reachable" do
+    archived = notify!(recipient: @actor, title: "Archived #{SecureRandom.hex(4)}")
+    archived.archive!
+    delivery_only = notify!(
+      recipient: @actor,
+      title: "Email only #{SecureRandom.hex(4)}",
+      inbox: false,
+      channels: [ :email ]
+    )
+
+    get "#{API_ROOT}/notifications",
+        headers: bearer_headers(@issued.fetch(:token)),
+        as: :json
+    assert_response :success
+    ids = response.parsed_body.fetch("records").map { |row| row.fetch("id") }
+    refute_includes ids, archived.id
+    refute_includes ids, delivery_only.id
+    assert_includes ids, @notification.id
+
+    [
+      archived,
+      delivery_only
+    ].each do |hidden|
+      get "#{API_ROOT}/notifications/#{hidden.id}",
+          headers: bearer_headers(@issued.fetch(:token)),
+          as: :json
+      assert_response :not_found, "show should 404 for #{hidden.title}"
+
+      %i[mark_read mark_unread archive unarchive].each do |action|
+        post "#{API_ROOT}/notifications/#{hidden.id}/#{action}",
+             headers: bearer_headers(@issued.fetch(:token)),
+             as: :json
+        assert_response :not_found, "#{action} should 404 for #{hidden.title}"
+      end
+    end
+  end
+
+  test "inbox pages do not overlap and cover the full inbox" do
+    extras = 3.times.map do |index|
+      notify!(recipient: @actor, title: "Page row #{index} #{SecureRandom.hex(4)}")
+    end
+    inbox_ids = ([@notification] + extras).map(&:id)
+    per_page = 2
+
+    get "#{API_ROOT}/notifications",
+        params: { page: 1, per_page: per_page },
+        headers: bearer_headers(@issued.fetch(:token)),
+        as: :json
+    assert_response :success
+    page_one = response.parsed_body
+    page_one_ids = page_one.fetch("records").map { |row| row.fetch("id") }
+
+    get "#{API_ROOT}/notifications",
+        params: { page: 2, per_page: per_page },
+        headers: bearer_headers(@issued.fetch(:token)),
+        as: :json
+    assert_response :success
+    page_two = response.parsed_body
+    page_two_ids = page_two.fetch("records").map { |row| row.fetch("id") }
+
+    assert_equal per_page, page_one_ids.size
+    assert_equal per_page, page_two_ids.size
+    assert_empty page_one_ids & page_two_ids
+    assert_equal inbox_ids.sort, (page_one_ids + page_two_ids).sort
+    assert_equal inbox_ids.size, page_one.fetch("meta").fetch("total_count")
+    assert_equal inbox_ids.size, page_two.fetch("meta").fetch("total_count")
   end
 
   test "preferences get and update work for the current actor" do
@@ -139,7 +206,6 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
       [:post, "#{API_ROOT}/notifications/#{@notification.id}/mark_unread", {}],
       [:post, "#{API_ROOT}/notifications/#{@notification.id}/archive", {}],
       [:post, "#{API_ROOT}/notifications/#{@notification.id}/unarchive", {}],
-      [:post, "#{API_ROOT}/notifications/#{@notification.id}/clear", {}],
       [:get, "#{API_ROOT}/notifications/preferences", {}],
       [:patch, "#{API_ROOT}/notifications/preferences", { notification_type: "page_comment", channel: "email", enabled: false }]
     ].each do |verb, path, params|
@@ -158,8 +224,7 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
       :mark_read,
       :mark_unread,
       :archive,
-      :unarchive,
-      :clear
+      :unarchive
     ].each do |action|
       post "#{API_ROOT}/notifications/#{@foreign.id}/#{action}",
            headers: bearer_headers(@issued.fetch(:token)),
@@ -170,13 +235,15 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
 
   private
 
-  def notify!(recipient:, title:)
+  def notify!(recipient:, title:, inbox: true, channels: nil)
     RecordingStudioNotifications.notify(
       notification_type: :page_comment,
       recipient: recipient,
       actor: @owner,
       root_recording: @root,
       title: title,
+      inbox: inbox,
+      channels: channels,
       deliver_later: false,
       idempotency_key: "notifications-api-#{SecureRandom.uuid}"
     )

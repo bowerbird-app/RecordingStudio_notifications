@@ -385,7 +385,7 @@ Delivery selection rules:
 
 When the host loads `recording_studio_api`, this engine registers inbox, member, and preference endpoints. MCP advertises them. Do not add MCP tools in this gem. `notify` / `notify_each` stay host emit.
 
-Handlers authorize with `access_grant.authorize!` on the request root, then the existing Accessible named actions. Inbox uses `Notification.for_recipient` and `visible_notification?`. Member actions call `#mark_read!`, `#mark_unread!`, `#archive!`, `#unarchive!`, and `#clear!`. Preference writes call `Preference.set!` / `set_cadence!`.
+Handlers authorize with `access_grant.authorize!` on the request root, then the existing Accessible named actions. Inbox uses `Notification.for_recipient(...).active.visible_in_inbox.in_inbox` and `visible_notification?`. Member actions call `#mark_read!`, `#mark_unread!`, `#archive!`, and `#unarchive!`. HTML `clear_all` is not exposed over the API. Preference writes call `Preference.set!` / `set_cadence!`.
 
 ## 13. Add A Custom Channel Adapter
 

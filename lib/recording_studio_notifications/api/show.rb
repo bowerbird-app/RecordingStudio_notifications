@@ -8,7 +8,8 @@ module RecordingStudioNotifications
         title: TITLE,
         summary: TITLE,
         description: "One notification for the current actor. Looks up Notification.for_recipient, " \
-                     "then visible_notification? under :view_notifications. Missing rows are 404. " \
+                     "requires inbox? like HTML show, then visible_notification? under " \
+                     ":view_notifications. Missing, archived, and inbox: false rows are 404. " \
                      "A row the actor cannot see is 403.",
         tags: ["Notifications"]
       }.freeze

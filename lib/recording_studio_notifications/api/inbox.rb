@@ -7,8 +7,9 @@ module RecordingStudioNotifications
       OPENAPI = {
         title: TITLE,
         summary: TITLE,
-        description: "Paged inbox for the current Accessible actor. Uses Notification.for_recipient " \
-                     "and visible_notification? under :view_notifications. Offset paging with page " \
+        description: "Paged inbox for the current Accessible actor. Uses the HTML inbox scopes " \
+                     "Notification.for_recipient.active.visible_in_inbox.in_inbox and " \
+                     "visible_notification? under :view_notifications. Offset paging with page " \
                      "and per_page, same as other non-recording gem lists.",
         tags: ["Notifications"],
         parameters: [
@@ -46,16 +47,18 @@ module RecordingStudioNotifications
 
       def self.call(context)
         recipient = Gate.authorize_inbox!(context)
-        visible = Notification.for_recipient(recipient).newest_first.select do |notification|
+        inbox = Notification.for_recipient(recipient).active.visible_in_inbox.in_inbox.newest_first
+        visible = inbox.select do |notification|
           Services::NotificationAuthorization.visible_notification?(
             actor: recipient,
             notification: notification
           )
         end
+        payload = Gate.request_payload(context)
         page = Query.paginate(
           visible,
-          page: Gate.param(context, :page),
-          per_page: Gate.param(context, :per_page)
+          page: payload[:page],
+          per_page: payload[:per_page]
         )
         {
           records: page.fetch(:rows).map { |notification| Serialize.notification(notification) },

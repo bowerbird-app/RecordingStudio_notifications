@@ -32,6 +32,8 @@ module RecordingStudioNotifications
         recipient = authorize_inbox!(context)
         notification = Notification.for_recipient(recipient).find_by(id: param(context, :id))
         not_found! if notification.blank?
+        not_found! unless notification.inbox?
+        not_found! if notification.archived?
         unless Services::NotificationAuthorization.visible_notification?(
           actor: recipient,
           notification: notification
@@ -47,10 +49,14 @@ module RecordingStudioNotifications
       end
 
       def param(context, key)
-        params = context.params
-        return if params.blank?
+        request_payload(context)[key]
+      end
 
-        params[key] || params[key.to_s]
+      def request_payload(context)
+        payload_context = context
+        payload_context = Struct.new(:request_params, :params).new(nil, context.params) unless payload_context.respond_to?(:request_params)
+
+        RecordingStudioApi::RequestPayload.call(payload_context).with_indifferent_access
       end
 
       def forbidden!

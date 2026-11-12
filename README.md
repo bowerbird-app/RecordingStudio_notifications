@@ -540,11 +540,10 @@ When Recording Studio API is loaded, this engine registers public endpoints with
 | `notifications.mark_unread` | POST | `notifications/:id/mark_unread` |
 | `notifications.archive` | POST | `notifications/:id/archive` |
 | `notifications.unarchive` | POST | `notifications/:id/unarchive` |
-| `notifications.clear` | POST | `notifications/:id/clear` |
 | `notifications.preferences` | GET | `notifications/preferences` |
 | `notifications.update_preferences` | PATCH | `notifications/preferences` |
 
-Inbox index and show use `Notification.for_recipient` plus `NotificationAuthorization.visible_notification?` under `:view_notifications`. Index pages with `page` and `per_page`. Member actions call the existing bang methods on a visible row. A missing row is 404. A row the actor cannot see is 403. Preference get and update use `Preference.for_recipient` / `set!` / `set_cadence!` under `:manage_preferences`. Handlers also call `access_grant.authorize!` on the request root. `notify` and `notify_each` stay host emit.
+Inbox index matches the HTML inbox: `active.visible_in_inbox.in_inbox`, then `visible_notification?` under `:view_notifications`. Index pages with `page` and `per_page`. Member actions call the existing bang methods on a visible inbox row. A missing, archived, or `inbox: false` row is 404. A row the actor cannot see is 403. Preference get and update use `Preference.for_recipient` / `set!` / `set_cadence!` under `:manage_preferences`. Handlers also call `access_grant.authorize!` on the request root. `notify` and `notify_each` stay host emit. HTML `clear_all` is not an API endpoint.
 
 ## Operations metrics
 
