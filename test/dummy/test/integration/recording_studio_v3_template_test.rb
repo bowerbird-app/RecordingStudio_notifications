@@ -54,6 +54,11 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     assert_match(/recording_studio_notifications_email.*\n.*tag: "v0.5.1"/, dummy_gemfile)
     assert_match(/recording_studio_cache.*, tag: "v0.6.2"/, dummy_gemfile)
     assert_match(/recording_studio_internationalization.*, tag: "v0.2.0"/, dummy_gemfile)
+    assert_match(/recording_studio_api.*, tag: "v0.21.3"/, root_gemfile)
+    assert_match(/recording_studio_api.*, tag: "v0.21.3"/, dummy_gemfile)
+    assert_match(/recording_studio_logs.*, tag: "v0.7.4"/, dummy_gemfile)
+    assert_match(/recording_studio_moveable.*, tag: "v4.1.1"/, dummy_gemfile)
+    assert_match(/recording_studio_icons.*, tag: "v0.2.0"/, dummy_gemfile)
   end
 
   test "dummy seeds use v3 hierarchy idempotently and restore current actor" do

@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-11-12
+
+### Added
+- Public API endpoints for the current actor's inbox, one notification, mark read/unread, archive/unarchive, and preferences. Hosts that load Recording Studio API get them from `RecordingStudioApi.register_endpoint` on every named API. MCP advertises those registered endpoints. This gem adds no MCP tools.
+- Inbox index uses the HTML inbox scopes `Notification.for_recipient(...).active.visible_in_inbox.in_inbox` and `NotificationAuthorization.visible_notification?` under Accessible `:view_notifications`. Member actions call `Notification#mark_read!`, `#mark_unread!`, `#archive!`, and `#unarchive!` on a row the actor can see. Missing rows, archived rows, and `inbox: false` rows are 404. A row the actor cannot see is 403. HTML `clear_all` is not exposed over the API.
+- Preference get and update use `Preference.for_recipient`, `Preference.set!`, and `Preference.set_cadence!` under `:manage_preferences`.
+
+### Upgrade notes
+- Bump to `0.15.0`. No migration. No new gemspec runtime dependency. `recording_studio_api` is a development/dummy pin (`v0.21.3`). Hosts that already load that gem get the endpoints. Hosts without it are unchanged.
+- Dummy also pins Logs `v0.7.4`, Moveable `v4.1.1`, Icons `v0.2.0`, Redis `~> 5.3`, and keeps Admin `v2.5.1` plus Flatpack `v0.1.353` (API's floor is Flatpack `>= 0.1.341`).
+- Authorization stays Accessible: `access_grant.authorize!` on the request root, then the existing named actions. `register_endpoint` on API `v0.21.3` has no `required_role`. Registration uses `defined?(::RecordingStudioApi)` and `configuration.each_api`. A second load skips only when the existing handler is this gem's. A foreign handler with the same name is left for Recording Studio API to reject. Handlers read `context.params.with_indifferent_access`.
+- Inbox lists are offset-paged with `page` / `per_page`. Default and max page size are `NotificationsController::PER_PAGE` (25), the same cap as the HTML inbox. `notify` and `notify_each` stay host emit. UI, SGID unsubscribe, registries, jobs, and admin are unchanged. Per-notification `clear` is HTML-only.
+
 ## [0.14.11] - 2026-11-12
 
 ### Fixed
@@ -533,7 +546,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.11...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.11...v0.15.0
 [0.14.11]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.10...v0.14.11
 [0.14.10]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.9...v0.14.10
 [0.14.9]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.8...v0.14.9

@@ -16,6 +16,7 @@ require "recording_studio_notifications/services/root_resolver"
 require "recording_studio_notifications/services/notification_authorization"
 require "recording_studio_notifications/delivery_payload_registry"
 require "recording_studio_notifications/metrics"
+require "recording_studio_notifications/api"
 
 if defined?(RecordingStudioAdmin)
   require "recording_studio_notifications/admin/failed_deliveries_chart"

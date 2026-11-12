@@ -12,6 +12,7 @@ It covers:
 - How channel preferences work
 - Authorization behavior
 - Jobs, delivery adapters, and instrumentation
+- JSON API endpoints when Recording Studio API is loaded
 - Troubleshooting and implementation patterns
 
 ## 1. What This Gem Does
@@ -378,7 +379,15 @@ Delivery selection rules:
 - required channels always send
 - optional channels send only if selected and not disabled by preference
 
-## 12. Add A Custom Channel Adapter
+`GET` / `PATCH notifications/preferences` on Recording Studio API wraps the same `Preference` methods for the current actor.
+
+## 12. JSON API (Recording Studio API)
+
+When the host loads `recording_studio_api`, this engine registers inbox, member, and preference endpoints. MCP advertises them. Do not add MCP tools in this gem. `notify` / `notify_each` stay host emit.
+
+Handlers authorize with `access_grant.authorize!` on the request root, then the existing Accessible named actions. Inbox uses `Notification.for_recipient(...).active.visible_in_inbox.in_inbox` and `visible_notification?`. Member actions call `#mark_read!`, `#mark_unread!`, `#archive!`, and `#unarchive!`. HTML `clear_all` is not exposed over the API. Preference writes call `Preference.set!` / `set_cadence!`.
+
+## 13. Add A Custom Channel Adapter
 
 Register an adapter that responds to `deliver(notification:, delivery:)`.
 
@@ -398,7 +407,7 @@ RecordingStudioNotifications.register_channel(:email, EmailNotificationAdapter.n
 
 Then include `:email` in notification type `available_channels` (and optionally defaults).
 
-## 13. Authorization Model
+## 14. Authorization Model
 
 Three common checks exist:
 
@@ -412,7 +421,7 @@ Without it, a safe fallback allows same actor == recipient access.
 
 For root-scoped visibility, a notification can still be hidden if actor lacks view rights on that root. When the host has not defined Accessible `:view`, the engine supplies a default that calls `authorized?(actor:, recording:, role: :view)`.
 
-## 14. Background Jobs And Delivery Pipeline
+## 15. Background Jobs And Delivery Pipeline
 
 Create flow:
 
@@ -429,7 +438,7 @@ Important config options:
 - `queue_name` from `ApplicationJob`
 - `raise_on_delivery_error` controls whether adapter errors bubble
 
-## 15. Instrumentation Hooks
+## 16. Instrumentation Hooks
 
 Subscribe to these events:
 
@@ -446,7 +455,7 @@ ActiveSupport::Notifications.subscribe("notify.recording_studio_notifications") 
 end
 ```
 
-## 16. Error Cases You Should Expect
+## 17. Error Cases You Should Expect
 
 Common `ArgumentError` causes:
 
@@ -470,7 +479,7 @@ rescue ArgumentError => e
 end
 ```
 
-## 17. Practical Implementation Checklist
+## 18. Practical Implementation Checklist
 
 1. Install gem, run install and migration generators, migrate.
 2. Register all notification types in initializer.
@@ -481,7 +490,7 @@ end
 7. Add optional channels and preferences only when you have adapters.
 8. Add instrumentation subscribers for operational visibility.
 
-## 18. Example: Full End-To-End Page Comment Flow
+## 19. Example: Full End-To-End Page Comment Flow
 
 ```ruby
 # config/initializers/recording_studio_notifications.rb
@@ -546,7 +555,7 @@ This pattern gives you:
 - standard read/unread/archive controls
 - channel-delivery extensibility later
 
-## 19. Final Notes
+## 20. Final Notes
 
 If you are just getting started, begin with:
 

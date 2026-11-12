@@ -16,6 +16,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 - FlatPack/Tailwind inbox, notification menu, and preference UI
 - Engine-owned Stimulus polling controller for the async notification menu
 - Recording Studio Accessible authorization, ActiveSupport instrumentation, hooks, and install/migration generators
+- Recording Studio API endpoints for the current actor's inbox, member actions, and preferences when `recording_studio_api` is loaded (MCP advertises them; this gem adds no MCP tools)
 
 ## Requirements
 
@@ -526,6 +527,23 @@ Webhook delivery is intentionally deferred: host apps may register a custom adap
 ## Authorization
 
 The engine registers Accessible actions for viewing notifications and managing preferences when `RecordingStudioAccessible` is available. It defines a default `:view` action that defers to `authorized?(role: :view)` unless the host already defined `:view`. Root-scoped inbox visibility uses that action on the root recording. Preference pages use `:"recording_studio_notifications.manage_preferences"`. Types with `creation_action:` require that Accessible action before creation. Settings lists only types whose `visible_to` proc, when present, returns true for the recipient.
+
+## JSON API
+
+When Recording Studio API is loaded, this engine registers public endpoints with `RecordingStudioApi.register_endpoint`. MCP picks those up. There is no MCP tool code here, and no permission logic in RS_API or MCP.
+
+| Name | Verb | Path |
+| --- | --- | --- |
+| `notifications.inbox` | GET | `notifications` |
+| `notifications.show` | GET | `notifications/:id` |
+| `notifications.mark_read` | POST | `notifications/:id/mark_read` |
+| `notifications.mark_unread` | POST | `notifications/:id/mark_unread` |
+| `notifications.archive` | POST | `notifications/:id/archive` |
+| `notifications.unarchive` | POST | `notifications/:id/unarchive` |
+| `notifications.preferences` | GET | `notifications/preferences` |
+| `notifications.update_preferences` | PATCH | `notifications/preferences` |
+
+Inbox index matches the HTML inbox: `active.visible_in_inbox.in_inbox`, then `visible_notification?` under `:view_notifications`. Index pages with `page` and `per_page`, defaulting to and capped at `NotificationsController::PER_PAGE`. Member actions call the existing bang methods on a visible inbox row. A missing, archived, or `inbox: false` row is 404. A row the actor cannot see is 403. Preference get and update use `Preference.for_recipient` / `set!` / `set_cadence!` under `:manage_preferences`. Handlers also call `access_grant.authorize!` on the request root. `notify` and `notify_each` stay host emit. HTML `clear_all` is not an API endpoint.
 
 ## Operations metrics
 
