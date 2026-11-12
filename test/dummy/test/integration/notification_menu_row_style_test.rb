@@ -128,33 +128,82 @@ class NotificationMenuRowStyleTest < ActionDispatch::IntegrationTest
 
   def assert_row_styles(html)
     document = Nokogiri::HTML(html)
-    style = document.at_css("style").text
     unread_row = row_for(document, @unread_title)
     read_row = row_for(document, @read_title)
     rollup_row = row_for(document, "Page comment")
+    child_row = row_for(document, @rollup_child_title)
 
-    assert_includes style, "gap: 0;"
-    assert_includes style, "background-color: transparent;"
-    assert_includes style, "background-color: var(--surface-border-color);"
-    assert_includes style, "font-weight: 400;"
-    assert_includes style, "color: var(--surface-muted-content-color);"
-    assert_includes style, "li:has(.fp-red-dot) .truncate"
-    assert_includes style, "li:has(.fp-rollup-counter-badge) .truncate"
-    assert_includes style, "font-weight: 600;"
-    assert_includes style, "color: var(--surface-content-color);"
-    assert_includes html, "rsn-notification-menu"
+    assert_nil document.at_css("style")
+    refute_includes html, "rsn-notification-menu"
+    refute_includes html, "fp-red-dot"
+    refute_includes html, "fp-rollup-counter-badge"
+    refute_includes html, "list-item-active-background-color"
 
-    assert unread_row.at_css(".fp-red-dot")
-    assert_nil read_row.at_css(".fp-red-dot")
-    assert_nil read_row.at_css(".fp-rollup-counter-badge")
-    assert rollup_row.at_css(".fp-rollup-counter-badge")
-    assert_nil rollup_row.at_css(".fp-red-dot")
+    document.css("ul.flat-pack-list").each do |list|
+      assert_includes list["class"], "flat-pack-list-divided"
+      refute_includes list["class"], "gap-1"
+    end
+
+    assert_unread_row(unread_row)
+    assert_read_row(read_row)
+    assert_rollup_row(rollup_row)
+    assert_unread_row(child_row)
+  end
+
+  def assert_unread_row(row)
+    title = title_node(row)
+    note = row.at_css(".line-clamp-2")
+    time = row.at_css("time")
+
+    assert_includes title["class"], "font-semibold"
+    assert_includes title["class"], "text-(--surface-content-color)"
+    assert_includes note["class"], "font-semibold"
+    assert_includes note["class"], "text-(--surface-muted-content-color)"
+    assert_includes time["class"], "font-semibold"
+    assert_includes time["class"], "text-(--surface-muted-content-color)"
+    assert row.at_css("span.h-3.w-3.rounded-full.bg-red-600")
+    assert_nil row.at_css("span.min-w-4.bg-red-600")
+    refute_includes row["class"].to_s, "list-item-active-background-color"
+    assert_includes row["class"], "hover:bg-[var(--list-item-hover-background-color)]"
+  end
+
+  def assert_read_row(row)
+    title = title_node(row)
+    note = row.at_css(".line-clamp-2")
+    time = row.at_css("time")
+
+    assert_includes title["class"], "font-normal"
+    assert_includes title["class"], "text-(--surface-muted-content-color)"
+    refute_includes title["class"], "font-semibold"
+    assert_includes note["class"], "font-normal"
+    assert_includes note["class"], "text-(--surface-muted-content-color)"
+    assert_includes time["class"], "font-normal"
+    assert_includes time["class"], "text-(--surface-muted-content-color)"
+    assert_nil row.at_css("span.h-3.w-3.rounded-full.bg-red-600")
+    assert_nil row.at_css("span.min-w-4.bg-red-600")
+  end
+
+  def assert_rollup_row(row)
+    title = title_node(row)
+    note = row.at_css(".line-clamp-2")
+    badge = row.at_css("span.min-w-4.bg-red-600")
+
+    assert_includes title["class"], "font-semibold"
+    assert_includes title["class"], "text-(--surface-content-color)"
+    assert_includes note["class"], "font-semibold"
+    assert_includes note["class"], "text-(--surface-muted-content-color)"
+    assert_equal "1", badge.text.strip
+    assert_nil row.at_css("span.h-3.w-3.rounded-full.bg-red-600")
+    refute_includes row["class"].to_s, "list-item-active-background-color"
   end
 
   def row_for(document, title)
-    document.css("li").find do |item|
-      item.css(".truncate").any? { |node| node.text == title }
-    end
+    node = document.css(".truncate").find { |item| item.text == title }
+    node.ancestors("li").first
+  end
+
+  def title_node(row)
+    row.at_css(".truncate")
   end
 
   def notify_mention(root, title, read:)

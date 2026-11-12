@@ -11,10 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.14.11] - 2026-11-12
 
 ### Fixed
-- Bell menu rows match the inbox. Unread rows and rollup rows sit on the plain dropdown surface, with no shaded fill. A 1px `--surface-border-color` line separates rows, and the gap between rows is gone. An unread title is semibold in `--surface-content-color`. Its note and time are semibold in `--surface-muted-content-color`. A read title, note, and time are regular weight in `--surface-muted-content-color`. The red dot and the rollup count badge stay. The See all notifications footer stays.
+- Bell menu rows use Flatpack `style: :plain` and `divider: true`. The menu no longer ships a scoped style override. An unread title is semibold in `--surface-content-color`. Its note and time are semibold in `--surface-muted-content-color`. A read title, note, and time are regular weight in `--surface-muted-content-color`. An unread row draws the inbox red dot on the top-left of its icon. A rollup keeps the inbox count badge. The See all notifications footer stays.
 
 ### Upgrade notes
-- Bump to `0.14.11`. No migration. No host code change. Menu JSON keys are unchanged. `notify` and `notify_each` are unchanged.
+- Bump to `0.14.11`. No migration. Menu JSON keys are unchanged. `notify` and `notify_each` are unchanged.
+- Hosts need `flat_pack` `>= 0.1.353`. The gemspec floor is `>= 0.1.353`, which still satisfies a host pin of `~> 0.1`.
+- Rebuild Tailwind when the host compiles utility classes. The menu row classes live in the engine view and helpers. The install generator already adds those paths as `@source` globs. A host that scans them picks up `font-semibold`, `font-normal`, and the surface color utilities on the next build.
 
 ## [0.14.10] - 2026-11-11
 

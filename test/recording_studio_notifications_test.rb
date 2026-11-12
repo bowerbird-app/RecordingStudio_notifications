@@ -32,7 +32,7 @@ class RecordingStudioNotificationsTest < Minitest::Test
     refute_includes spec.dependencies.map(&:name), "recording_studio_admin"
     assert_includes spec.dependencies.map(&:name), "recording_studio_metrics"
     flat_pack = spec.dependencies.find { |dependency| dependency.name == "flat_pack" }
-    assert_equal ">= 0.1.341", flat_pack.requirement.to_s
+    assert_equal ">= 0.1.353", flat_pack.requirement.to_s
     studio = spec.dependencies.find { |dependency| dependency.name == "recording_studio" }
     assert_equal ">= 6.3.0", studio.requirement.to_s
     view_component = spec.dependencies.find { |dependency| dependency.name == "view_component" }

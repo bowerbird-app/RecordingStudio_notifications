@@ -36,8 +36,8 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
 
     assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v6.3.0"/, root_gemfile)
     assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v6.3.0"/, dummy_gemfile)
-    assert_match(/tag: "v0.1.341"/, root_gemfile)
-    assert_match(/tag: "v0.1.341"/, dummy_gemfile)
+    assert_match(/tag: "v0.1.353"/, root_gemfile)
+    assert_match(/tag: "v0.1.353"/, dummy_gemfile)
     refute_match(/ref: "1fcbafe/, root_gemfile)
     refute_match(/ref: "1fcbafe/, dummy_gemfile)
     assert_match(/gem "view_component", "4.19.0"/, root_gemfile)
@@ -111,5 +111,4 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
   ensure
     Current.actor = nil
   end
-
 end

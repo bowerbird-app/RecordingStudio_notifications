@@ -21,15 +21,15 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 
 - Ruby 3.3 or newer
 - Rails 8.1 (development and dummy locks: `8.1.4.1`)
-- `recording_studio` `>= 6.3.0`, `recording_studio_accessible` `~> 0.18` (inbox, preferences, and `creation_action` pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth), `flat_pack` `>= 0.1.341`, and `view_component` `>= 4.14, < 5`
+- `recording_studio` `>= 6.3.0`, `recording_studio_accessible` `~> 0.18` (inbox, preferences, and `creation_action` pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth), `flat_pack` `>= 0.1.353`, and `view_component` `>= 4.14, < 5`
 - `recording_studio_metrics` for operations metrics registration
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus
 
 Development and dummy Gemfiles pin Recording Studio to GitHub tag `v6.3.0` and Accessible to `v0.24.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
 
-Root and dummy Gemfiles pin Trashable `v0.12.2` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.5.1` and Metrics `v0.7.2`. Both Gemfiles pin Flatpack to GitHub tag `v0.1.341` and `view_component` `4.19.0`. Inbox cards use `border: :strong`. `Card` no longer takes `style:`.
+Root and dummy Gemfiles pin Trashable `v0.12.2` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.5.1` and Metrics `v0.7.2`. Both Gemfiles pin Flatpack to GitHub tag `v0.1.353` and `view_component` `4.19.0`. Inbox cards use `border: :strong`. `Card` no longer takes `style:`.
 
-Hosts need Recording Studio `>= 6.3.0`, Flatpack `>= 0.1.341`, `view_component` `>= 4.14, < 5`, and Admin `>= 2.5.1`. The gemspec requires Accessible `~> 0.18`. Passing `controller:` into Accessible `authorized_action?` (inbox, preferences, `creation_action`) needs Accessible `0.18` ControllerAuth. Development pins `v0.24.0`. A card that still passes `style:` drops that keyword and sets `border:` instead.
+Hosts need Recording Studio `>= 6.3.0`, Flatpack `>= 0.1.353`, `view_component` `>= 4.14, < 5`, and Admin `>= 2.5.1`. The gemspec requires Accessible `~> 0.18`. Passing `controller:` into Accessible `authorized_action?` (inbox, preferences, `creation_action`) needs Accessible `0.18` ControllerAuth. Development pins `v0.24.0`. A card that still passes `style:` drops that keyword and sets `border:` instead.
 
 ## Installation
 
@@ -38,7 +38,7 @@ Add the gem to the host application's `Gemfile`:
 ```ruby
 gem "recording_studio_notifications"
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.3.0"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.341"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.353"
 ```
 
 Install the engine, copy migrations, and migrate:
@@ -411,7 +411,7 @@ Add the gem and install it in your host app:
 ```ruby
 gem "recording_studio_notifications"
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.3.0"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.341"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.353"
 ```
 
 ```bash
@@ -539,7 +539,7 @@ The engine provides:
 - `/notifications/menu.json` async top-nav menu payload (unread count + recent notifications)
 - `/settings` notification channel preferences
 
-The inbox list is wrapped in a FlatPack card with `border: :strong` and the card body's default padding. On a wide screen the card spans two of three grid columns and stays left-aligned. Below that it is full width. Unread rows keep a red mark and do not use a shaded background. On an unread row, the title is semibold in `text-(--surface-content-color)`, and the note and the time are semibold in `text-(--surface-muted-content-color)`. On a read row, the title, the note, and the time are regular weight in `text-(--surface-muted-content-color)`. A rollup header with unread items uses semibold `text-(--surface-content-color)` on its type label. A rollup header with none uses regular weight and `text-(--surface-muted-content-color)` on that label. The period and the time stay muted. Rollup child rows use the same title colors. The inbox view sets both colors in a style rule, so a host does not need a Tailwind rebuild for them. A rollup count sits on the top-left of its type icon. An individual unread row shows a larger red dot on the top-left of its type icon. The bell menu is Flatpack's notification dropdown. The menu partial scopes a style rule to `.rsn-notification-menu`, so a host does not need a Tailwind rebuild. Unread rows and rollup rows use the plain dropdown surface, with no shaded fill. An unread row keeps its red dot or count badge. Its title is semibold in `--surface-content-color`, and its note and time are semibold in `--surface-muted-content-color`. A read row uses regular weight in `--surface-muted-content-color` for the title, the note, and the time. Rows meet with no gap, and a 1px `--surface-border-color` line separates them. The See all notifications footer stays. Menu JSON keys, unread counts, root scoping, and `inbox: false` exclusion stay the same. Each row and rollup header has 1.5rem (24px) of padding on every side, set in the inbox view so a host does not need those utilities compiled. Inbox, settings, and menu views use FlatPack components. On settings, each notification type is a row in its category accordion. A divider separates those rows, with 2.5rem (40px) above and below the line on desktop and mobile. The last type in a category has no extra space under it. That spacing is a style rule in the settings view, so a host does not need those Tailwind utilities compiled.
+The inbox list is wrapped in a FlatPack card with `border: :strong` and the card body's default padding. On a wide screen the card spans two of three grid columns and stays left-aligned. Below that it is full width. Unread rows keep a red mark and do not use a shaded background. On an unread row, the title is semibold in `text-(--surface-content-color)`, and the note and the time are semibold in `text-(--surface-muted-content-color)`. On a read row, the title, the note, and the time are regular weight in `text-(--surface-muted-content-color)`. A rollup header with unread items uses semibold `text-(--surface-content-color)` on its type label. A rollup header with none uses regular weight and `text-(--surface-muted-content-color)` on that label. The period and the time stay muted. Rollup child rows use the same title colors. The inbox view sets both colors in a style rule, so a host does not need a Tailwind rebuild for them. A rollup count sits on the top-left of its type icon. An individual unread row shows a larger red dot on the top-left of its type icon. The bell menu is Flatpack's notification dropdown with `style: :plain` and `divider: true`. Flatpack keeps the row wrapper, the hover wash, the link, and the rollup toggle. The menu block draws each row, including a rollup child. An unread title is semibold in `text-(--surface-content-color)`. Its note and time are semibold in `text-(--surface-muted-content-color)`. A read title, note, and time are regular weight in `text-(--surface-muted-content-color)`. An unread row draws the same larger red dot as the inbox, on the top-left of the icon. A rollup keeps the inbox count badge on that icon. Rows meet with no gap, and Flatpack's list rule separates them. The See all notifications footer stays. Menu JSON keys, unread counts, root scoping, and `inbox: false` exclusion stay the same. Those row classes live in the menu view and the notification helpers. The install generator's `@source` globs already cover both. Rebuild Tailwind after upgrading so the utilities are in the host stylesheet. This needs Flatpack `>= 0.1.353`. Each row and rollup header has 1.5rem (24px) of padding on every side, set in the inbox view so a host does not need those utilities compiled. Inbox, settings, and menu views use FlatPack components. On settings, each notification type is a row in its category accordion. A divider separates those rows, with 2.5rem (40px) above and below the line on desktop and mobile. The last type in a category has no extra space under it. That spacing is a style rule in the settings view, so a host does not need those Tailwind utilities compiled.
 
 ## Instrumentation
 
