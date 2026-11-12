@@ -19,7 +19,7 @@ This guide explains how to install the RecordingStudioNotifications engine in yo
 - `recording_studio` `>= 6.3.0` (git tag `v6.3.0`)
 - `flat_pack` `>= 0.1.353`. Development pins GitHub tag `v0.1.353`. The bell menu uses `style: :plain` and `divider: true`, which need that Flatpack release.
 - `view_component` `>= 4.14, < 5` (development pins `4.19.0`)
-- Accessible: gemspec `~> 0.18`. Inbox, preference, and `creation_action` checks pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth. Development and dummy Gemfiles pin `v0.24.0`. Dummy Admin `v2.5.1`
+- Accessible: gemspec `~> 0.18`. Inbox, preference, and `creation_action` checks pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth. Development and dummy Gemfiles pin `v0.24.0`. Dummy Admin `v2.5.1`. Dummy pins Recording Studio API `v0.21.3` (plus Logs, Moveable, Icons, and Redis) so inbox endpoints can be exercised. The notifications gemspec does not depend on `recording_studio_api`.
 - A card drops `style:` and sets `border:` (`border: :strong` on an inbox card, `border: :default` otherwise)
 - TailwindCSS (optional, for styling engine views)
 

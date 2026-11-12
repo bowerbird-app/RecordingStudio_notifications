@@ -147,12 +147,16 @@ class NotificationMetricsTest < ActiveSupport::TestCase
       assert_equal identifier, payload[:metric]
       assert_includes %i[timeseries breakdown], payload[:type]
 
-      error = assert_raises(RecordingStudioMetrics::Errors::AuthorizationError) do
+      error = assert_raises(
+        RecordingStudioMetrics::Errors::AuthorizationError,
+        RecordingStudioApi::AuthorizationError
+      ) do
         RecordingStudioMetrics::Api::ExecuteHandler.call(
           build_api_context(@outsider, resource: resource, name: name)
         )
       end
-      assert_equal "Not authorized to run this metric", error.public_message
+      message = error.respond_to?(:public_message) ? error.public_message : error.message
+      assert_equal "Not authorized to run this metric", message
     end
   end
 

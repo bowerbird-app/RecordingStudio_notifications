@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   mount RecordingStudioRootSwitchable::Engine, at: "/recording_studio_root_switchable"
   mount RecordingStudioInternationalization::Engine, at: "/recording_studio_internationalization"
 
+  mount RecordingStudioApi::Engine, at: "/recording_studio_api" if defined?(RecordingStudioApi)
   mount RecordingStudioNotifications::Engine, at: "/notifications"
 
   # Legacy path from mounted index; keep old links working.
