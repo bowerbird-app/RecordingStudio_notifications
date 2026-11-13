@@ -33,6 +33,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
 
     workspace = Workspace.create!(name: "Switch Page Workspace")
     RecordingStudio.root_recording_for(workspace)
+    ensure_switch_page_view!(user)
 
     get "/recording_studio_root_switchable/v1/root_switch?scope=all_workspaces"
 
@@ -50,6 +51,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
 
     Workspace.create!(name: "Admin Root Scope Workspace")
     RecordingStudio.root_recording_for(AdminRoot.first_or_create!)
+    ensure_switch_page_view!(user)
 
     get "/recording_studio_root_switchable/v1/root_switch?scope=all_workspaces"
 
@@ -69,6 +71,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     target_workspace = Workspace.create!(name: "Target Workspace")
     target_root_recording = RecordingStudio.root_recording_for(target_workspace)
     RecordingStudio.root_recording_for(source_workspace)
+    ensure_switch_page_view!(user)
 
     patch "/recording_studio_root_switchable/v1/root_switch", params: {
       scope: "all_workspaces",
@@ -93,6 +96,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     target_workspace = Workspace.create!(name: "Fallback Target Workspace")
     target_root_recording = RecordingStudio.root_recording_for(target_workspace)
     RecordingStudio.root_recording_for(source_workspace)
+    ensure_switch_page_view!(user)
 
     patch "/recording_studio_root_switchable/v1/root_switch", params: {
       scope: "all_workspaces",

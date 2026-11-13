@@ -26,11 +26,11 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 - `recording_studio_metrics` for operations metrics registration
 - A host application with a current actor resolver; the bundled UI also expects FlatPack and Stimulus
 
-Development and dummy Gemfiles pin Recording Studio to GitHub tag `v6.3.0` and Accessible to `v0.24.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
+Development and dummy Gemfiles pin Recording Studio to GitHub tag `v6.7.0` and Accessible to `v0.32.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
 
-Root and dummy Gemfiles pin Trashable `v0.12.2` (`require: false`, query helpers only) next to Accessible. The dummy Gemfile also pins Admin to GitHub tag `v2.5.1` and Metrics `v0.7.2`. Both Gemfiles pin Flatpack to GitHub tag `v0.1.353` and `view_component` `4.19.0`. Inbox cards use `border: :strong`. `Card` no longer takes `style:`.
+Root and dummy Gemfiles pin Trashable `v0.14.0` (`require: false`, query helpers only) next to Accessible. The dummy does not boot the Trashable engine, so it does not install the `purge_at` column. The dummy Gemfile also pins Admin to GitHub tag `v2.13.0` and Metrics `v0.8.0`. Both Gemfiles pin Flatpack to GitHub tag `v0.1.356` and `view_component` `4.19.0`. Inbox cards use `border: :strong`. `Card` no longer takes `style:`.
 
-Hosts need Recording Studio `>= 6.3.0`, Flatpack `>= 0.1.353`, `view_component` `>= 4.14, < 5`, and Admin `>= 2.5.1`. The gemspec requires Accessible `~> 0.18`. Passing `controller:` into Accessible `authorized_action?` (inbox, preferences, `creation_action`) needs Accessible `0.18` ControllerAuth. Development pins `v0.24.0`. A card that still passes `style:` drops that keyword and sets `border:` instead.
+Hosts need Recording Studio `>= 6.3.0`, Flatpack `>= 0.1.353`, `view_component` `>= 4.14, < 5`, and Admin `>= 2.5.1`. The gemspec requires Accessible `~> 0.18` and Metrics `>= 0.7.2, < 1`. Passing `controller:` into Accessible `authorized_action?` (inbox, preferences, `creation_action`) needs Accessible `0.18` ControllerAuth. Development pins Accessible `v0.32.0`. Recording Studio `6.5` denies a write unless the host sets `config.authorize_write`, or sets `config.allow_unauthorized_writes` for writes that have no actor. The dummy keeps open writes because tests record roots before a grant exists. A card that still passes `style:` drops that keyword and sets `border:` instead.
 
 ## Installation
 
@@ -38,8 +38,8 @@ Add the gem to the host application's `Gemfile`:
 
 ```ruby
 gem "recording_studio_notifications"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.3.0"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.353"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.7.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.356"
 ```
 
 Install the engine, copy migrations, and migrate:
@@ -411,8 +411,8 @@ Add the gem and install it in your host app:
 
 ```ruby
 gem "recording_studio_notifications"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.3.0"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.353"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.7.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.356"
 ```
 
 ```bash
