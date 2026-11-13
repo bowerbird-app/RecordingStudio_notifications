@@ -2,7 +2,7 @@
 
 RecordingStudioAdmin.configure do |config|
   config.default_mount_path = "/admin"
-  config.engine_layout = "admin"
+  config.layout = "admin"
   config.authentication_method = :authenticate_user!
   config.current_actor_method = :current_user
 

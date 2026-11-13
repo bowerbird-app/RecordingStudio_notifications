@@ -9,6 +9,16 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
   end
 
+  test "dummy keeps open writes so Recording Studio 6.5 can record before a grant exists" do
+    assert RecordingStudio.configuration.allow_unauthorized_writes
+    assert_nil RecordingStudio.configuration.authorize_write
+  end
+
+  test "dummy admin layout uses the Admin 2.7 layout setting" do
+    assert_equal "admin", RecordingStudioAdmin.configuration.layout
+    refute RecordingStudioAdmin.configuration.respond_to?(:engine_layout)
+  end
+
   test "dummy app validates v3 recordable declarations" do
     assert RecordingStudio.validate_recordable_declarations!
     assert_equal [ "Workspace", "AdminRoot" ], RecordingStudio.root_recordable_types
@@ -30,35 +40,38 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     refute connection.table_exists?(:recording_studio_device_sessions)
   end
 
-  test "Gemfiles pin Recording Studio to v6.3.0, Accessible to v0.24.0, Commentable to v0.7.0, and Admin to v2.5.1" do
+  test "Gemfiles pin Recording Studio to v6.7.0, Accessible to v0.32.0, Commentable to v0.7.0, and Admin to v2.13.0" do
     root_gemfile = File.read(Rails.root.join("../../Gemfile"))
     dummy_gemfile = File.read(Rails.root.join("Gemfile"))
 
-    assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v6.3.0"/, root_gemfile)
-    assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v6.3.0"/, dummy_gemfile)
-    assert_match(/tag: "v0.1.353"/, root_gemfile)
-    assert_match(/tag: "v0.1.353"/, dummy_gemfile)
+    assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v6.7.0"/, root_gemfile)
+    assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v6.7.0"/, dummy_gemfile)
+    assert_match(/tag: "v0.1.356"/, root_gemfile)
+    assert_match(/tag: "v0.1.356"/, dummy_gemfile)
     refute_match(/ref: "1fcbafe/, root_gemfile)
     refute_match(/ref: "1fcbafe/, dummy_gemfile)
     assert_match(/gem "view_component", "4.19.0"/, root_gemfile)
     assert_match(/gem "view_component", "4.19.0"/, dummy_gemfile)
-    assert_match(/recording_studio_accessible.*, tag: "v0.24.0"/, root_gemfile)
-    assert_match(/recording_studio_accessible.*, tag: "v0.24.0"/, dummy_gemfile)
+    assert_match(/recording_studio_accessible.*, tag: "v0.32.0"/, root_gemfile)
+    assert_match(/recording_studio_accessible.*, tag: "v0.32.0"/, dummy_gemfile)
     assert_match(/recording_studio_commentable.*, tag: "v0.7.0"/, dummy_gemfile)
-    assert_match(/recording_studio_admin.*, tag: "v2.5.1"/, dummy_gemfile)
-    assert_match(/recording_studio_root_switchable.*, tag: "v0.11.4"/, dummy_gemfile)
-    assert_match(/recording_studio_trashable.*, tag: "v0.12.2"/, root_gemfile)
-    assert_match(/recording_studio_trashable.*, tag: "v0.12.2"/, dummy_gemfile)
-    assert_match(/recording_studio_metrics.*, tag: "v0.7.2"/, root_gemfile)
-    assert_match(/recording_studio_metrics.*, tag: "v0.7.2"/, dummy_gemfile)
-    assert_match(/recording_studio_notifications_email.*\n.*tag: "v0.5.1"/, dummy_gemfile)
-    assert_match(/recording_studio_cache.*, tag: "v0.6.2"/, dummy_gemfile)
+    assert_match(/recording_studio_admin.*, tag: "v2.13.0"/, dummy_gemfile)
+    assert_match(/recording_studio_root_switchable.*, tag: "v0.15.0"/, dummy_gemfile)
+    assert_match(/recording_studio_trashable.*, tag: "v0.14.0"/, root_gemfile)
+    assert_match(/recording_studio_trashable.*, tag: "v0.14.0"/, dummy_gemfile)
+    assert_match(/recording_studio_metrics.*, tag: "v0.8.0"/, root_gemfile)
+    assert_match(/recording_studio_metrics.*, tag: "v0.8.0"/, dummy_gemfile)
+    assert_match(/recording_studio_notifications_email.*\n.*tag: "v0.5.2"/, dummy_gemfile)
+    assert_match(/recording_studio_cache.*, tag: "v0.6.3"/, dummy_gemfile)
     assert_match(/recording_studio_internationalization.*, tag: "v0.2.0"/, dummy_gemfile)
-    assert_match(/recording_studio_api.*, tag: "v0.21.3"/, root_gemfile)
-    assert_match(/recording_studio_api.*, tag: "v0.21.3"/, dummy_gemfile)
+    assert_match(/recording_studio_api.*, tag: "v0.23.0"/, root_gemfile)
+    assert_match(/recording_studio_api.*, tag: "v0.23.0"/, dummy_gemfile)
+    assert_match(/recording_studio_logs.*, tag: "v0.7.4"/, root_gemfile)
     assert_match(/recording_studio_logs.*, tag: "v0.7.4"/, dummy_gemfile)
+    assert_match(/recording_studio_moveable.*, tag: "v4.1.1"/, root_gemfile)
     assert_match(/recording_studio_moveable.*, tag: "v4.1.1"/, dummy_gemfile)
-    assert_match(/recording_studio_icons.*, tag: "v0.2.0"/, dummy_gemfile)
+    assert_match(/recording_studio_icons.*, tag: "v0.2.1"/, root_gemfile)
+    assert_match(/recording_studio_icons.*, tag: "v0.2.1"/, dummy_gemfile)
   end
 
   test "dummy seeds use v3 hierarchy idempotently and restore current actor" do

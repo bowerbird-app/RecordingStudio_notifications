@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Development and dummy Gemfiles pin Recording Studio `v6.7.0`, Flatpack `v0.1.356`, Accessible `v0.32.0`, Metrics `v0.8.0`, Trashable `v0.14.0` (`require: false`), API `v0.23.0`, and Icons `v0.2.1`. Dummy also pins Notifications Email `v0.5.2`, Root Switchable `v0.15.0`, Cache `v0.6.3`, and Admin `v2.13.0`. Logs stays `v0.7.4`, Moveable `v4.1.1`, Commentable `v0.7.0`, and Internationalization `v0.2.0`. `view_component` stays `4.19.0`.
+- Dummy `RecordingStudio.configure` sets `config.allow_unauthorized_writes` so Recording Studio 6.5+ accepts writes that have no authorizer. Tests and seeds record roots before an actor or grant exists.
+- Dummy Admin initializer sets `config.layout` (`engine_layout` was removed in Admin 2.7). The admin layout name stays `"admin"`.
+- The dummy no longer replaces Admin's page nav partial. Admin 2.13 draws section links with `page_nav_button_group`. The old partial dropped those links.
+- Root Switchable 0.15 refuses the switch page without Accessible `:view` on the current root. Dummy tests that open or post that page grant `:view` on the first all-workspaces root. The open list of every workspace stays.
+
+### Upgrade notes
+- No version bump and no gemspec change. Re-bundle to pick up the release tags.
+- Hosts on Recording Studio 6.5+ set `config.authorize_write`, or `config.allow_unauthorized_writes` when a write has no actor.
+- Trashable stays query-helpers only. The dummy does not boot that engine and does not add `purge_at`.
+
 ## [0.15.0] - 2026-11-12
 
 ### Added

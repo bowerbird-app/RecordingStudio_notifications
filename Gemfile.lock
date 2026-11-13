@@ -1,28 +1,28 @@
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio.git
-  revision: 6acc0377fa4c940a2ff7222bbcbdc3ee6d59c591
-  tag: v6.3.0
+  revision: 481dfd1f32703bd23a38c4cfd1faf171df42b430
+  tag: v6.7.0
   specs:
-    recording_studio (6.3.0)
+    recording_studio (6.7.0)
       flat_pack (>= 0.1.315)
-      rails (>= 8.1.0)
+      rails (>= 8.1.4.1)
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_accessible.git
-  revision: 9e9bf29234ae14586dd28dd76abeb08363dd4c33
-  tag: v0.24.0
+  revision: 97b935ecd1f6147e20ce0c0d1efb7366a93f018b
+  tag: v0.32.0
   specs:
-    recording_studio_accessible (0.24.0)
+    recording_studio_accessible (0.32.0)
       rails (~> 8.1.0)
       recording_studio (~> 6.1, >= 6.1.0)
       recording_studio_trashable (~> 0.10)
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_api.git
-  revision: 752f524d925426978826b536d5b33a102bffae5d
-  tag: v0.21.3
+  revision: a5a862c2a857fe9ed1b98acb06fc21d95db7a18d
+  tag: v0.23.0
   specs:
-    recording_studio_api (0.21.3)
+    recording_studio_api (0.23.0)
       flat_pack (>= 0.1.341)
       rails (~> 8.1.0)
       recording_studio (>= 6.1.0)
@@ -36,10 +36,10 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_icons.git
-  revision: 329fbbb1d75bba3b1cc59f0b00650442f2433288
-  tag: v0.2.0
+  revision: 697bc12cdd776971678be08d60ed5d4db0f8c2b5
+  tag: v0.2.1
   specs:
-    recording_studio_icons (0.2.0)
+    recording_studio_icons (0.2.1)
       rails (>= 8.1.0)
       recording_studio (>= 6.3.0)
 
@@ -55,10 +55,10 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_metrics.git
-  revision: cb87f3b47ec6825458e3f467f7b16a5cb407e96c
-  tag: v0.7.2
+  revision: 4521e585007f19c8c2fb10e513988fd5546c6230
+  tag: v0.8.0
   specs:
-    recording_studio_metrics (0.7.2)
+    recording_studio_metrics (0.8.0)
       rails (~> 8.1.0)
       recording_studio (>= 6.1.0)
 
@@ -77,10 +77,10 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_trashable.git
-  revision: 07d715d32bb44225b9482f6318a071f7c1876141
-  tag: v0.12.2
+  revision: cbd24858202d6ad3ca76cb49803ef82adf0f78a7
+  tag: v0.14.0
   specs:
-    recording_studio_trashable (0.12.2)
+    recording_studio_trashable (0.14.0)
       flat_pack (>= 0.1.315)
       rails (~> 8.1.0)
       recording_studio (>= 6.1.0)
@@ -88,10 +88,10 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/flatpack.git
-  revision: e921b48cb41219902939be0697260b0ac317be01
-  tag: v0.1.353
+  revision: 7f669689ce8aa080bb5de8b0f14ed01b395d6054
+  tag: v0.1.356
   specs:
-    flat_pack (0.1.353)
+    flat_pack (0.1.356)
       pagy (~> 9.0)
       rails (>= 7.1, < 9)
       tailwind_merge (>= 0.13, < 2)
@@ -452,7 +452,7 @@ CHECKSUMS
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
   erb (6.0.7) sha256=c5ca6dc25b0ef974a44dc8f59fe847577122483b1968a38dec305c60bf91ee92
   erubi (1.13.1) sha256=a082103b0885dbc5ecf1172fede897f9ebdb745a4b97a5e8dc63953db1ee4ad9
-  flat_pack (0.1.353)
+  flat_pack (0.1.356)
   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
   io-console (0.9.5) sha256=83dd9bbf4c4680416629245b39cd4212eb5f4d9a4ea91804870c1f6b846414d5
@@ -500,15 +500,15 @@ CHECKSUMS
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
   rbs (4.2.0) sha256=51f7b886dcc05bc09e10b901daa6a81829f6adc03101d6ca9ea4aac6103e0674
   rdoc (8.1.0) sha256=befc37880a5cfd36dcb176c748b5fd5ee39dd3536a75e81824e4972ce230f60a
-  recording_studio (6.3.0)
-  recording_studio_accessible (0.24.0)
-  recording_studio_api (0.21.3)
-  recording_studio_icons (0.2.0)
+  recording_studio (6.7.0)
+  recording_studio_accessible (0.32.0)
+  recording_studio_api (0.23.0)
+  recording_studio_icons (0.2.1)
   recording_studio_logs (0.7.4)
-  recording_studio_metrics (0.7.2)
+  recording_studio_metrics (0.8.0)
   recording_studio_moveable (4.1.1)
   recording_studio_notifications (0.15.0)
-  recording_studio_trashable (0.12.2)
+  recording_studio_trashable (0.14.0)
   redis (5.4.1) sha256=b5e675b57ad22b15c9bcc765d5ac26f60b675408af916d31527af9bd5a81faae
   redis-client (0.31.0) sha256=6820cb2a21e6795a823141f50fd25e655de2b8dc8ff833b43509a27b0263fd75
   regexp_parser (2.13.1) sha256=5aedb6b7c35688f51e86eef17a15374dfd287c83f4ca644b2c5f3ec50a33b44b

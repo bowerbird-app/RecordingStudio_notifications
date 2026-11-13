@@ -285,6 +285,7 @@ class NotificationMenuRowStyleTest < ActionDispatch::IntegrationTest
   end
 
   def switch_to_root!(root)
+    ensure_switch_page_view!(@viewer)
     patch "/recording_studio_root_switchable/v1/root_switch", params: {
       scope: "all_workspaces",
       root_switch: {
