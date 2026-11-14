@@ -126,12 +126,10 @@ module RecordingStudioNotifications
       end
 
       def write_batch(recipients)
-        outcome = nil
         Notification.transaction do
-          outcome = FanOutBatch.insert(request, recipients)
-          outcome.inserted.each { |inserted| run_hooks(inserted) }
+          FanOutBatch.insert(request, recipients).inserted.each { |inserted| run_hooks(inserted) }
         end
-        enqueue_deliveries(outcome.immediate_delivery_ids)
+        enqueue_deliveries(FanOutBatch.pending_immediate_ids(@idempotency_key, recipients))
       end
 
       def enqueue_deliveries(delivery_ids)

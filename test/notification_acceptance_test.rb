@@ -175,7 +175,7 @@ class NotificationAcceptanceTest < Minitest::Test
 
     assert_includes adapter, "class InAppAdapter"
     assert_includes job, "RecordingStudioNotifications.channels.fetch"
-    assert_includes job, "delivery.mark_delivered! if delivery.reload.pending?"
+    assert_includes job, "delivery.mark_delivered! if current.pending? || current.processing?"
     assert_includes job, "deliver.recording_studio_notifications"
   end
 

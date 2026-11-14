@@ -89,9 +89,11 @@ class NotifyFanOutTest < ActiveSupport::TestCase
     attributes = { prefix: "fan-retry", notification_type: :fan_out_inbox, idempotency_key: "fan-retry", title: "First" }
 
     run_fan_out(**attributes, inbox: false)
+    perform_enqueued_jobs
     first = RecordingStudioNotifications::Notification.where(idempotency_key: "fan-retry").order(:id).to_a
     assert_equal [false, false], first.map(&:inbox)
     assert_equal [%w[fan_out_mail], %w[fan_out_mail]], first.map { |notification| notification.deliveries.pluck(:channel).sort }
+    assert first.all? { |notification| notification.deliveries.sole.delivered? }
 
     assert_no_difference -> { RecordingStudioNotifications::Notification.count } do
       assert_no_difference -> { RecordingStudioNotifications::Delivery.count } do
@@ -104,6 +106,55 @@ class NotifyFanOutTest < ActiveSupport::TestCase
     assert_equal ["First", "First"], reloaded.map(&:title)
     assert_equal [false, false], reloaded.map(&:inbox)
     assert_equal [%w[fan_out_mail], %w[fan_out_mail]], reloaded.map { |notification| notification.deliveries.pluck(:channel).sort }
+  end
+
+  test "retry after a crash between commit and enqueue sends each delivery once" do
+    calls = register_mail_adapter
+    register_type(:fan_out_crash_mail, channels: [:fan_out_mail])
+    create_users("fan-crash", 3)
+    payload = fan_out_payload(prefix: "fan-crash", notification_type: :fan_out_crash_mail, idempotency_key: "fan-crash")
+    clear_enqueued_jobs
+
+    crashed = RecordingStudioNotifications::Services::FanOut.new(payload)
+    crashed.define_singleton_method(:enqueue_deliveries) { |*| raise "crash before enqueue" }
+    events = 0
+    callback = ->(*) { events += 1 }
+
+    ActiveSupport::Notifications.subscribed(callback, "notify.recording_studio_notifications") do
+      error = assert_raises(RuntimeError) { crashed.call }
+      assert_equal "crash before enqueue", error.message
+    end
+
+    assert_equal 3, events
+    assert_equal 3, RecordingStudioNotifications::Notification.where(idempotency_key: "fan-crash").count
+    assert_equal 0, jobs_named("RecordingStudioNotifications::FanOutDeliveryJob")
+    assert_empty calls
+
+    events = 0
+    ActiveSupport::Notifications.subscribed(callback, "notify.recording_studio_notifications") do
+      assert_no_difference -> { RecordingStudioNotifications::Notification.count } do
+        assert_no_difference -> { RecordingStudioNotifications::Delivery.count } do
+          clear_enqueued_jobs
+          RecordingStudioNotifications::Services::FanOut.perform(payload)
+        end
+      end
+    end
+
+    assert_equal 0, events
+    assert_equal 1, jobs_named("RecordingStudioNotifications::FanOutDeliveryJob")
+    perform_enqueued_jobs
+    assert_equal 3, calls.uniq.size
+    assert_equal calls.uniq.size, calls.size
+
+    RecordingStudioNotifications::FanOutDeliveryJob.perform_now(calls.dup)
+    delivery = RecordingStudioNotifications::Delivery.find(calls.first)
+    delivery.update!(status: "processing")
+    RecordingStudioNotifications::FanOutDeliveryJob.perform_now([delivery.id])
+    RecordingStudioNotifications::DeliveryJob.perform_now(delivery.notification_id)
+    delivery.update!(status: "failed", error_message: "stopped")
+    RecordingStudioNotifications::FanOutDeliveryJob.perform_now([delivery.id])
+    assert_equal 3, calls.size
+    assert_equal calls.uniq.sort, calls.sort
   end
 
   test "inbox false skips in_app and required in_app raises" do

@@ -30,7 +30,7 @@ RecordingStudioNotifications provides a powerful hook system that allows host ap
 | `after_service` | After any service completes |
 | `around_service` | Wraps service execution |
 
-`notify` runs these once per call. `notify_fan_out` runs them once per inserted recipient inside `FanOutJob`, after that chunk's rows are inserted and before the chunk commits. A retry that inserts no new rows does not run them again. The service class is `RecordingStudioNotifications::Services::FanOut`.
+`notify` runs these once per call. `notify_fan_out` runs them once per inserted recipient inside `FanOutJob`, after that chunk's rows are inserted and before the chunk commits. A retry that inserts no new rows does not run them again, including a retry that only enqueues deliveries committed before a crash. The service class is `RecordingStudioNotifications::Services::FanOut`.
 
 ---
 

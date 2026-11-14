@@ -13,7 +13,7 @@ module RecordingStudioNotifications
         end
       end
       Inserted = Struct.new(:notification, :recipient, :channels, keyword_init: true)
-      Outcome = Struct.new(:inserted, :immediate_delivery_ids, keyword_init: true)
+      Outcome = Struct.new(:inserted, keyword_init: true)
       IDEMPOTENCY_COLUMNS = %w[recipient_type recipient_id idempotency_key].freeze
 
       def self.insert(request, recipients)
@@ -33,18 +33,15 @@ module RecordingStudioNotifications
         return empty_outcome if plans.empty?
 
         inserted_ids = insert_notifications(notification_rows(plans, timestamp))
-        delivery_result = insert_deliveries(delivery_rows(plans, inserted_ids, timestamp))
+        insert_deliveries(delivery_rows(plans, inserted_ids, timestamp))
         notifications = load_notifications(inserted_ids.values)
-        Outcome.new(
-          inserted: inserted_records(plans, inserted_ids, notifications),
-          immediate_delivery_ids: immediate_ids(plans, inserted_ids, delivery_result)
-        )
+        Outcome.new(inserted: inserted_records(plans, inserted_ids, notifications))
       end
 
       private
 
       def empty_outcome
-        Outcome.new(inserted: [], immediate_delivery_ids: [])
+        Outcome.new(inserted: [])
       end
 
       def load_preferences
@@ -226,17 +223,6 @@ module RecordingStudioNotifications
         end
       end
 
-      def immediate_ids(plans, inserted_ids, delivery_result)
-        immediate_notification_ids = plans.filter_map do |plan|
-          next if plan.deferred?
-
-          inserted_ids[recipient_key(plan.recipient)]&.to_s
-        end
-        delivery_result.filter_map do |row|
-          row["id"] if immediate_notification_ids.include?(row["notification_id"].to_s)
-        end
-      end
-
       def polymorphic_name(record)
         return if record.nil?
 
@@ -252,6 +238,16 @@ module RecordingStudioNotifications
       end
 
       class << self
+        def pending_immediate_ids(idempotency_key, recipients)
+          return [] if recipients.empty?
+
+          Delivery.pending
+                  .joins(:notification)
+                  .merge(notifications_for(idempotency_key, recipients))
+                  .where("#{Delivery.table_name}.metadata ->> 'rollup' IS DISTINCT FROM ?", "true")
+                  .pluck("#{Delivery.table_name}.id")
+        end
+
         def idempotency_index_name
           index = Notification.connection.indexes(Notification.table_name).find do |candidate|
             candidate.unique &&
@@ -261,6 +257,19 @@ module RecordingStudioNotifications
           raise ArgumentError, "notification idempotency index is missing" unless index
 
           index.name
+        end
+
+        private
+
+        def notifications_for(idempotency_key, recipients)
+          scopes = recipients.group_by { |recipient| recipient.class.base_class.name }.map do |type, people|
+            Notification.where(
+              idempotency_key: idempotency_key,
+              recipient_type: type,
+              recipient_id: people.map(&:id)
+            )
+          end
+          scopes.reduce { |combined, scope| combined.or(scope) }
         end
       end
     end
