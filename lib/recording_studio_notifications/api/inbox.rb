@@ -8,9 +8,10 @@ module RecordingStudioNotifications
         title: TITLE,
         summary: TITLE,
         description: "Paged inbox for the current Accessible actor. Uses the HTML inbox scopes " \
-                     "Notification.for_recipient.active.visible_in_inbox.in_inbox and " \
-                     "visible_notification? under :view_notifications. Offset paging with page " \
-                     "and per_page, same as other non-recording gem lists.",
+                     "Notification.for_recipient.active.visible_in_inbox.in_inbox. Root view is " \
+                     "authorized_root_recording_ids(actor:, role: :view) when " \
+                     "authorized_root_recording_ids_supported? is true, and visible_notification? " \
+                     "otherwise. Offset paging with page and per_page. The query uses LIMIT and OFFSET.",
         tags: ["Notifications"],
         parameters: [
           {
@@ -47,16 +48,18 @@ module RecordingStudioNotifications
 
       def self.call(context)
         recipient = Gate.authorize_inbox!(context)
-        inbox = Notification.for_recipient(recipient).active.visible_in_inbox.in_inbox.newest_first
-        visible = inbox.select do |notification|
-          Services::NotificationAuthorization.visible_notification?(
-            actor: recipient,
-            notification: notification
-          )
+        inbox = Services::InboxScope.relation(recipient: recipient, actor: recipient)
+        unless Services::InboxScope.authorized_root_recording_ids_supported?
+          inbox = inbox.select do |notification|
+            Services::NotificationAuthorization.visible_notification?(
+              actor: recipient,
+              notification: notification
+            )
+          end
         end
         payload = Gate.request_payload(context)
         page = Query.paginate(
-          visible,
+          inbox,
           page: payload[:page],
           per_page: payload[:per_page]
         )

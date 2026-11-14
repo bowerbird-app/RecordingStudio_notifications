@@ -5,6 +5,7 @@ if defined?(RecordingStudioAccessible)
   RecordingStudioAccessible.configure do |config|
     config.access_actor_types = ["User"]
     config.access_actor_types += ["RecordingStudioApi::ApiClient"] if defined?(RecordingStudioApi)
+    config.access_management_actor_scope = ->(_controller) { User.order(:email) }
   end
 
   # Compatibility adapter: expose action-based APIs expected by notifications engine.

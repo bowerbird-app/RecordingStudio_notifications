@@ -28,9 +28,11 @@ module RecordingStudioNotifications
     scope :rootless_or_global, -> { where(root_recording_id: nil) }
     scope :of_type, ->(type) { where(notification_type: type.to_s) }
     scope :visible_in_inbox, lambda {
-      where.not(
-        id: Delivery.pending.for_channel(:in_app).rollups.select(:notification_id)
+      deliveries = Delivery.arel_table
+      pending_rollup = Delivery.pending.for_channel(:in_app).rollups.where(
+        deliveries[:notification_id].eq(arel_table[:id])
       )
+      where(Arel::Nodes::Not.new(pending_rollup.arel.exists))
     }
     scope :for_current_root_inbox, lambda { |root_recording|
       root_recording ? where(root_recording_id: [nil, root_recording.id]) : rootless_or_global

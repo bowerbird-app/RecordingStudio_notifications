@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.16.1", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.17.0", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -65,6 +65,19 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_includes migration, "t.uuid :notifiable_id"
     assert_includes migration, "idx_rsn_notifications_idempotency"
     assert_includes migration, "recording_studio_notifications_preferences"
+  end
+
+  def test_inbox_index_migration_is_partial
+    migration = File.read(File.expand_path(
+                            "../db/migrate/20261114090000_add_inbox_indexes_to_recording_studio_notifications_notifications.rb",
+                            __dir__
+                          ))
+
+    assert_includes migration, "idx_rsn_notifications_inbox"
+    assert_includes migration, "idx_rsn_notifications_unread"
+    assert_includes migration, "archived_at IS NULL AND inbox = TRUE"
+    assert_includes migration, "read_at IS NULL AND cleared_at IS NULL AND archived_at IS NULL AND inbox = TRUE"
+    assert_includes migration, "order: { created_at: :desc, id: :desc }"
   end
 
   def test_dummy_app_mounts_engine_and_registers_example_types

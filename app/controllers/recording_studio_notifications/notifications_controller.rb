@@ -29,12 +29,13 @@ module RecordingStudioNotifications
       @inbox_scope = notifications_inbox_scope
       @current_root_recording = current_notifications_root_recording
 
-      visible = visible_notifications(scoped_notifications)
+      relation = scoped_notifications
+      visible = visible_notifications(relation)
       limit = normalized_menu_limit
       groups = grouped_notification_sections(visible).flat_map(&:groups)
       recent_groups = groups.sort_by { |group| [group.latest_notification.created_at, group.id] }.reverse.first(limit)
       payload = recent_groups.map { |group| menu_group_payload(group) }
-      unread_count = visible.count(&:unread?)
+      unread_count = unread_count_for(relation, visible)
 
       render json: {
         unread_count: unread_count,
@@ -114,10 +115,7 @@ module RecordingStudioNotifications
       return unless authorize_notifications!(recipient: @recipient)
 
       prepare_inbox
-
-      Notification.transaction do
-        @visible_notifications.select(&:unread?).each(&:clear!)
-      end
+      clear_visible_unread!
 
       respond_to do |format|
         format.html do
@@ -165,26 +163,40 @@ module RecordingStudioNotifications
     end
 
     def scoped_notifications
-      notifications = Notification.for_recipient(@recipient).active.visible_in_inbox.in_inbox
-      notifications = notifications.for_current_root_inbox(@current_root_recording) if @inbox_scope == "current_root"
-      notifications.newest_first
+      Services::InboxScope.relation(
+        recipient: @recipient,
+        actor: current_notifications_actor,
+        root_recording: @current_root_recording,
+        inbox_scope: @inbox_scope
+      )
     end
 
     def prepare_inbox
       @inbox_scope = notifications_inbox_scope
       @current_root_recording = current_notifications_root_recording
       @page = current_page
-      @visible_notifications = visible_notifications(scoped_notifications)
-      @has_unread_notifications = @visible_notifications.any?(&:unread?)
+      relation = scoped_notifications
+      @visible_notifications = visible_notifications(relation)
+      @has_unread_notifications = unread_count_for(relation, @visible_notifications).positive?
       @notification_sections, @has_next_page = visible_notification_sections_page(@visible_notifications)
     end
 
     def visible_notifications(notifications)
-      notifications.select { |notification| visible_notification?(notification) }
+      Services::InboxScope.rows(notifications) { |notification| visible_notification?(notification) }
     end
 
-    def visible_notification_sections_page(notifications_scope)
-      all_sections = grouped_notification_sections(visible_notifications(notifications_scope))
+    def unread_count_for(relation, rows)
+      Services::InboxScope.unread_total(relation, rows)
+    end
+
+    def clear_visible_unread!
+      Services::InboxScope.clear_visible_unread!(scoped_notifications) do |notification|
+        visible_notification?(notification)
+      end
+    end
+
+    def visible_notification_sections_page(notifications)
+      all_sections = grouped_notification_sections(notifications)
       groups = all_sections.flat_map(&:groups)
       page_groups = groups.slice((@page - 1) * PER_PAGE, PER_PAGE) || []
       sections = page_groups.group_by(&:notification_type).map do |type, section_groups|

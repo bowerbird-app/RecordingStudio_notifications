@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** November 13, 2026
+> *   **Last Updated:** November 14, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -19,7 +19,7 @@ This guide explains how to install the RecordingStudioNotifications engine in yo
 - `recording_studio` `>= 6.3.0` (development git tag `v6.7.0`). Recording Studio `6.5` denies a write unless the host sets `config.authorize_write`, or sets `config.allow_unauthorized_writes` when writes have no actor.
 - `flat_pack` `>= 0.1.353`. Development pins GitHub tag `v0.1.356`. The bell menu uses `style: :plain` and `divider: true`, which need Flatpack `0.1.353` or newer.
 - `view_component` `>= 4.14, < 5` (development pins `4.19.0`)
-- Accessible: gemspec `~> 0.18`. Inbox, preference, and `creation_action` checks pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth. Development and dummy Gemfiles pin `v0.32.0`. Dummy Admin `v2.13.0`. Dummy pins Recording Studio API `v0.23.0` (plus Logs `v0.7.4`, Moveable `v4.1.1`, Icons `v0.2.1`, and Redis) so inbox endpoints can be exercised. The notifications gemspec does not depend on `recording_studio_api`.
+- Accessible: gemspec `~> 0.18`. Inbox, preference, and `creation_action` checks pass `controller:` to `authorized_action?`, which needs Accessible `0.18` ControllerAuth. Development and dummy Gemfiles pin `v0.39.0` so the inbox can filter roots with `authorized_root_recording_ids`. The gemspec floor stays `~> 0.18` until the Gem Updates bot raises it. Hosts on an older Accessible keep the per-row inbox check. Dummy Admin `v2.13.0`. Dummy pins Recording Studio API `v0.23.0` (plus Logs `v0.7.4`, Moveable `v4.1.1`, Icons `v0.2.1`, and Redis) so inbox endpoints can be exercised. The notifications gemspec does not depend on `recording_studio_api`.
 - A card drops `style:` and sets `border:` (`border: :strong` on an inbox card, `border: :default` otherwise)
 - TailwindCSS (optional, for styling engine views)
 

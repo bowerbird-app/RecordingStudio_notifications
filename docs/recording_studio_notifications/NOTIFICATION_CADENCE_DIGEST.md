@@ -180,7 +180,7 @@ unread_count = notifications.count(&:unread?)
 | Expand/collapse | No notification state changes |
 | Open an item | Mark only that item read, then follow normal destination |
 | Mark one item read/unread | Update only that item |
-| Clear all | Set `cleared_at` for all visible unread items without changing `read_at` |
+| Clear all | One update sets `cleared_at` and `updated_at` on every visible unread item. `read_at` stays blank |
 | Archive an item | Remove it from active inbox and update counts |
 
 The global badge remains the total unread **source notification** count, not the number of groups.
