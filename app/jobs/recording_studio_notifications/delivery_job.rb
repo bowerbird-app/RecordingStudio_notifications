@@ -24,10 +24,11 @@ module RecordingStudioNotifications
     def self.claim_pending!(delivery)
       return if delivery.deferred_rollup?
       return unless delivery.pending?
-      return if Delivery.where(id: delivery.id, status: "pending").update_all(
-        status: "processing",
-        updated_at: Time.current
-      ) != 1
+
+      claimed = Delivery.where(id: delivery.id, status: "pending")
+                        .where("#{Delivery.table_name}.metadata ->> 'rollup' IS DISTINCT FROM ?", "true")
+                        .update_all(status: "processing", updated_at: Time.current)
+      return if claimed != 1
 
       delivery
     end
