@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Development and dummy Gemfiles pin Recording Studio `v6.7.0`, Flatpack `v0.1.356`, Accessible `v0.32.0`, Metrics `v0.8.0`, Trashable `v0.14.0` (`require: false`), API `v0.23.0`, and Icons `v0.2.1`. Dummy also pins Notifications Email `v0.5.2`, Root Switchable `v0.15.0`, Cache `v0.6.3`, and Admin `v2.13.0`. Logs stays `v0.7.4`, Moveable `v4.1.1`, Commentable `v0.7.0`, and Internationalization `v0.2.0`. `view_component` stays `4.19.0`.
+- Development and dummy Gemfiles pin Recording Studio `v6.7.0`, Flatpack `v0.1.356`, Accessible `v0.39.0`, Metrics `v0.8.0`, Trashable `v0.14.0` (`require: false`), API `v0.23.0`, and Icons `v0.2.1`. Dummy also pins Notifications Email `v0.5.2`, Root Switchable `v0.15.0`, Cache `v0.6.3`, and Admin `v2.13.0`. Logs stays `v0.7.4`, Moveable `v4.1.1`, Commentable `v0.7.0`, and Internationalization `v0.2.0`. `view_component` stays `4.19.0`.
 - Dummy `RecordingStudio.configure` sets `config.allow_unauthorized_writes` so Recording Studio 6.5+ accepts writes that have no authorizer. Tests and seeds record roots before an actor or grant exists.
 - Dummy Admin initializer sets `config.layout` (`engine_layout` was removed in Admin 2.7). The admin layout name stays `"admin"`.
 - The dummy no longer replaces Admin's page nav partial. Admin 2.13 draws section links with `page_nav_button_group`. The old partial dropped those links.
@@ -19,6 +19,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - No version bump and no gemspec change. Re-bundle to pick up the release tags.
 - Hosts on Recording Studio 6.5+ set `config.authorize_write`, or `config.allow_unauthorized_writes` when a write has no actor.
 - Trashable stays query-helpers only. The dummy does not boot that engine and does not add `purge_at`.
+
+## [0.17.0] - 2026-11-14
+
+### Changed
+- The inbox, the bell, and the JSON inbox apply root view in SQL when Accessible answers `authorized_root_recording_ids_supported?`. The filter is `authorized_root_recording_ids(actor:, role: :view)`. A rootless row stays. A row on any other root stays only when that id is in the set. When the method is missing or the authorization service does not implement it, the inbox keeps the per-row `visible_notification?` check.
+- Trashed roots are left out in SQL on our side. A row whose root has `trashed_at` set is not listed, counted, or cleared.
+- Unread totals are a live `COUNT` of the visible unread rows. There is no stored counter.
+- Clear all is one `update_all` on those rows. It sets `cleared_at` and `updated_at`. `read_at` stays blank.
+- `visible_in_inbox` excludes a pending in-app rollup with `NOT EXISTS`.
+- The JSON inbox still takes `page` and `per_page`. The query uses `LIMIT` and `OFFSET`. `total_count` is a `COUNT`.
+
+### Added
+- Partial index `idx_rsn_notifications_inbox` on `(recipient_type, recipient_id, created_at, id)` where `archived_at` is null and `inbox` is true, ordered by `created_at` and `id` descending.
+- Partial index `idx_rsn_notifications_unread` on `(recipient_type, recipient_id)` where `read_at`, `cleared_at`, and `archived_at` are null and `inbox` is true.
+
+### Upgrade notes
+- Bump to `0.17.0`. Run `bin/rails generate recording_studio_notifications:migrations`, then `bin/rails db:migrate`.
+- The gemspec floor for `recording_studio_accessible` stays `~> 0.18`. The SQL root check needs Accessible `0.39.0`. Hosts on an older Accessible keep the per-row check. The Gem Updates bot raises the floor.
+- `page` and `per_page` are unchanged. There is no cursor. Clear all still leaves `read_at` blank.
+- Development and dummy Gemfiles pin Accessible `v0.39.0`. Dummy manage-access lists actors with `access_management_actor_scope`.
 
 ## [0.16.1] - 2026-11-14
 

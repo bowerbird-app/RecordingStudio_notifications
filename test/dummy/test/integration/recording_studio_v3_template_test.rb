@@ -40,7 +40,7 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     refute connection.table_exists?(:recording_studio_device_sessions)
   end
 
-  test "Gemfiles pin Recording Studio to v6.7.0, Accessible to v0.32.0, Commentable to v0.7.0, and Admin to v2.13.0" do
+  test "Gemfiles pin Recording Studio to v6.7.0, Accessible to v0.39.0, Commentable to v0.7.0, and Admin to v2.13.0" do
     root_gemfile = File.read(Rails.root.join("../../Gemfile"))
     dummy_gemfile = File.read(Rails.root.join("Gemfile"))
 
@@ -52,8 +52,8 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     refute_match(/ref: "1fcbafe/, dummy_gemfile)
     assert_match(/gem "view_component", "4.19.0"/, root_gemfile)
     assert_match(/gem "view_component", "4.19.0"/, dummy_gemfile)
-    assert_match(/recording_studio_accessible.*, tag: "v0.32.0"/, root_gemfile)
-    assert_match(/recording_studio_accessible.*, tag: "v0.32.0"/, dummy_gemfile)
+    assert_match(/recording_studio_accessible.*, tag: "v0.39.0"/, root_gemfile)
+    assert_match(/recording_studio_accessible.*, tag: "v0.39.0"/, dummy_gemfile)
     assert_match(/recording_studio_commentable.*, tag: "v0.7.0"/, dummy_gemfile)
     assert_match(/recording_studio_admin.*, tag: "v2.13.0"/, dummy_gemfile)
     assert_match(/recording_studio_root_switchable.*, tag: "v0.15.0"/, dummy_gemfile)

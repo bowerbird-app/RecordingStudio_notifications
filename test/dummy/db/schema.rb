@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_12_080025) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_14_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -292,6 +292,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_080025) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.string "url"
+    t.index ["recipient_type", "recipient_id", "created_at", "id"], name: "idx_dummy_rsn_notifications_inbox", order: { created_at: :desc, id: :desc }, where: "(archived_at IS NULL AND inbox = true)"
+    t.index ["recipient_type", "recipient_id"], name: "idx_dummy_rsn_notifications_unread", where: "((read_at IS NULL) AND (cleared_at IS NULL) AND (archived_at IS NULL) AND (inbox = true))"
     t.index ["recipient_type", "recipient_id", "idempotency_key"], name: "idx_dummy_rsn_notifications_idempotency", unique: true, where: "(idempotency_key IS NOT NULL)"
     t.index ["recipient_type", "recipient_id", "notification_type"], name: "idx_dummy_rsn_notifications_recipient"
     t.index ["recording_id"], name: "idx_dummy_rsn_notifications_recording"

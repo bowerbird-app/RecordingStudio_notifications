@@ -48,9 +48,13 @@ class ApiTest < Minitest::Test
     refute_includes api, "register_capability_action"
     refute_includes api, "required_role"
     refute File.exist?(File.expand_path("../lib/recording_studio_notifications/mcp.rb", __dir__))
-    assert_includes inbox, "Notification.for_recipient"
-    assert_includes inbox, ".active.visible_in_inbox.in_inbox"
+    scope = File.read(File.expand_path("../lib/recording_studio_notifications/services/inbox_scope.rb", __dir__))
+    assert_includes inbox, "InboxScope.relation"
     assert_includes inbox, "visible_notification?"
+    assert_includes inbox, "authorized_root_recording_ids_supported?"
+    assert_includes scope, "Notification.for_recipient"
+    assert_includes scope, ".active.visible_in_inbox.in_inbox"
+    assert_includes scope, "authorized_root_recording_ids"
     assert_includes inbox, "title: TITLE"
     assert_includes gate, "grant.authorize!"
     assert_includes gate, "NotificationAuthorization.allowed?"
