@@ -20,6 +20,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hosts on Recording Studio 6.5+ set `config.authorize_write`, or `config.allow_unauthorized_writes` when a write has no actor.
 - Trashable stays query-helpers only. The dummy does not boot that engine and does not add `purge_at`.
 
+## [0.16.1] - 2026-11-14
+
+### Fixed
+- The menu example that hides a denied mention keeps an allowed workspace first in the all-workspaces list. The switch-page helper grants `:view` on the alphabetically first workspace, and a random name sometimes made the denied workspace first. The bell then showed that mention, which is the access check working. `inbox_scope=all` still hides a row the viewer cannot see.
+
+### Upgrade notes
+- Bump to `0.16.1`. No migration and no gemspec change. Notification behavior is unchanged.
+
 ## [0.16.0] - 2026-11-14
 
 ### Added

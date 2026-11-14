@@ -393,7 +393,7 @@ file; do not generate a per-repo dummy key.
 
 ## Validation
 
-Run both suites from the repository root. `rake test:all` runs the gem suite, the dummy app suite, and prints one SimpleCov result for `app/` and `lib/`.
+Run both suites from the repository root. `rake test:all` runs the gem suite, the dummy app suite, and prints one SimpleCov result for `app/` and `lib/`. That result counts lines Ruby can execute. A gem-only report is lower: `track_files` also counts lines such as `end` on files that suite never loads, and collation drops those once the dummy suite loads the file.
 
 ```bash
 bundle exec rake test:all
@@ -586,7 +586,7 @@ Subscribe to:
 
 ## Validation
 
-Run both suites from the repository root. `rake test:all` runs the gem suite, the dummy app suite, and prints one SimpleCov result for `app/` and `lib/`.
+Run both suites from the repository root. `rake test:all` runs the gem suite, the dummy app suite, and prints one SimpleCov result for `app/` and `lib/`. That result counts lines Ruby can execute. A gem-only report is lower: `track_files` also counts lines such as `end` on files that suite never loads, and collation drops those once the dummy suite loads the file.
 
 ```bash
 bundle exec rake test:all

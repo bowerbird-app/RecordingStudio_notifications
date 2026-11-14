@@ -100,7 +100,7 @@ GIT
 PATH
   remote: .
   specs:
-    recording_studio_notifications (0.16.0)
+    recording_studio_notifications (0.16.1)
       flat_pack (>= 0.1.353)
       rails (~> 8.1.0)
       recording_studio (>= 6.3.0)
@@ -507,7 +507,7 @@ CHECKSUMS
   recording_studio_logs (0.7.4)
   recording_studio_metrics (0.8.0)
   recording_studio_moveable (4.1.1)
-  recording_studio_notifications (0.16.0)
+  recording_studio_notifications (0.16.1)
   recording_studio_trashable (0.14.0)
   redis (5.4.1) sha256=b5e675b57ad22b15c9bcc765d5ac26f60b675408af916d31527af9bd5a81faae
   redis-client (0.31.0) sha256=6820cb2a21e6795a823141f50fd25e655de2b8dc8ff833b43509a27b0263fd75
