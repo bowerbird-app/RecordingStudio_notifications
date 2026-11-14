@@ -35,3 +35,13 @@ RecordingStudioNotifications.configure do |config|
   # Register custom channels here. The bundled :in_app channel is enabled by default.
   # config.channels.register(:custom, MyNotificationAdapter.new)
 end
+
+# Async fan-out. The scope name is what the job stores. Do not pass a relation.
+# RecordingStudioNotifications.register_recipient_scope(:all_users) { User.all }
+#
+# RecordingStudioNotifications.notify_fan_out(
+#   recipient_scope: :all_users,
+#   notification_type: :generic,
+#   title: "Hello",
+#   idempotency_key: "hello-#{Time.current.to_date}"
+# )

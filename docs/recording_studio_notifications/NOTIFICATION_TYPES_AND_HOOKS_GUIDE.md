@@ -84,43 +84,30 @@ RecordingStudioCommentable.configuration.hooks.after_service(priority: 10) do |s
   root_recording = comment_recording.root_recording
   next unless root_recording
 
-  workspace_viewers = RecordingStudio::Recording.unscoped
-    .where(
-      parent_recording_id: root_recording.id,
-      recordable_type: "RecordingStudio::Access",
-      trashed_at: nil
-    )
-    .map { |r| r.recordable&.actor }
-    .compact
-    .reject { |actor| actor == comment.author }
-
-  next if workspace_viewers.empty?
-
   url = Rails.application.routes.url_helpers.page_path(page_recordable)
-  workspace_viewers.each do |viewer|
-    RecordingStudioNotifications.notify(
-      notification_type: :page_comment,
-      recipient: viewer,
-      actor: comment.author,
-      recording: comment_recording,
-      root_recording: root_recording,
-      title: "New comment on #{page_recordable.title}",
-      body: comment.body.to_s,
-      url: url,
-      idempotency_key: "comment-#{comment.id}-#{viewer.id}"
-    )
-  end
+  RecordingStudioNotifications.notify_fan_out(
+    recipient_scope: :page_comment_viewers,
+    notification_type: :page_comment,
+    actor: comment.author,
+    notifiable: comment,
+    recording: comment_recording,
+    root_recording: root_recording,
+    title: "New comment on #{page_recordable.title}",
+    body: comment.body.to_s,
+    url: url,
+    idempotency_key: "comment-#{comment.id}"
+  )
 end
 ```
+
+The `:page_comment_viewers` scope loads workspace access under that root and drops the comment author. The fan-out job creates one notification per remaining recipient.
 
 What this code does:
 - Runs only for successful comment creation service calls.
 - Ensures the comment belongs to a Page.
 - Extracts the root recording of that comment's workspace.
-- Finds users with workspace access under that root.
-- Excludes the author (no self-notification).
-- Creates one notification per recipient.
-- Uses idempotency_key to avoid duplicate rows for the same comment+recipient pair.
+- Enqueues one fan-out job. The scope finds users with workspace access under that root and excludes the author.
+- Uses one idempotency key per comment. The recipient unique index still prevents a duplicate row for the same comment and person.
 
 ## 4) Which root is notified
 

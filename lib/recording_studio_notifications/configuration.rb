@@ -3,6 +3,7 @@
 require_relative "hooks"
 require_relative "notification_type_registry"
 require_relative "channel_registry"
+require_relative "recipient_scope_registry"
 
 module RecordingStudioNotifications
   class Configuration
@@ -11,7 +12,7 @@ module RecordingStudioNotifications
     attr_accessor :actor_resolver, :current_root_resolver, :allowed_url_hosts, :default_channels,
                   :deliver_later, :queue_name, :raise_on_delivery_error, :polling_interval_seconds,
                   :rollup_reservation_timeout, :rollup_delivery_enabled, :unsubscribe_expires_in
-    attr_reader :hooks, :notification_types, :channels, :layout, :default_inbox_scope
+    attr_reader :hooks, :notification_types, :channels, :layout, :default_inbox_scope, :recipient_scopes
 
     def initialize
       @actor_resolver = -> { Current.actor if defined?(Current) && Current.respond_to?(:actor) }
@@ -30,6 +31,7 @@ module RecordingStudioNotifications
       @hooks = Hooks.new
       @notification_types = NotificationTypeRegistry.new
       @channels = ChannelRegistry.new
+      @recipient_scopes = RecipientScopeRegistry.new
       channels.register(:in_app, Channels::InAppAdapter.new)
       notification_types.register(
         :generic,

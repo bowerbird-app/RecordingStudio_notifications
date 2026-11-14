@@ -4,13 +4,15 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.15.0", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.16.0", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
   def test_public_api_methods_exist
     assert_respond_to RecordingStudioNotifications, :notify
     assert_respond_to RecordingStudioNotifications, :notify_each
+    assert_respond_to RecordingStudioNotifications, :notify_fan_out
+    assert_respond_to RecordingStudioNotifications, :register_recipient_scope
     assert_respond_to RecordingStudioNotifications, :register_notification_type
     assert_respond_to RecordingStudioNotifications, :register_channel
     assert_respond_to RecordingStudioNotifications, :notification_url

@@ -237,7 +237,7 @@ notification = RecordingStudioNotifications.notify(
 
 ## 7. Create Notifications For Multiple Recipients
 
-Use `notify_each` for fan-out:
+`notify_each` is synchronous and returns one notification per recipient. Use it for a small list you already have in memory:
 
 ```ruby
 notifications = RecordingStudioNotifications.notify_each(
@@ -253,7 +253,30 @@ notifications = RecordingStudioNotifications.notify_each(
 )
 ```
 
-For strict dedupe across retries, call `notify` per recipient with an explicit `idempotency_key` that includes recipient id.
+For a large or dynamic audience, register a scope and call `notify_fan_out`. The call enqueues one job. The job receives GlobalIDs for the actor, recording, notifiable, and root recording, plus the scope name. It does not receive a relation.
+
+```ruby
+RecordingStudioNotifications.register_recipient_scope(:workspace_viewers) do |context|
+  WorkspaceMembers.for_root(context.root_recording).where.not(id: context.actor.id)
+end
+
+RecordingStudioNotifications.notify_fan_out(
+  recipient_scope: :workspace_viewers,
+  notification_type: :page_comment,
+  actor: comment.author,
+  notifiable: page,
+  recording: page_recording,
+  root_recording: page_recording.root_recording,
+  title: "New comment on #{page.title}",
+  body: comment.body.to_s,
+  url: Rails.application.routes.url_helpers.page_path(page),
+  idempotency_key: "comment-#{comment.id}"
+)
+```
+
+`idempotency_key` is required. One key covers the fan-out. The partial unique index on recipient plus key keeps the first row, including its `inbox` flag and channels. The job validates the type, title, channels, URL, root, and `creation_action` once. It then inserts about 1,000 recipients per transaction: one preference query per chunk, cadence and time zone and `available_for?` per recipient, `insert_all` with `ON CONFLICT DO NOTHING`, and deliveries only for the ids that insert created. `inbox: false` skips `:in_app`. Deferred deliveries are not enqueued. Each chunk of immediate deliveries enqueues one job that calls `adapter.deliver` once per delivery.
+
+Service hooks and `notify.recording_studio_notifications` run once per inserted recipient inside the job. A retry that inserts nothing does not run them again.
 
 ## 8. Trigger Notifications From Domain Events
 
@@ -261,19 +284,17 @@ Recommended pattern: trigger from a successful service/hook outcome, not directl
 
 ```ruby
 # Example pattern inside a hook or service callback
-workspace_viewers.each do |viewer|
-  RecordingStudioNotifications.notify(
-    notification_type: :page_comment,
-    recipient: viewer,
-    actor: comment.author,
-    recording: comment_recording,
-    root_recording: comment_recording.root_recording,
-    title: "New comment on #{page.title}",
-    body: comment.body.to_s,
-    url: Rails.application.routes.url_helpers.page_path(page),
-    idempotency_key: "comment-#{comment.id}-viewer-#{viewer.id}"
-  )
-end
+RecordingStudioNotifications.notify_fan_out(
+  recipient_scope: :workspace_viewers,
+  notification_type: :page_comment,
+  actor: comment.author,
+  recording: comment_recording,
+  root_recording: comment_recording.root_recording,
+  title: "New comment on #{page.title}",
+  body: comment.body.to_s,
+  url: Rails.application.routes.url_helpers.page_path(page),
+  idempotency_key: "comment-#{comment.id}"
+)
 ```
 
 Benefits:
@@ -423,14 +444,23 @@ For root-scoped visibility, a notification can still be hidden if actor lacks vi
 
 ## 15. Background Jobs And Delivery Pipeline
 
-Create flow:
+`notify` create flow:
 
 1. validate input and authorization
 2. create/find notification (idempotency)
 3. create pending deliveries
 4. enqueue `DeliveryJob` (or perform inline)
 
-`DeliveryJob` loads pending deliveries and dispatches each to the registered adapter for that channel.
+`DeliveryJob.perform(notification_id)` loads that notification's pending deliveries and calls `adapter.deliver` for each one that is not a deferred rollup.
+
+`notify_fan_out` create flow:
+
+1. enqueue one `FanOutJob` with GlobalIDs and a recipient scope name
+2. validate input and authorization once
+3. insert notifications and deliveries in chunks of 1,000
+4. enqueue one `FanOutDeliveryJob` per chunk that has immediate deliveries
+
+`FanOutDeliveryJob` calls `adapter.deliver` once per delivery. Deferred deliveries stay pending for `RollupDeliveryJob`. A chunk with only deferred channels enqueues nothing.
 
 Important config options:
 
@@ -517,22 +547,18 @@ class Comments::CreateAndNotify
     page_recording = RecordingStudio::Recording.find_by!(recordable: page)
     root = page_recording.root_recording
 
-    recipients = WorkspaceMembers.for_root(root).where.not(id: author.id)
-
-    recipients.find_each do |recipient|
-      RecordingStudioNotifications.notify(
-        notification_type: :page_comment,
-        recipient: recipient,
-        actor: author,
-        notifiable: page,
-        recording: page_recording,
-        root_recording: root,
-        title: "New comment on #{page.title}",
-        body: body.to_s,
-        url: Rails.application.routes.url_helpers.page_path(page),
-        idempotency_key: "comment-#{comment.id}-recipient-#{recipient.id}"
-      )
-    end
+    RecordingStudioNotifications.notify_fan_out(
+      recipient_scope: :workspace_viewers,
+      notification_type: :page_comment,
+      actor: author,
+      notifiable: page,
+      recording: page_recording,
+      root_recording: root,
+      title: "New comment on #{page.title}",
+      body: body.to_s,
+      url: Rails.application.routes.url_helpers.page_path(page),
+      idempotency_key: "comment-#{comment.id}"
+    )
 
     comment
   end

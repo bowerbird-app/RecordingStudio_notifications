@@ -90,5 +90,19 @@ RecordingStudioNotifications.configure do |config|
     default_cadence: :individual,
     scope: :root
   )
+end
 
+RecordingStudioNotifications.register_recipient_scope(:all_users) { User.all }
+
+RecordingStudioNotifications.register_recipient_scope(:page_comment_viewers) do |context|
+  root = context.root_recording
+  root ||= context.recording.root_recording if context.recording.respond_to?(:root_recording)
+  next [] unless root
+
+  RecordingStudio::Recording.unscoped
+    .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+    .where(parent_recording_id: root.id, recordable_type: "RecordingStudio::Access")
+    .filter_map { |access_recording| access_recording.recordable&.actor }
+    .uniq
+    .reject { |actor| actor == context.actor }
 end

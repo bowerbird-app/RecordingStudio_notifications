@@ -32,51 +32,19 @@ RecordingStudioCommentable.configuration.hooks.after_service(priority: 10) do |s
   # Stop if we cannot determine a root recording.
   next unless root_recording
 
-  # Collect workspace access recordings under this root.
-  # These represent users who can see this workspace.
-  workspace_viewers = RecordingStudio::Recording.unscoped
-    # Restrict to access records directly under the root and not trashed.
-    .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
-    .where(
-      parent_recording_id: root_recording.id,
-      recordable_type: "RecordingStudio::Access"
-    )
-    # Map each access recording to its actor (for example, a User).
-    .map { |r| r.recordable&.actor }
-    # Remove nil actors caused by incomplete access rows.
-    .compact
-    # Avoid notifying the same person who wrote the comment.
-    .reject { |actor| actor == comment.author }
-
-  # Stop when there is no one else to notify.
-  next if workspace_viewers.empty?
-
-  # Build the destination URL for notification clicks.
   url = Rails.application.routes.url_helpers.page_path(page_recordable)
-  # Create one notification per recipient.
-  workspace_viewers.each do |viewer|
-    # Send an in-app notification for the new page comment.
-    RecordingStudioNotifications.notify(
-      # Use the registered notification type for page comments.
-      notification_type: :page_comment,
-      # Recipient who should receive this notification.
-      recipient: viewer,
-      # Actor who triggered the event (the commenter).
-      actor: comment.author,
-      # Recording context for authorization/visibility checks.
-      recording: comment_recording,
-      # Root context so notifications are scoped to the correct workspace.
-      root_recording: root_recording,
-      # Human-readable title displayed in the UI.
-      title: "New comment on #{page_recordable.title}",
-      # Message body, truncated for compact notification display.
-      body: comment.body.to_s,
-      # URL opened when the recipient clicks the notification.
-      url: url,
-      # Idempotency key prevents duplicate notifications per comment+recipient.
-      idempotency_key: "comment-#{comment.id}-#{viewer.id}"
-    )
-  end
+  RecordingStudioNotifications.notify_fan_out(
+    recipient_scope: :page_comment_viewers,
+    notification_type: :page_comment,
+    actor: comment.author,
+    notifiable: comment,
+    recording: comment_recording,
+    root_recording: root_recording,
+    title: "New comment on #{page_recordable.title}",
+    body: comment.body.to_s,
+    url: url,
+    idempotency_key: "comment-#{comment.id}"
+  )
 rescue StandardError => e
   # Keep app flow resilient by logging failures instead of crashing requests.
   Rails.logger.warn "[RecordingStudioNotifications] Comment hook failed: #{e.message}" if defined?(Rails)

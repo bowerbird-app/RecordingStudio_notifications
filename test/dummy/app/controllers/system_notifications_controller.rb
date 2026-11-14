@@ -30,19 +30,15 @@ class SystemNotificationsController < ApplicationController
   end
 
   def broadcast_system_notification(system_notification)
-    url = system_notification_path(system_notification)
-
-    User.find_each do |recipient|
-      RecordingStudioNotifications.notify(
-        notification_type: :system_announcement,
-        recipient: recipient,
-        actor: current_user,
-        notifiable: system_notification,
-        title: system_notification.title,
-        body: system_notification.body.to_s.truncate(200),
-        url: url,
-        idempotency_key: "system-notification-#{system_notification.id}-#{recipient.id}"
-      )
-    end
+    RecordingStudioNotifications.notify_fan_out(
+      recipient_scope: :all_users,
+      notification_type: :system_announcement,
+      actor: current_user,
+      notifiable: system_notification,
+      title: system_notification.title,
+      body: system_notification.body.to_s.truncate(200),
+      url: system_notification_path(system_notification),
+      idempotency_key: "system-notification-#{system_notification.id}"
+    )
   end
 end
