@@ -175,7 +175,7 @@ class NotificationAcceptanceTest < Minitest::Test
 
     assert_includes adapter, "class InAppAdapter"
     assert_includes job, "RecordingStudioNotifications.channels.fetch"
-    assert_includes job, "delivery.mark_delivered! if delivery.reload.pending?"
+    assert_includes job, "delivery.mark_delivered! if current.pending? || current.processing?"
     assert_includes job, "deliver.recording_studio_notifications"
   end
 
@@ -493,9 +493,17 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes model, "include RecordingStudioCommentable::Commentable"
     assert_includes initializer, "RecordingStudioCommentable.configuration.hooks.after_service"
     assert_includes initializer, "RecordingStudioCommentable::Services::CreateComment"
-    assert_includes initializer, "RecordingStudioNotifications.notify"
+    assert_includes initializer, "RecordingStudioNotifications.notify_fan_out"
+    assert_includes initializer, "recipient_scope: :page_comment_viewers"
     assert_includes initializer, "notification_type: :page_comment"
+    assert_includes initializer, 'idempotency_key: "comment-#{comment.id}"'
     assert_includes initializer, "page_path(page_recordable)"
+    refute_includes initializer, "workspace_viewers"
+    controller_path = "../test/dummy/app/controllers/system_notifications_controller.rb"
+    controller = File.read(File.expand_path(controller_path, __dir__))
+    assert_includes controller, "notify_fan_out"
+    assert_includes controller, "recipient_scope: :all_users"
+    refute_includes controller, "User.find_each"
   end
 
   def test_pages_routes_and_views_use_flatpack

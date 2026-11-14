@@ -274,6 +274,21 @@ end
 
 ---
 
+## Recipient scopes
+
+`notify_fan_out` takes a scope name, not a relation. Register the name on the host:
+
+```ruby
+RecordingStudioNotifications.register_recipient_scope(:all_users) { User.all }
+
+RecordingStudioNotifications.register_recipient_scope(:page_comment_viewers) do |context|
+  # context.actor, context.recording, context.notifiable, context.root_recording
+  User.where.not(id: context.actor&.id)
+end
+```
+
+A scope with no block arguments is called with none. Any other scope receives one context object. Return an `ActiveRecord::Relation` when the audience is large so the job can load it in batches. Return an array when the recipients are already resolved. The job never serializes that relation.
+
 ## Notification Menu Polling
 
 The top-nav notification menu is hydrated asynchronously after page load and then polled.

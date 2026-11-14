@@ -10,6 +10,8 @@ require "recording_studio_notifications/channel_registry"
 require "recording_studio_notifications/url_safety"
 require "recording_studio_notifications/menu_payload"
 require "recording_studio_notifications/services/notify"
+require "recording_studio_notifications/services/fan_out"
+require "recording_studio_notifications/fan_out_methods"
 require "recording_studio_notifications/services/cadence_period"
 require "recording_studio_notifications/services/inbox_grouping"
 require "recording_studio_notifications/services/root_resolver"
@@ -66,6 +68,8 @@ module RecordingStudioNotifications
         notify(recipient: recipient, **attributes)
       end
     end
+
+    include FanOutMethods
 
     def unsubscribe_purpose(notification_type, channel)
       "recording_studio_notifications.unsubscribe.#{notification_type.to_s.strip}.#{channel.to_s.strip}"

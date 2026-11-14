@@ -20,6 +20,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hosts on Recording Studio 6.5+ set `config.authorize_write`, or `config.allow_unauthorized_writes` when a write has no actor.
 - Trashable stays query-helpers only. The dummy does not boot that engine and does not add `purge_at`.
 
+## [0.16.0] - 2026-11-14
+
+### Added
+- `RecordingStudioNotifications.notify_fan_out` enqueues one `FanOutJob`. The job arguments are GlobalIDs for the actor, recording, notifiable, and root recording, plus a named `recipient_scope`. Register scopes with `register_recipient_scope`. The job never receives a relation. `notify` stays synchronous. `notify_each` stays synchronous and returns rows.
+- Fan-out requires `idempotency_key`. The job checks the type, title, channels, URL, root match, and `creation_action` once, then writes in chunks of 1,000. Each chunk loads preferences once, applies cadence, time zone, and `available_for?` per recipient, and inserts notifications with `ON CONFLICT DO NOTHING` on the partial `(recipient_type, recipient_id, idempotency_key)` index. The first write wins, including `inbox`. Deliveries are inserted only for the notification ids that statement inserted. `created_at` and `updated_at` are set. `inbox: false` skips `:in_app`.
+- Rollup metadata is stored on each delivery from that recipient's cadence and time zone. A chunk shares one timestamp. Deferred deliveries do not get a delivery job. `RollupDeliveryJob` is unchanged.
+- Each chunk, after it commits, enqueues one `FanOutDeliveryJob` for deliveries that belong to that chunk's recipients and idempotency key and are still pending and immediate. A retry sends rows the previous attempt committed but did not enqueue. The job calls `adapter.deliver` once per delivery. A second run skips a delivery that is already delivered, failed, or processing. Email and push adapters are unchanged. `DeliveryJob.perform(notification_id)` stays the single-notification job and uses the same claim. A chunk whose deliveries are all deferred enqueues nothing.
+- `before_service`, `around_service`, `after_service`, and `notify.recording_studio_notifications` run once per inserted recipient inside the fan-out job. A retry that inserts no new rows does not run them again.
+
+### Changed
+- The dummy system-notification broadcast and the dummy page-comment hook call `notify_fan_out`. The comment hook uses the `:page_comment_viewers` scope and one idempotency key per comment. The broadcast uses the `:all_users` scope.
+
+### Upgrade notes
+- Bump to `0.16.0`. No migration.
+- Register a recipient scope, then call `notify_fan_out` with `recipient_scope:` and an `idempotency_key`. One key covers the whole fan-out. The existing partial unique index dedupes per recipient. A retry does not change the first `inbox` flag or the first set of channels. A retry enqueues pending immediate deliveries for the recipients in each chunk, including when the first attempt committed and crashed before enqueue. A delivery that is already delivered, failed, or processing is not sent again. The job marks a pending immediate delivery processing before `adapter.deliver`, then delivered afterward unless the adapter already finished it.
+- `notify` and `notify_each` are unchanged. Adapters still implement `deliver(notification:, delivery:)`. A grouped channel still implements `deliver_rollup`.
+- Hosts that copied the dummy comment hook should pass one idempotency key for the comment. Do not append the viewer id. The scope resolves viewers, including excluding the author.
+- `creation_action` is checked once for the fan-out, with no single recipient in the Accessible context. An action that only allows the actor to notify themselves will refuse the fan-out.
+
 ## [0.15.0] - 2026-11-12
 
 ### Added

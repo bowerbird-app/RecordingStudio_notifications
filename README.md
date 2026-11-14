@@ -4,7 +4,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 
 ## Features
 
-- `RecordingStudioNotifications.notify` and `notify_each` public APIs
+- `RecordingStudioNotifications.notify`, `notify_each`, and `notify_fan_out` public APIs
 - UUID notifications, deliveries, and per-recipient preferences
 - Idempotent creation with a recipient-scoped `idempotency_key`
 - Global, root-scoped, and optional-root notification types
@@ -205,6 +205,22 @@ RecordingStudioNotifications.notify_each(
 )
 ```
 
+`notify_each` stays synchronous and returns one row per recipient. For a large audience, register a recipient scope and enqueue one fan-out job. The job receives GlobalIDs and the scope name. It does not receive a relation.
+
+```ruby
+RecordingStudioNotifications.register_recipient_scope(:all_users) { User.all }
+
+RecordingStudioNotifications.notify_fan_out(
+  recipient_scope: :all_users,
+  notification_type: :system_announcement,
+  actor: Current.actor,
+  title: "Maintenance tonight",
+  idempotency_key: "maintenance-2026-11-14"
+)
+```
+
+`idempotency_key` is required. The same key covers every recipient. The partial unique index on `(recipient_type, recipient_id, idempotency_key)` keeps the first write, including `inbox`. The job checks the type, title, channels, URL, root, and `creation_action` once, then inserts about 1,000 recipients per transaction. Each chunk loads preferences once. Cadence, time zone, and `available_for?` are applied per recipient. `inbox: false` skips `:in_app`. After the chunk commits, the job enqueues every still-pending immediate delivery for that idempotency key and those recipients. A crash between commit and enqueue is recovered on retry. Deferred deliveries are not enqueued. The delivery job calls `adapter.deliver` once per delivery and skips one that is already delivered, failed, or processing. Hooks and the notify event run only for rows that attempt inserted. `notify` stays synchronous. `DeliveryJob.perform(notification_id)` stays the single-notification job.
+
 Pass `channels:` to request a subset of a type's available channels. Required channels are always included. Optional channels respect each recipient's preference.
 
 Pass `inbox: false` to keep the notification and its email (and any other non-in-app) deliveries without listing it in the inbox, menu, unread count, or clear-all. The type can default `inbox:` too. A per-call value wins. `inbox: false` does not create an `:in_app` delivery, and it raises `ArgumentError` when `:in_app` is required. The default is `true`, so existing rows stay in the inbox. A retry with the same `idempotency_key` keeps the first `inbox` flag and the first set of channels. `open` still marks a hidden notification read and redirects. `show`, mark read, mark unread, archive, and unarchive return 404.
@@ -388,7 +404,7 @@ RecordingStudioNotifications is a Recording Studio addon Rails engine for root-a
 
 ## Features
 
-- `RecordingStudioNotifications.notify` and `notify_each` public APIs
+- `RecordingStudioNotifications.notify`, `notify_each`, and `notify_fan_out` public APIs
 - Notification type registry with `default_channels`, `required_channels`, `available_channels`, `scope`, optional `creation_action`, optional `visible_to`, and optional `inbox`
 - Public unsubscribe links and `list_unsubscribe_headers`
 - `Delivery#mark_email_unsubscribed!`, `mark_email_bounced!`, `mark_email_opened!`, `mark_email_clicked!`, and `mark_email_complained!`
@@ -505,6 +521,8 @@ RecordingStudioNotifications.notify_each(
   url: "/"
 )
 ```
+
+`notify_fan_out` is the async path. Register a scope, pass `recipient_scope:` and a required `idempotency_key`, and the job writes recipients in chunks. `notify_each` still returns the rows.
 
 ## Channels and preferences
 
