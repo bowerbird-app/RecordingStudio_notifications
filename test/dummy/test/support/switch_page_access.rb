@@ -2,7 +2,10 @@
 
 # Root Switchable 0.15 refuses the switch page unless the actor can :view
 # the current root. The dummy all-workspaces list still includes every
-# workspace, and the current root is the first of that list.
+# workspace, and the current root is the first of that list (workspaces
+# by name, then admin roots). The grant below lands on that first root.
+# A test that must keep another root denied has to give an allowed root
+# an earlier name, or this grant can make the denied root visible.
 module SwitchPageAccess
   def ensure_switch_page_view!(actor)
     recording = first_all_workspaces_root

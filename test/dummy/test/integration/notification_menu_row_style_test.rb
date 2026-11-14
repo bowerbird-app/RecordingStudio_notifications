@@ -18,9 +18,12 @@ class NotificationMenuRowStyleTest < ActionDispatch::IntegrationTest
       password_confirmation: "Password123!"
     )
     Current.actor = @owner
-    @root = root_for("Menu style #{SecureRandom.hex(4)}")
-    @other_root = root_for("Menu style other #{SecureRandom.hex(4)}")
-    @denied_root = root_for("Menu style denied #{SecureRandom.hex(4)}")
+    # Root Switchable's switch page is the alphabetically first workspace.
+    # ensure_switch_page_view! grants :view there. Keep the allowed root first
+    # so that grant cannot land on the denied root.
+    @root = root_for("0 menu style #{SecureRandom.hex(4)}")
+    @other_root = root_for("1 menu style other #{SecureRandom.hex(4)}")
+    @denied_root = root_for("9 menu style denied #{SecureRandom.hex(4)}")
     bootstrap_owner!(@root, @owner)
     bootstrap_owner!(@other_root, @owner)
     bootstrap_owner!(@denied_root, @owner)
@@ -57,6 +60,8 @@ class NotificationMenuRowStyleTest < ActionDispatch::IntegrationTest
     Current.actor = nil
     sign_in @viewer
     switch_to_root!(@root)
+    assert RecordingStudioAccessible.authorized?(actor: @viewer, recording: @root, role: :view)
+    refute RecordingStudioAccessible.authorized?(actor: @viewer, recording: @denied_root, role: :view)
   end
 
   teardown do
