@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Gemspec requires `recording_studio` `>= 7.0, < 8.0`, `recording_studio_accessible` `>= 0.44.0, < 1.0`, and `recording_studio_metrics` `>= 0.9.0, < 1.0`.
-- Development and dummy Gemfiles pin Recording Studio `v7.0.0`, Accessible `v0.44.0`, Metrics `v0.9.0`, Trashable `v0.17.0` (`require: false`), and API `v0.23.4`. Dummy also pins Root Switchable `v0.15.1`, Admin `v2.16.0`, Internationalization `v0.3.0`, and Notifications Email `v0.5.3`. Flatpack stays `v0.1.356`. Logs stays `v0.7.4`, Moveable `v4.1.1`, Commentable `v0.7.0`, Cache `v0.6.3`, and Icons `v0.2.1`. `view_component` stays `4.19.0`.
+- Development and dummy Gemfiles pin Recording Studio `v7.0.0`, Accessible `v0.44.0`, Metrics `v0.9.0`, Trashable `v0.17.0` (`require: false`), and API `v0.23.4`. Dummy also pins Root Switchable `v0.15.1`, Admin `v2.16.0`, Internationalization `v0.3.0`, and Notifications Email `v0.5.3`. Flatpack stays `v0.1.356`. Logs stays `v0.7.4`, Moveable `v4.1.1`, Commentable `v0.7.0`, Cache `v0.6.3`, and Icons `v0.2.1`. `view_component` stays `4.19.0`. Both lockfiles use Puma `8.1.0`.
 - Roots are created with `RecordingStudio.create_root_recording!(recordable, actor:)`. `root_recording_for` only finds a root and returns nil when there is none.
 - Dummy `RecordingStudio.configure` sets `config.authorize_write` so a present actor may write, including a new root where `root_recording` is nil. It does not set `allow_unauthorized_writes`.
 - Dummy kept-recording lookups use `Recording.kept`. Trashable 0.16 removed `recording_studio_trashable_kept_sql`.
