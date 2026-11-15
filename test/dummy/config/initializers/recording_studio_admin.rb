@@ -20,7 +20,6 @@ RecordingStudioAdmin.configure do |config|
     RecordingStudio.root_recording_for(root_recordable)
   end
   config.access_recording_resolver = admin_root_recording
-  config.site_admin_recording_resolver = admin_root_recording
 
   # Add per-route admin surfaces when different URL entrypoints should resolve
   # different access recordings or layouts.

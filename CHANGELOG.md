@@ -8,17 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-11-15
+
 ### Changed
-- Development and dummy Gemfiles pin Recording Studio `v6.7.0`, Flatpack `v0.1.356`, Accessible `v0.39.0`, Metrics `v0.8.0`, Trashable `v0.14.0` (`require: false`), API `v0.23.0`, and Icons `v0.2.1`. Dummy also pins Notifications Email `v0.5.2`, Root Switchable `v0.15.0`, Cache `v0.6.3`, and Admin `v2.13.0`. Logs stays `v0.7.4`, Moveable `v4.1.1`, Commentable `v0.7.0`, and Internationalization `v0.2.0`. `view_component` stays `4.19.0`.
-- Dummy `RecordingStudio.configure` sets `config.allow_unauthorized_writes` so Recording Studio 6.5+ accepts writes that have no authorizer. Tests and seeds record roots before an actor or grant exists.
+- Gemspec requires `recording_studio` `>= 7.0, < 8.0`, `recording_studio_accessible` `>= 0.44.0, < 1.0`, and `recording_studio_metrics` `>= 0.9.0, < 1.0`.
+- Development and dummy Gemfiles pin Recording Studio `v7.0.0`, Accessible `v0.44.0`, Metrics `v0.9.0`, Trashable `v0.17.0` (`require: false`), and API `v0.23.4`. Dummy also pins Root Switchable `v0.15.1`, Admin `v2.16.0`, Internationalization `v0.3.0`, and Notifications Email `v0.5.3`. Flatpack stays `v0.1.356`. Logs stays `v0.7.4`, Moveable `v4.1.1`, Commentable `v0.7.0`, Cache `v0.6.3`, and Icons `v0.2.1`. `view_component` stays `4.19.0`.
+- Roots are created with `RecordingStudio.create_root_recording!(recordable, actor:)`. `root_recording_for` only finds a root and returns nil when there is none.
+- Dummy `RecordingStudio.configure` sets `config.authorize_write` so a present actor may write, including a new root where `root_recording` is nil. It does not set `allow_unauthorized_writes`.
+- Dummy kept-recording lookups use `Recording.kept`. Trashable 0.16 removed `recording_studio_trashable_kept_sql`.
 - Dummy Admin initializer sets `config.layout` (`engine_layout` was removed in Admin 2.7). The admin layout name stays `"admin"`.
-- The dummy no longer replaces Admin's page nav partial. Admin 2.13 draws section links with `page_nav_button_group`. The old partial dropped those links.
+- The dummy does not replace Admin's page nav partial. Admin draws section links with `page_nav_button_group`.
 - Root Switchable 0.15 refuses the switch page without Accessible `:view` on the current root. Dummy tests that open or post that page grant `:view` on the first all-workspaces root. The open list of every workspace stays.
+- The inbox still applies root view in SQL with `authorized_root_recording_ids(actor:, role: :view)` when Accessible supports that query.
+- Metrics authorization reads `RecordingStudioAccessible.admin_root` when `admin_root_resolver` is set, then Admin `access_recording_resolver`. Admin 2.15 removed `site_admin_recording_resolver`.
 
 ### Upgrade notes
-- No version bump and no gemspec change. Re-bundle to pick up the release tags.
-- Hosts on Recording Studio 6.5+ set `config.authorize_write`, or `config.allow_unauthorized_writes` when a write has no actor.
-- Trashable stays query-helpers only. The dummy does not boot that engine and does not add `purge_at`.
+- Bump to `0.18.0`. No notifications migration. Recording Studio 7 stores `root_recording_id` on events. Run core migration `add_root_recording_id_to_recording_studio_events` if that column is missing. The dummy copies it as `20261115090000` because `20261114090000` is already the inbox index.
+- Install Recording Studio `>= 7.0, < 8.0`, Accessible `>= 0.44.0, < 1.0`, and Metrics `>= 0.9.0, < 1.0`.
+- `root_recording_for` only finds a root. Create one with `RecordingStudio.create_root_recording!(recordable, actor:)`. A second call returns the same root and does not append another event.
+- Set `config.authorize_write` and pass an actor on writes. A new root is authorized with `root_recording` nil. Do not set `allow_unauthorized_writes`.
+- Replace `recording_studio_trashable_kept_sql` with `Recording.kept`. Trashable stays query-helpers only. The dummy does not boot that engine and does not add `purge_at`.
+- The inbox SQL path is unchanged. A rootless row stays. A row on any other root stays only when that id is in `authorized_root_recording_ids(actor:, role: :view)`. Trashed roots stay out.
+- Set Accessible `admin_root_resolver` for site metrics. `site_admin_recording_resolver` is gone.
 
 ## [0.17.0] - 2026-11-14
 
@@ -605,7 +616,11 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.17.0...v0.18.0
+[0.17.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.16.1...v0.17.0
+[0.16.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.16.0...v0.16.1
+[0.16.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.11...v0.15.0
 [0.14.11]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.10...v0.14.11
 [0.14.10]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.14.9...v0.14.10

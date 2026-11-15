@@ -20,8 +20,8 @@ class NotificationOpenRootSwitchTest < ActionDispatch::IntegrationTest
     Current.actor = @owner
     @workspace_a = Workspace.create!(name: "Open switch A #{SecureRandom.hex(4)}")
     @workspace_b = Workspace.create!(name: "Open switch B #{SecureRandom.hex(4)}")
-    @root_a = RecordingStudio.root_recording_for(@workspace_a)
-    @root_b = RecordingStudio.root_recording_for(@workspace_b)
+    @root_a = RecordingStudio.create_root_recording!(@workspace_a, actor: @owner)
+    @root_b = RecordingStudio.create_root_recording!(@workspace_b, actor: @owner)
     bootstrap_owner!(@root_a, @owner)
     bootstrap_owner!(@root_b, @owner)
     grant!(@root_a, @viewer, :view)

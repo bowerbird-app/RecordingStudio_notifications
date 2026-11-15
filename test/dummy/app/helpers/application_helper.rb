@@ -18,8 +18,7 @@ module ApplicationHelper
 		return if recording.blank?
 		return unless respond_to?(:recording_studio_accessible)
 
-		access_count = RecordingStudio::Recording.unscoped
-			.where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+		access_count = RecordingStudio::Recording.kept
 			.where(parent_recording_id: recording.id, recordable_type: "RecordingStudio::Access")
 			.count
 

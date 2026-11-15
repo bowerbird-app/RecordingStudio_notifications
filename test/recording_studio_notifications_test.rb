@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.17.0", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.18.0", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
   end
 
@@ -37,13 +37,13 @@ class RecordingStudioNotificationsTest < Minitest::Test
     flat_pack = spec.dependencies.find { |dependency| dependency.name == "flat_pack" }
     assert_equal ">= 0.1.353", flat_pack.requirement.to_s
     studio = spec.dependencies.find { |dependency| dependency.name == "recording_studio" }
-    assert_equal ">= 6.3.0", studio.requirement.to_s
+    assert_equal ">= 7.0, < 8.0", studio.requirement.to_s
     view_component = spec.dependencies.find { |dependency| dependency.name == "view_component" }
     assert_equal ">= 4.14, < 5", view_component.requirement.to_s
     accessible = spec.dependencies.find { |dependency| dependency.name == "recording_studio_accessible" }
-    assert_equal "~> 0.18", accessible.requirement.to_s
+    assert_equal ">= 0.44.0, < 1.0", accessible.requirement.to_s
     metrics = spec.dependencies.find { |dependency| dependency.name == "recording_studio_metrics" }
-    assert_equal ">= 0.7.2, < 1.0", metrics.requirement.to_s
+    assert_equal ">= 0.9.0, < 1.0", metrics.requirement.to_s
   end
 
   def test_engine_routes_notifications_as_root

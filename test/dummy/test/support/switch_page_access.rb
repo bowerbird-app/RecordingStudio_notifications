@@ -24,7 +24,8 @@ module SwitchPageAccess
       RecordingStudio.root_recording_for(workspace)
     end
     admin_root = AdminRoot.first
-    admin_roots = admin_root ? [RecordingStudio.root_recording_for(admin_root)] : []
+    admin_recording = admin_root && RecordingStudio.root_recording_for(admin_root)
+    admin_roots = admin_recording ? [admin_recording] : []
 
     (workspace_roots + admin_roots).uniq(&:id).first
   end

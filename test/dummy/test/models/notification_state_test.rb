@@ -75,7 +75,10 @@ class NotificationStateTest < ActiveSupport::TestCase
     assert_includes missing_root.errors[:root_recording], "is required"
 
     Current.actor = @recipient
-    root = RecordingStudio.root_recording_for(Workspace.create!(name: "State root #{SecureRandom.hex(4)}"))
+    root = RecordingStudio.create_root_recording!(
+      Workspace.create!(name: "State root #{SecureRandom.hex(4)}"),
+      actor: @recipient
+    )
     global_with_root = RecordingStudioNotifications::Notification.new(
       notification_type: "notification_state_global",
       recipient: @recipient,
@@ -90,8 +93,14 @@ class NotificationStateTest < ActiveSupport::TestCase
 
   test "optional root rejects a recording from a different root" do
     Current.actor = @recipient
-    first_root = RecordingStudio.root_recording_for(Workspace.create!(name: "State A #{SecureRandom.hex(4)}"))
-    second_root = RecordingStudio.root_recording_for(Workspace.create!(name: "State B #{SecureRandom.hex(4)}"))
+    first_root = RecordingStudio.create_root_recording!(
+      Workspace.create!(name: "State A #{SecureRandom.hex(4)}"),
+      actor: @recipient
+    )
+    second_root = RecordingStudio.create_root_recording!(
+      Workspace.create!(name: "State B #{SecureRandom.hex(4)}"),
+      actor: @recipient
+    )
     mismatched = RecordingStudioNotifications::Notification.new(
       notification_type: "notification_state_optional",
       recipient: @recipient,

@@ -8,17 +8,30 @@ module RecordingStudioNotifications
       ResolverContext = Struct.new(:controller)
 
       def admin_root_recording
-        return unless defined?(RecordingStudioAdmin)
+        return accessible_admin_root if accessible_admin_root_configured?
 
-        config = RecordingStudioAdmin.configuration
-        resolver = config.site_admin_recording_resolver || config.access_recording_resolver
+        admin_access_recording
+      end
+
+      def accessible_admin_root_configured?
+        defined?(::RecordingStudioAccessible) &&
+          ::RecordingStudioAccessible.respond_to?(:admin_root) &&
+          ::RecordingStudioAccessible.configuration.admin_root_resolver
+      end
+
+      def accessible_admin_root
+        ::RecordingStudioAccessible.admin_root(context: {})
+      end
+
+      def admin_access_recording
+        return unless defined?(::RecordingStudioAdmin)
+
+        resolver = ::RecordingStudioAdmin.configuration.access_recording_resolver
         return unless resolver
 
-        begin
-          resolver.call(ResolverContext.new(nil))
-        rescue StandardError
-          nil
-        end
+        resolver.call(ResolverContext.new(nil))
+      rescue StandardError
+        nil
       end
 
       def actor_for(context)

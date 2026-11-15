@@ -19,7 +19,7 @@ class NotificationRootViewInboxTest < ActionDispatch::IntegrationTest
     )
     Current.actor = @owner
     @workspace = Workspace.create!(name: "View inbox #{SecureRandom.hex(4)}")
-    @root = RecordingStudio.root_recording_for(@workspace)
+    @root = RecordingStudio.create_root_recording!(@workspace, actor: @owner)
     bootstrap_owner!(@root, @owner)
     grant!(@root, @viewer, :view)
     RecordingStudioNotifications.notification_types.register(

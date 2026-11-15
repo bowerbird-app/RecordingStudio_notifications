@@ -265,7 +265,7 @@ class NotificationMenuRowStyleTest < ActionDispatch::IntegrationTest
   end
 
   def root_for(name)
-    RecordingStudio.root_recording_for(Workspace.create!(name: name))
+    RecordingStudio.create_root_recording!(Workspace.create!(name: name), actor: @owner)
   end
 
   def bootstrap_owner!(recording, actor)
