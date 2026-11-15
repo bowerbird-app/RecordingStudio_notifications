@@ -37,9 +37,7 @@ class PagesController < ApplicationController
 
   def comment
     @page = Page.find(params[:id])
-    @page_recording = RecordingStudio::Recording.where(
-      RecordingStudio::Recording.recording_studio_trashable_kept_sql
-    ).find_by(recordable: @page)
+    @page_recording = RecordingStudio::Recording.kept.find_by(recordable: @page)
 
     unless @page_recording
       redirect_to page_path(@page), alert: "Page is not recorded in a workspace."
@@ -69,8 +67,7 @@ class PagesController < ApplicationController
     current_root = send(:current_root_recording)
     return Page.all if current_root.blank?
 
-    recording_ids = RecordingStudio::Recording
-      .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
+    recording_ids = RecordingStudio::Recording.kept
       .where(root_recording: current_root, recordable_type: "Page")
       .pluck(:recordable_id)
 
@@ -82,17 +79,13 @@ class PagesController < ApplicationController
   end
 
   def find_page_recording
-    RecordingStudio::Recording.where(
-      RecordingStudio::Recording.recording_studio_trashable_kept_sql
-    ).find_by(recordable: @page)
+    RecordingStudio::Recording.kept.find_by(recordable: @page)
   end
 
   def ensure_page_recording!(page, current_root:)
     return if current_root.blank?
 
-    existing = RecordingStudio::Recording.where(
-      RecordingStudio::Recording.recording_studio_trashable_kept_sql
-    ).find_by(
+    existing = RecordingStudio::Recording.kept.find_by(
       root_recording: current_root,
       recordable: page
     )
@@ -133,9 +126,7 @@ class PagesController < ApplicationController
   end
 
   def workspace_recipients_for(root_recording)
-    RecordingStudio::Recording.unscoped
-      .where(RecordingStudio::Recording.recording_studio_trashable_kept_sql)
-      .where(
+    RecordingStudio::Recording.kept.where(
         parent_recording_id: root_recording.id,
         recordable_type: "RecordingStudio::Access"
       )

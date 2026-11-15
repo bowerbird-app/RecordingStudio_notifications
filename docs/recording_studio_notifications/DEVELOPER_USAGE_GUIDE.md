@@ -436,7 +436,7 @@ Three common checks exist:
 - managing preferences
 - optional creation authorization per notification type (`creation_action`)
 
-If `RecordingStudioAccessible` is present, authorization uses its action checks. Accessible `0.11` stores roles as strings; grant and bootstrap through `RecordingStudioAccessible.grant_access` and `bootstrap_owner_access!`, then migrate with `bin/rails generate recording_studio_accessible:migrations`.
+If `RecordingStudioAccessible` is present, authorization uses its action checks. This gem requires Accessible `>= 0.44.0, < 1.0`. Roles are strings. Grant and bootstrap through `RecordingStudioAccessible.grant_access` and `bootstrap_owner_access!`, then migrate with `bin/rails generate recording_studio_accessible:migrations`. The inbox filters roots in SQL with `authorized_root_recording_ids(actor:, role: :view)`.
 
 Without it, a safe fallback allows same actor == recipient access.
 

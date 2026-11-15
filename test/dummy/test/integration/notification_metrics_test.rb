@@ -28,8 +28,8 @@ class NotificationMetricsTest < ActiveSupport::TestCase
     )
     Current.actor = @staff
     @workspace = Workspace.create!(name: "Metrics #{SecureRandom.hex(4)}")
-    @root = RecordingStudio.root_recording_for(@workspace)
-    @admin_root = RecordingStudio.root_recording_for(AdminRoot.first_or_create!)
+    @root = RecordingStudio.create_root_recording!(@workspace, actor: @staff)
+    @admin_root = RecordingStudio.create_root_recording!(AdminRoot.first_or_create!, actor: @staff)
     bootstrap_owner!(@admin_root, @staff)
     bootstrap_owner!(@root, @staff)
     seed_notifications!
@@ -156,10 +156,10 @@ class NotificationMetricsTest < ActiveSupport::TestCase
     end
   end
 
-  test "site resolver is preferred when it is set" do
+  test "admin root resolver is preferred when it is set" do
     access_called = false
     with_admin_resolvers(
-      site_resolver: ->(_context) { @admin_root },
+      admin_root_resolver: -> { @admin_root },
       access_resolver: ->(_context) {
         access_called = true
         nil
@@ -171,9 +171,9 @@ class NotificationMetricsTest < ActiveSupport::TestCase
     end
   end
 
-  test "access resolver is used when the site resolver is unset" do
+  test "access resolver is used when the admin root resolver is unset" do
     with_admin_resolvers(
-      site_resolver: nil,
+      admin_root_resolver: nil,
       access_resolver: ->(_context) { @admin_root }
     ) do
       assert_equal @admin_root, RecordingStudioNotifications::Api::Access.admin_root_recording
@@ -183,7 +183,7 @@ class NotificationMetricsTest < ActiveSupport::TestCase
 
   test "a raising resolver denies the request" do
     with_admin_resolvers(
-      site_resolver: ->(_context) { raise NoMethodError, "controller is nil" },
+      admin_root_resolver: -> { raise NoMethodError, "controller is nil" },
       access_resolver: ->(_context) { @admin_root }
     ) do
       assert_nothing_raised do
@@ -194,7 +194,7 @@ class NotificationMetricsTest < ActiveSupport::TestCase
 
   test "a resolver that returns nothing denies the request" do
     with_admin_resolvers(
-      site_resolver: ->(_context) { nil },
+      admin_root_resolver: -> { nil },
       access_resolver: ->(_context) { @admin_root }
     ) do
       refute RecordingStudioNotifications::Api::Access.can_view?(GrantContext.new(Grant.new(@staff)))
@@ -203,16 +203,17 @@ class NotificationMetricsTest < ActiveSupport::TestCase
 
   private
 
-  def with_admin_resolvers(site_resolver:, access_resolver:)
-    config = RecordingStudioAdmin.configuration
-    original_site_resolver = config.site_admin_recording_resolver
-    original_access_resolver = config.access_recording_resolver
-    config.site_admin_recording_resolver = site_resolver
-    config.access_recording_resolver = access_resolver
+  def with_admin_resolvers(admin_root_resolver:, access_resolver:)
+    accessible = RecordingStudioAccessible.configuration
+    admin = RecordingStudioAdmin.configuration
+    original_admin_root_resolver = accessible.admin_root_resolver
+    original_access_resolver = admin.access_recording_resolver
+    accessible.admin_root_resolver = admin_root_resolver
+    admin.access_recording_resolver = access_resolver
     yield
   ensure
-    config.site_admin_recording_resolver = original_site_resolver
-    config.access_recording_resolver = original_access_resolver
+    accessible.admin_root_resolver = original_admin_root_resolver
+    admin.access_recording_resolver = original_access_resolver
   end
 
   def execute(identifier, **params)

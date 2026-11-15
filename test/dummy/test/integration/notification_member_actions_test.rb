@@ -204,7 +204,10 @@ class NotificationMemberActionsTest < ActionDispatch::IntegrationTest
 
   def create_root_notification
     Current.actor = @user
-    root = RecordingStudio.root_recording_for(Workspace.create!(name: "Member root #{SecureRandom.hex(4)}"))
+    root = RecordingStudio.create_root_recording!(
+      Workspace.create!(name: "Member root #{SecureRandom.hex(4)}"),
+      actor: @user
+    )
     RecordingStudioNotifications.notify(
       notification_type: :member_action_root,
       recipient: @user,

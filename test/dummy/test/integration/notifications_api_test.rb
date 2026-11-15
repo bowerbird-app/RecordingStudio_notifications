@@ -13,7 +13,7 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
     )
     Current.actor = @owner
     @workspace = Workspace.create!(name: "Notifications API #{SecureRandom.hex(4)}")
-    @root = RecordingStudio.root_recording_for(@workspace)
+    @root = RecordingStudio.create_root_recording!(@workspace, actor: @owner)
     bootstrap_owner!(@root, @owner)
     @issued = issue_token_for(@owner, @root)
     @actor = @issued.fetch(:api_client)

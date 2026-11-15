@@ -16,7 +16,7 @@ class FailedDeliveriesChartTest < ActiveSupport::TestCase
       password: "Password",
       password_confirmation: "Password"
     )
-    @admin_root = RecordingStudio.root_recording_for(AdminRoot.first_or_create!)
+    @admin_root = RecordingStudio.create_root_recording!(AdminRoot.first_or_create!, actor: @staff)
     Current.actor = @staff
     notification = RecordingStudioNotifications::Notification.create!(
       notification_type: :mention,

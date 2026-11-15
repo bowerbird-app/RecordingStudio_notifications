@@ -6,6 +6,12 @@ if defined?(RecordingStudioAccessible)
     config.access_actor_types = ["User"]
     config.access_actor_types += ["RecordingStudioApi::ApiClient"] if defined?(RecordingStudioApi)
     config.access_management_actor_scope = ->(_controller) { User.order(:email) }
+    config.admin_root_resolver = lambda do
+      root_recordable = AdminRoot.first
+      next nil unless root_recordable
+
+      RecordingStudio.root_recording_for(root_recordable)
+    end
   end
 
   # Compatibility adapter: expose action-based APIs expected by notifications engine.

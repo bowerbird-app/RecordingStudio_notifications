@@ -37,7 +37,10 @@ class AllNotificationsScreenTest < ActiveSupport::TestCase
       idempotency_key: "admin-screen-global-#{SecureRandom.uuid}"
     )
     Current.actor = @actor
-    root = RecordingStudio.root_recording_for(Workspace.create!(name: "Admin screen #{SecureRandom.hex(4)}"))
+    root = RecordingStudio.create_root_recording!(
+      Workspace.create!(name: "Admin screen #{SecureRandom.hex(4)}"),
+      actor: @actor
+    )
     @rooted = RecordingStudioNotifications.notify(
       notification_type: :admin_screen_root,
       recipient: @recipient,

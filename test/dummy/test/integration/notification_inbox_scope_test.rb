@@ -94,7 +94,7 @@ class NotificationInboxScopeTest < ActionDispatch::IntegrationTest
   private
 
   def root_for(name)
-    RecordingStudio.root_recording_for(Workspace.create!(name: name))
+    RecordingStudio.create_root_recording!(Workspace.create!(name: name), actor: @owner)
   end
 
   def notify_on(root, title)
