@@ -491,7 +491,8 @@ class NotificationAcceptanceTest < Minitest::Test
     model = File.read(File.expand_path("../test/dummy/app/models/page.rb", __dir__))
 
     assert_includes model, "include RecordingStudioCommentable::Commentable"
-    assert_includes initializer, "RecordingStudioCommentable.configuration.hooks.after_service"
+    assert_includes initializer, "RecordingStudio.configuration.hooks.after_service"
+    refute_includes initializer, "RecordingStudioCommentable.configuration.hooks"
     assert_includes initializer, "RecordingStudioCommentable::Services::CreateComment"
     assert_includes initializer, "RecordingStudioNotifications.notify_fan_out"
     assert_includes initializer, "recipient_scope: :page_comment_viewers"

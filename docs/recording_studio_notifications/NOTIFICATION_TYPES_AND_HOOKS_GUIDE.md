@@ -67,7 +67,7 @@ The hook is in:
 Code excerpt:
 
 ```ruby
-RecordingStudioCommentable.configuration.hooks.after_service(priority: 10) do |service_class, result|
+RecordingStudio.configuration.hooks.after_service(priority: 10) do |service_class, result|
   next unless service_class == RecordingStudioCommentable::Services::CreateComment
   next unless result.success?
 
