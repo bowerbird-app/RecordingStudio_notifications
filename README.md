@@ -16,7 +16,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 - FlatPack/Tailwind inbox, notification menu, and preference UI
 - Engine-owned Stimulus polling controller for the async notification menu
 - Recording Studio Accessible authorization, ActiveSupport instrumentation, hooks, and install/migration generators
-- Recording Studio API endpoints for the current actor's inbox, member actions, and preferences when `recording_studio_api` is loaded (MCP advertises them; this gem adds no MCP tools)
+- Recording Studio API endpoints for the token root inbox (plus rootless rows), member actions, and preferences (`recording_studio_api` `>= 0.26.0, < 1.0`; MCP advertises them; this gem adds no MCP tools)
 
 ## Requirements
 
@@ -24,6 +24,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 - Rails 8.1 (development and dummy locks: `8.1.4.1`)
 - `recording_studio` `>= 7.0, < 8.0`, `recording_studio_accessible` `>= 0.44.0, < 1.0` (inbox, preferences, and `creation_action` pass `controller:` to `authorized_action?`), `flat_pack` `>= 0.1.353`, and `view_component` `>= 4.14, < 5`
 - `recording_studio_metrics` `>= 0.9.0, < 1.0` for operations metrics registration
+- `recording_studio_api` `>= 0.26.0, < 1.0` (that gem requires Logs `>= 0.8.0, < 1.0` and Moveable `>= 5.0, < 6.0`)
 - A host application with a current actor resolver and `config.authorize_write`; the bundled UI also expects FlatPack and Stimulus
 
 Development and dummy Gemfiles pin Recording Studio to GitHub tag `v7.0.0` and Accessible to `v0.44.0`. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.

@@ -28,12 +28,13 @@ module RecordingStudioNotifications
         recipient
       end
 
-      def visible_notification!(context)
+      def visible_notification!(context, include_archived: false)
         recipient = authorize_inbox!(context)
         notification = Notification.for_recipient(recipient).find_by(id: param(context, :id))
         not_found! if notification.blank?
+        not_found! unless token_root_or_rootless?(notification, context)
         not_found! unless notification.inbox?
-        not_found! if notification.archived?
+        not_found! if notification.archived? && !include_archived
         unless Services::NotificationAuthorization.visible_notification?(
           actor: recipient,
           notification: notification
@@ -42,6 +43,12 @@ module RecordingStudioNotifications
         end
 
         notification
+      end
+
+      # Global and optional-root notifications may have no root. Every other row
+      # must belong to this token's root.
+      def token_root_or_rootless?(notification, context)
+        notification.root_recording_id.nil? || notification.root_recording_id == context.root_recording&.id
       end
 
       def authorize_root!(context)

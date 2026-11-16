@@ -19,18 +19,18 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_api.git
-  revision: 67c27ffb760a1bfe883155a03318a7f180d7d4a8
-  tag: v0.23.4
+  revision: 7e7bcdb9bfb6b5e347e4f43756936e3628ad1f14
+  tag: v0.26.0
   specs:
-    recording_studio_api (0.23.4)
+    recording_studio_api (0.26.0)
       flat_pack (>= 0.1.341)
       rails (~> 8.1.0)
-      recording_studio (>= 6.14.0)
-      recording_studio_accessible (>= 0.42.0)
-      recording_studio_logs (>= 0.4.1, < 1.0)
-      recording_studio_metrics (>= 0.3.0, < 1.0)
-      recording_studio_moveable (~> 4.0)
-      recording_studio_trashable (>= 0.16.0)
+      recording_studio (>= 7.0, < 8.0)
+      recording_studio_accessible (>= 0.44.0, < 1.0)
+      recording_studio_logs (>= 0.8.0, < 1.0)
+      recording_studio_metrics (>= 0.9.0, < 1.0)
+      recording_studio_moveable (>= 5.0, < 6.0)
+      recording_studio_trashable (>= 0.17.0, < 1.0)
       redis (~> 5.3)
       view_component (>= 4.14, < 5)
 
@@ -45,13 +45,13 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_logs.git
-  revision: 47d70f2c1d72cdc9bbb9ce7f63d98835347ce449
-  tag: v0.7.4
+  revision: 6dc75b4290f655564f20f96a295b7c1d0c9851dc
+  tag: v0.8.0
   specs:
-    recording_studio_logs (0.7.4)
+    recording_studio_logs (0.8.0)
       rails (~> 8.1.0)
-      recording_studio (>= 6.1.0)
-      recording_studio_metrics (>= 0.6.1, < 1.0)
+      recording_studio (>= 7.0, < 8.0)
+      recording_studio_metrics (>= 0.9.0, < 1.0)
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_metrics.git
@@ -64,14 +64,14 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_moveable.git
-  revision: 8fac42eae770d04938957b3225ebc617ab04617e
-  tag: v4.1.1
+  revision: 997b83b85bcef4e23ba039ac8dae8a6cdff8811d
+  tag: v5.0.0
   specs:
-    recording_studio_moveable (4.1.1)
+    recording_studio_moveable (5.0.0)
       flat_pack (>= 0.1.331)
       rails (>= 8.1.0, < 9.0)
-      recording_studio (>= 6.1.0)
-      recording_studio_accessible (~> 0.6)
+      recording_studio (>= 7.0, < 8.0)
+      recording_studio_accessible (>= 0.44.0, < 1.0)
       recording_studio_icons (>= 0.1.0)
       view_component (>= 4.14, < 5)
 
@@ -100,11 +100,12 @@ GIT
 PATH
   remote: .
   specs:
-    recording_studio_notifications (0.19.0)
+    recording_studio_notifications (0.19.1)
       flat_pack (>= 0.1.353)
       rails (~> 8.1.0)
       recording_studio (>= 7.0, < 8.0)
       recording_studio_accessible (>= 0.44.0, < 1.0)
+      recording_studio_api (>= 0.26.0, < 1.0)
       recording_studio_metrics (>= 0.9.0, < 1.0)
       view_component (>= 4.14, < 5)
 
@@ -502,12 +503,12 @@ CHECKSUMS
   rdoc (8.1.0) sha256=befc37880a5cfd36dcb176c748b5fd5ee39dd3536a75e81824e4972ce230f60a
   recording_studio (7.0.0)
   recording_studio_accessible (0.44.0)
-  recording_studio_api (0.23.4)
+  recording_studio_api (0.26.0)
   recording_studio_icons (0.2.1)
-  recording_studio_logs (0.7.4)
+  recording_studio_logs (0.8.0)
   recording_studio_metrics (0.9.0)
-  recording_studio_moveable (4.1.1)
-  recording_studio_notifications (0.19.0)
+  recording_studio_moveable (5.0.0)
+  recording_studio_notifications (0.19.1)
   recording_studio_trashable (0.17.0)
   redis (5.4.1) sha256=b5e675b57ad22b15c9bcc765d5ac26f60b675408af916d31527af9bd5a81faae
   redis-client (0.31.0) sha256=6820cb2a21e6795a823141f50fd25e655de2b8dc8ff833b43509a27b0263fd75

@@ -12,13 +12,13 @@ class ApiTest < Minitest::Test
     refute_includes api, "respond_to?(:registered_endpoint"
   end
 
-  def test_gemspec_omits_runtime_recording_studio_api_dependency
+  def test_gemspec_requires_recording_studio_api
     gemspec = File.read(File.expand_path("../recording_studio_notifications.gemspec", __dir__))
     gemfile = File.read(File.expand_path("../Gemfile", __dir__))
 
-    refute_includes gemspec, 'spec.add_dependency "recording_studio_api"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_api", ">= 0.26.0", "< 1.0"'
     refute_includes gemspec, 'spec.add_development_dependency "recording_studio_api"'
-    assert_includes gemfile, "recording_studio_api"
+    assert_includes gemfile, 'tag: "v0.26.0"'
   end
 
   def test_engine_registers_api_when_present
@@ -50,8 +50,13 @@ class ApiTest < Minitest::Test
     refute File.exist?(File.expand_path("../lib/recording_studio_notifications/mcp.rb", __dir__))
     scope = File.read(File.expand_path("../lib/recording_studio_notifications/services/inbox_scope.rb", __dir__))
     assert_includes inbox, "InboxScope.relation"
+    assert_includes inbox, 'inbox_scope: "current_root"'
     assert_includes inbox, "visible_notification?"
     assert_includes inbox, "authorized_root_recording_ids_supported?"
+    assert_includes gate, "token_root_or_rootless?"
+    assert_includes gate, "include_archived"
+    assert_includes api, "scope_id: false"
+    assert_includes member, "include_archived?"
     assert_includes scope, "Notification.for_recipient"
     assert_includes scope, ".active.visible_in_inbox.in_inbox"
     assert_includes scope, "authorized_root_recording_ids"
@@ -89,13 +94,14 @@ class ApiTest < Minitest::Test
       registrations.find { |entry| entry.name == name && entry.api == api }
     }) do
       RecordingStudioApi.stub(:register_endpoint, lambda { |name, api: :public, **options|
-        registrations << Struct.new(:name, :api, :handler, :openapi, :http_verb, :path, keyword_init: true).new(
+        registrations << Struct.new(:name, :api, :handler, :openapi, :http_verb, :path, :scope_id, keyword_init: true).new(
           name: name,
           api: api,
           handler: options.fetch(:handler),
           openapi: options.fetch(:openapi),
           http_verb: options.fetch(:http_verb),
-          path: options.fetch(:path)
+          path: options.fetch(:path),
+          scope_id: options[:scope_id]
         )
       }) do
         RecordingStudioApi.configuration.stub(:each_api, lambda { |&block|
@@ -112,12 +118,24 @@ class ApiTest < Minitest::Test
     end
     assert_equal expected, names
 
+    member_names = %w[
+      notifications.show
+      notifications.mark_read
+      notifications.mark_unread
+      notifications.archive
+      notifications.unarchive
+    ]
     registrations.each do |registration|
       openapi = registration.openapi
       assert openapi[:title]
       assert openapi[:summary]
       assert openapi[:description]
       assert_equal ["Notifications"], openapi[:tags]
+      if member_names.include?(registration.name)
+        assert_equal false, registration.scope_id
+      else
+        assert_nil registration.scope_id
+      end
     end
   end
 

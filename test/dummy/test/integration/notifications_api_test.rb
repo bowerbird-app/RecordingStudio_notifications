@@ -44,6 +44,7 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
       assert registered.openapi[:title]
       assert registered.openapi[:summary]
       assert registered.openapi[:description]
+      refute registered.scopes_recording? if endpoint.fetch(:path).include?(":id")
     end
   end
 
@@ -79,20 +80,51 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert @notification.reload.unread?
 
+    post "#{API_ROOT}/notifications/#{@notification.id}/archive",
+         headers: bearer_headers(@issued.fetch(:token)),
+         as: :json
+    assert_response :success
+    assert @notification.reload.archived?
+
+    post "#{API_ROOT}/notifications/#{@notification.id}/unarchive",
+         headers: bearer_headers(@issued.fetch(:token)),
+         as: :json
+    assert_response :success
+    refute @notification.reload.archived?
+  end
+
+  test "unarchive restores an archived inbox notification" do
+    post "#{API_ROOT}/notifications/#{@notification.id}/archive",
+         headers: bearer_headers(@issued.fetch(:token)),
+         as: :json
+    assert_response :success
+    assert @notification.reload.archived?
+
+    get "#{API_ROOT}/notifications/#{@notification.id}",
+        headers: bearer_headers(@issued.fetch(:token)),
+        as: :json
+    assert_response :not_found
+
+    %i[mark_read mark_unread archive].each do |action|
+      post "#{API_ROOT}/notifications/#{@notification.id}/#{action}",
+           headers: bearer_headers(@issued.fetch(:token)),
+           as: :json
+      assert_response :not_found, "#{action} should 404 while archived"
+    end
+
     post "#{API_ROOT}/notifications/#{@notification.id}/unarchive",
          headers: bearer_headers(@issued.fetch(:token)),
          as: :json
     assert_response :success
     refute @notification.reload.archived?
 
-    post "#{API_ROOT}/notifications/#{@notification.id}/archive",
-         headers: bearer_headers(@issued.fetch(:token)),
-         as: :json
+    get "#{API_ROOT}/notifications/#{@notification.id}",
+        headers: bearer_headers(@issued.fetch(:token)),
+        as: :json
     assert_response :success
-    assert @notification.reload.archived?
   end
 
-  test "archived and delivery-only notifications are omitted and not reachable" do
+  test "archived rows stay out of the inbox until unarchive and delivery-only rows stay unreachable" do
     archived = notify!(recipient: @actor, title: "Archived #{SecureRandom.hex(4)}")
     archived.archive!
     delivery_only = notify!(
@@ -120,7 +152,9 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
           as: :json
       assert_response :not_found, "show should 404 for #{hidden.title}"
 
-      %i[mark_read mark_unread archive unarchive].each do |action|
+      actions = %i[mark_read mark_unread archive]
+      actions << :unarchive unless hidden.archived?
+      actions.each do |action|
         post "#{API_ROOT}/notifications/#{hidden.id}/#{action}",
              headers: bearer_headers(@issued.fetch(:token)),
              as: :json
@@ -241,14 +275,61 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "token sees its root and rootless notifications only" do
+    other_workspace = Workspace.create!(name: "Other root #{SecureRandom.hex(4)}")
+    other_root = RecordingStudio.create_root_recording!(other_workspace, actor: @owner)
+    bootstrap_owner!(other_root, @owner)
+    grant_view!(other_root, @actor)
+    elsewhere = notify!(
+      recipient: @actor,
+      title: "Other root #{SecureRandom.hex(4)}",
+      root_recording: other_root
+    )
+    global = RecordingStudioNotifications.notify(
+      notification_type: :system_announcement,
+      recipient: @actor,
+      actor: @owner,
+      title: "Global #{SecureRandom.hex(4)}",
+      deliver_later: false,
+      idempotency_key: "notifications-api-global-#{SecureRandom.uuid}"
+    )
+
+    get "#{API_ROOT}/notifications",
+        headers: bearer_headers(@issued.fetch(:token)),
+        as: :json
+    assert_response :success
+    ids = response.parsed_body.fetch("records").map { |row| row.fetch("id") }
+    assert_includes ids, @notification.id
+    assert_includes ids, global.id
+    refute_includes ids, elsewhere.id
+
+    get "#{API_ROOT}/notifications/#{elsewhere.id}",
+        headers: bearer_headers(@issued.fetch(:token)),
+        as: :json
+    assert_response :not_found
+
+    %i[mark_read mark_unread archive unarchive].each do |action|
+      post "#{API_ROOT}/notifications/#{elsewhere.id}/#{action}",
+           headers: bearer_headers(@issued.fetch(:token)),
+           as: :json
+      assert_response :not_found, "#{action} should 404 outside the token root"
+    end
+
+    get "#{API_ROOT}/notifications/#{global.id}",
+        headers: bearer_headers(@issued.fetch(:token)),
+        as: :json
+    assert_response :success
+    assert_nil global.root_recording_id
+  end
+
   private
 
-  def notify!(recipient:, title:, inbox: true, channels: nil)
+  def notify!(recipient:, title:, inbox: true, channels: nil, root_recording: @root)
     RecordingStudioNotifications.notify(
       notification_type: :page_comment,
       recipient: recipient,
       actor: @owner,
-      root_recording: @root,
+      root_recording: root_recording,
       title: title,
       inbox: inbox,
       channels: channels,
@@ -259,6 +340,20 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
 
   def bearer_headers(token)
     { "Authorization" => "Bearer #{token}", "Accept" => "application/json" }
+  end
+
+  def grant_view!(recording, actor)
+    original = RecordingStudioAccessible.configuration.access_management_authorizer
+    RecordingStudioAccessible.configuration.access_management_authorizer = ->(**) { true }
+    result = RecordingStudioAccessible.grant_access(
+      recording: recording,
+      actor: actor,
+      role: :view,
+      manager_actor: @owner
+    )
+    raise result.error if result.failure?
+  ensure
+    RecordingStudioAccessible.configuration.access_management_authorizer = original
   end
 
   def bootstrap_owner!(recording, actor)
