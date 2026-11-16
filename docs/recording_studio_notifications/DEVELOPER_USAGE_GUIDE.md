@@ -409,9 +409,9 @@ Delivery selection rules:
 
 ## 12. JSON API (Recording Studio API)
 
-This gem depends on `recording_studio_api` `>= 0.26.0, < 1.0`. The engine registers inbox, member, and preference endpoints. MCP advertises them. Do not add MCP tools in this gem. `notify` / `notify_each` stay host emit.
+This gem depends on `recording_studio_api` `>= 1.1, < 2.0`. The engine registers inbox, member, and preference endpoints. MCP advertises them. Do not add MCP tools in this gem. `notify` / `notify_each` stay host emit.
 
-`:id` on a member path is a notification row, not a recording. Those endpoints pass `scope_id: false`. API 0.26 has no other opt-out for that capture.
+`:id` on a member path is a notification row, not a recording. Those endpoints pass `scope_id: false`. API 1.1 still raises `ConfigurationError` at registration without `recordable_type:` or `scope_id: false`. There is no reason keyword.
 
 Handlers authorize with `access_grant.authorize!` on the token root, then the existing Accessible named actions. Inbox and member lookup use that token root plus rootless rows (global notifications, and optional-root notifications with no root). The inbox relation is `Notification.for_recipient(...).active.visible_in_inbox.in_inbox` with `inbox_scope: "current_root"`. Root view is `authorized_root_recording_ids(actor:, role: :view)` when `authorized_root_recording_ids_supported?` is true, and `visible_notification?` otherwise. Trashed roots are excluded in SQL. Pages use `page` and `per_page` with `LIMIT` and `OFFSET`. Member actions call `#mark_read!`, `#mark_unread!`, `#archive!`, and `#unarchive!`. `#unarchive!` accepts an archived inbox row. Show and the other member actions return not found for an archived row. HTML `clear_all` is not exposed over the API. It updates the visible unread rows in one statement, setting `cleared_at` and `updated_at`, and leaves `read_at` blank. Preference writes call `Preference.set!` / `set_cadence!` for the recipient. Preferences are not stored per root.
 

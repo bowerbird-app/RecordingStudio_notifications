@@ -16,9 +16,9 @@ class ApiTest < Minitest::Test
     gemspec = File.read(File.expand_path("../recording_studio_notifications.gemspec", __dir__))
     gemfile = File.read(File.expand_path("../Gemfile", __dir__))
 
-    assert_includes gemspec, 'spec.add_dependency "recording_studio_api", ">= 0.26.0", "< 1.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio_api", ">= 1.1", "< 2.0"'
     refute_includes gemspec, 'spec.add_development_dependency "recording_studio_api"'
-    assert_includes gemfile, 'tag: "v0.26.0"'
+    assert_includes gemfile, 'tag: "v1.1.0"'
   end
 
   def test_engine_registers_api_when_present

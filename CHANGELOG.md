@@ -16,12 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `POST notifications/:id/unarchive` restores an archived inbox notification. Show, mark read, mark unread, and archive still return not found for an archived row.
 
 ### Changed
-- Gemspec requires `recording_studio_api` `>= 0.26.0, < 1.0`.
-- Development and dummy Gemfiles pin API `v0.26.0`. API 0.26 requires Logs `>= 0.8.0` and Moveable `>= 5.0, < 6.0`, so those pins are `v0.8.0` and `v5.0.0`.
+- Gemspec requires `recording_studio` `>= 7.1, < 8.0` and `recording_studio_api` `>= 1.1, < 2.0`.
+- Development and dummy Gemfiles pin Recording Studio `v7.3.0` and API `v1.1.0`. API 1.1 requires Logs `>= 0.8.0` and Moveable `>= 5.0, < 6.0`, so those pins are `v0.8.0` and `v5.0.0`.
 
 ### Upgrade notes
 - Bump to `0.19.1`. No migration. `0.19.0` already shipped.
-- Install `recording_studio_api` `>= 0.26.0, < 1.0`. That gem requires Logs `>= 0.8.0, < 1.0` and Moveable `>= 5.0, < 6.0`.
+- Install `recording_studio` `>= 7.1, < 8.0` and `recording_studio_api` `>= 1.1, < 2.0`. API 1.1 requires Recording Studio `>= 7.1.0`, Logs `>= 0.8.0, < 1.0`, and Moveable `>= 5.0, < 6.0`.
 - Inbox and member routes return the token root plus rootless rows. Notifications on another root are not found.
 - Unarchive an archived inbox notification with `POST notifications/:id/unarchive`. Other member actions still return not found for archived rows.
 
