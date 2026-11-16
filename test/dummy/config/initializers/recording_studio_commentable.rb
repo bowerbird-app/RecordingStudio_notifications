@@ -2,9 +2,9 @@
 
 # Freeze string literals in this file for consistency and minor memory savings.
 
-# Register a post-service hook in RecordingStudioCommentable.
+# Commentable 0.12 runs CreateComment on the Recording Studio hook registry.
 # This runs after services complete, letting us react to successful comment creation.
-RecordingStudioCommentable.configuration.hooks.after_service(priority: 10) do |service_class, result|
+RecordingStudio.configuration.hooks.after_service(priority: 10) do |service_class, result|
   # Only react to the CreateComment service.
   next unless service_class == RecordingStudioCommentable::Services::CreateComment
   # Stop unless the comment service completed successfully.
