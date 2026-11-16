@@ -43,9 +43,9 @@ module RecordingStudioNotifications
 
         authorize_creation!
 
-        hooks.run(:before_service, self.class, service_payload)
-        result = hooks.run_around(:around_service, self) { create_and_deliver!(existing) }
-        hooks.run(:after_service, self.class, result)
+        RecordingStudio::Hooks.run(:before_service, self.class, service_payload)
+        result = RecordingStudio::Hooks.run_around(:around_service, self) { create_and_deliver!(existing) }
+        RecordingStudio::Hooks.run(:after_service, self.class, result)
         result
       end
 
@@ -128,10 +128,6 @@ module RecordingStudioNotifications
             metadata: @metadata
           }
         )
-      end
-
-      def hooks
-        RecordingStudioNotifications.configuration.hooks
       end
 
       def service_payload

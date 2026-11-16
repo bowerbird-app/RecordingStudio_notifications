@@ -276,7 +276,7 @@ RecordingStudioNotifications.notify_fan_out(
 
 `idempotency_key` is required. One key covers the fan-out. The partial unique index on recipient plus key keeps the first row, including its `inbox` flag and channels. The job validates the type, title, channels, URL, root, and `creation_action` once. It then inserts about 1,000 recipients per transaction: one preference query per chunk, cadence and time zone and `available_for?` per recipient, `insert_all` with `ON CONFLICT DO NOTHING`, and deliveries only for the ids that insert created. `inbox: false` skips `:in_app`. After the chunk commits, the job finds deliveries for this idempotency key and these recipients that are still pending and immediate, and enqueues those. A retry therefore sends deliveries that were committed before a crash and never enqueued. Deferred deliveries are not enqueued. The delivery job calls `adapter.deliver` once per delivery. Running it again skips a delivery that is already delivered, failed, or processing.
 
-Service hooks and `notify.recording_studio_notifications` run once per inserted recipient inside the job. A retry that inserts nothing does not run them again.
+`before_service`, `around_service`, and `after_service` run on `RecordingStudio.configuration.hooks` once per inserted recipient inside the job. The service class is `RecordingStudioNotifications::Services::FanOut`. `notify.recording_studio_notifications` runs with them. A retry that inserts nothing does not run them again.
 
 ## 8. Trigger Notifications From Domain Events
 
@@ -465,7 +465,7 @@ For root-scoped visibility, a notification can still be hidden if actor lacks vi
 3. insert notifications and deliveries in chunks of 1,000
 4. after each chunk commits, enqueue one `FanOutDeliveryJob` for that chunk's pending immediate deliveries
 
-`FanOutDeliveryJob` calls `adapter.deliver` once per delivery. The ids are the pending immediate deliveries for the chunk's recipients and idempotency key, not only the rows this attempt inserted. A second run skips deliveries that are delivered, failed, or processing. Deferred deliveries stay pending for `RollupDeliveryJob`. A chunk with only deferred channels enqueues nothing. Hooks and `notify.recording_studio_notifications` still run only for rows this attempt inserted.
+`FanOutDeliveryJob` calls `adapter.deliver` once per delivery. The ids are the pending immediate deliveries for the chunk's recipients and idempotency key, not only the rows this attempt inserted. A second run skips deliveries that are delivered, failed, or processing. Deferred deliveries stay pending for `RollupDeliveryJob`. A chunk with only deferred channels enqueues nothing. Service hooks on `RecordingStudio.configuration.hooks` and `notify.recording_studio_notifications` still run only for rows this attempt inserted.
 
 Important config options:
 
@@ -473,7 +473,17 @@ Important config options:
 - `queue_name` from `ApplicationJob`
 - `raise_on_delivery_error` controls whether adapter errors bubble
 
-## 16. Instrumentation Hooks
+## 16. Service hooks and instrumentation
+
+`Notify` and `FanOut` call `RecordingStudio::Hooks` on `RecordingStudio.configuration.hooks`. Register there and filter by service class. `Notify` runs the hooks after validation and authorization. It returns `nil` before the hooks when no channel remains. `FanOut` runs them once per inserted recipient. `around_service` must call the block for other services. See [Service hooks](HOOKS.md).
+
+```ruby
+RecordingStudio.configuration.hooks.after_service do |service_class, notification|
+  next unless service_class == RecordingStudioNotifications::Services::Notify
+
+  Rails.logger.info("stored #{notification.id}")
+end
+```
 
 Subscribe to these events:
 

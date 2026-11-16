@@ -1,272 +1,53 @@
-> **Architecture Documentation**
-> *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** December 11, 2025
->
-> *Maintainers: Please update the date above when modifying this file.*
+# Service hooks
 
----
+Register `before_service`, `around_service`, and `after_service` on `RecordingStudio.configuration.hooks`. That object is `RecordingStudio::Hooks` from Recording Studio 7.
 
-# Engine Hooks
+`RecordingStudioNotifications::Services::Notify` and `RecordingStudioNotifications::Services::FanOut` call that registry. `RecordingStudioNotifications::Hooks` and `RecordingStudioNotifications.configuration.hooks` are gone.
 
-RecordingStudioNotifications provides a powerful hook system that allows host applications to customize engine behavior without modifying the engine's source code.
+The registry is shared with every other Recording Studio service. Check the service class. From `around_service`, call the block for every other service, or that service never runs.
 
----
-
-## Available Hooks
-
-### Lifecycle Hooks
-
-| Hook | When it runs |
-|------|--------------|
-| `before_initialize` | Before the engine initializes |
-| `after_initialize` | After the engine initializes |
-| `on_configuration` | When configuration is applied |
-
-### Service Hooks
-
-| Hook | When it runs |
-|------|--------------|
-| `before_service` | Before any service executes |
-| `after_service` | After any service completes |
-| `around_service` | Wraps service execution |
-
-`notify` runs these once per call. `notify_fan_out` runs them once per inserted recipient inside `FanOutJob`, after that chunk's rows are inserted and before the chunk commits. A retry that inserts no new rows does not run them again, including a retry that only enqueues deliveries committed before a crash. The service class is `RecordingStudioNotifications::Services::FanOut`.
-
----
-
-## Registering Hooks
-
-### Block Syntax
+## Register a hook
 
 ```ruby
-# config/initializers/recording_studio_notifications.rb
-RecordingStudioNotifications.configure do |config|
-  config.hooks.after_initialize do
-    Rails.logger.info "RecordingStudioNotifications initialized!"
-  end
-  
-  config.hooks.before_service do |service_class, args|
-    Rails.logger.debug "Calling #{service_class} with #{args}"
-  end
+RecordingStudio.configuration.hooks.before_service do |service_class, payload|
+  next unless service_class == RecordingStudioNotifications::Services::Notify
+
+  Rails.logger.info("notify #{payload[:notification_type]} for recipient #{payload[:recipient].id}")
+end
+
+RecordingStudio.configuration.hooks.around_service do |service, block|
+  next block.call unless service.is_a?(RecordingStudioNotifications::Services::Notify)
+
+  block.call
+end
+
+RecordingStudio.configuration.hooks.after_service do |service_class, notification|
+  next unless service_class == RecordingStudioNotifications::Services::Notify
+
+  Rails.logger.info("stored notification #{notification.id}")
 end
 ```
 
-### Class Syntax
+`before_service` and `after_service` receive the service class, then the payload or the result. `around_service` receives the service instance and the block. Return the block's result when `notify` should return the notification.
 
-```ruby
-# app/hooks/recording_studio_notifications_audit_hook.rb
-class RecordingStudioNotificationsAuditHook
-  def call(service_class, result)
-    AuditLog.create!(
-      service: service_class.name,
-      success: result.success?,
-      timestamp: Time.current
-    )
-  end
-end
+Fan-out uses `RecordingStudioNotifications::Services::FanOut`. `before_service` and `after_service` receive that class. `around_service` receives an instance of that class.
 
-# config/initializers/recording_studio_notifications.rb
-RecordingStudioNotifications.configure do |config|
-  config.hooks.after_service RecordingStudioNotificationsAuditHook.new
-end
-```
+## When the hooks run
 
----
+`Notify` runs the three hooks after validation and authorization, around the create-and-deliver step. `notify` returns the notification. When no channel remains, `notify` returns `nil` before the hooks run.
 
-## Extending Models
+`FanOut` runs the three hooks once per inserted recipient, after the insert and before the chunk commits. A retry that inserts nothing does not run them again.
 
-Add associations, validations, or methods to engine models:
+The `before_service` payload has `notification_type`, `recipient`, `actor`, `notifiable`, `recording`, `root_recording`, and `channels`.
 
-```ruby
-RecordingStudioNotifications.configure do |config|
-  config.hooks.extend_model :Example do
-    include Auditable
-    
-    belongs_to :organization
-    validates :organization, presence: true
-    
-    def custom_method
-      # Your logic here
-    end
-  end
-end
-```
+`after_service` receives whatever the around block returns. For these two services, that value is the stored notification.
 
----
+## Instrumentation
 
-## Extending Controllers
+These ActiveSupport notifications are unchanged.
 
-Add before_actions, concerns, or methods to engine controllers:
+- `notify.recording_studio_notifications`
+- `deliver.recording_studio_notifications`
+- `deliver_rollup.recording_studio_notifications`
 
-```ruby
-RecordingStudioNotifications.configure do |config|
-  config.hooks.extend_controller :HomeController do
-    before_action :authenticate_user!
-    
-    include YourConcern
-  end
-end
-```
-
----
-
-## Service Hooks Examples
-
-### Wrap Services in Transactions
-
-```ruby
-RecordingStudioNotifications.configure do |config|
-  config.hooks.around_service do |service, block|
-    ActiveRecord::Base.transaction do
-      block.call
-    end
-  end
-end
-```
-
-### Log All Service Calls
-
-```ruby
-RecordingStudioNotifications.configure do |config|
-  config.hooks.before_service do |service_class, args|
-    Rails.logger.info "[RecordingStudioNotifications] #{service_class.name} called"
-  end
-  
-  config.hooks.after_service do |service_class, result|
-    status = result.success? ? "succeeded" : "failed"
-    Rails.logger.info "[RecordingStudioNotifications] #{service_class.name} #{status}"
-  end
-end
-```
-
-### Add Metrics/Instrumentation
-
-```ruby
-RecordingStudioNotifications.configure do |config|
-  config.hooks.around_service do |service, block|
-    start_time = Time.current
-    result = block.call
-    duration = Time.current - start_time
-    
-    StatsD.measure("recording_studio_notifications.#{service.class.name.demodulize.underscore}", duration)
-    result
-  end
-end
-```
-
----
-
-## Custom Hooks
-
-The engine triggers custom hooks at specific points. You can listen for these:
-
-```ruby
-RecordingStudioNotifications.configure do |config|
-  config.hooks.on :example_created do |example|
-    Notifier.notify_admin(example)
-  end
-  
-  config.hooks.on :example_updated do |example, changes|
-    AuditLog.record(example, changes)
-  end
-end
-```
-
----
-
-## View Hooks
-
-### Content Injection Points
-
-Engine views include content injection points:
-
-```erb
-<%# In your host app layouts or views %>
-<% content_for :recording_studio_notifications_header do %>
-  <div class="custom-header">Your custom header</div>
-<% end %>
-
-<% content_for :recording_studio_notifications_footer do %>
-  <div class="custom-footer">Your custom footer</div>
-<% end %>
-```
-
-### Partial Overrides
-
-Override engine partials by creating matching files in your host app:
-
-```
-app/views/recording_studio_notifications/home/_sidebar.html.erb  # Overrides engine partial
-```
-
----
-
-## Hook Priority
-
-Hooks run in the order they're registered. To control order:
-
-```ruby
-RecordingStudioNotifications.configure do |config|
-  config.hooks.after_initialize priority: 10 do
-    # Runs first (lower = earlier)
-  end
-  
-  config.hooks.after_initialize priority: 20 do
-    # Runs second
-  end
-end
-```
-
----
-
-## Error Handling
-
-By default, hook errors are logged but don't stop execution. To change this:
-
-```ruby
-RecordingStudioNotifications.configure do |config|
-  config.hooks.raise_on_error = true  # Raise exceptions from hooks
-end
-```
-
----
-
-## Testing Hooks
-
-```ruby
-# test/hooks_test.rb
-class HooksTest < ActiveSupport::TestCase
-  setup do
-    @called = false
-    RecordingStudioNotifications.configuration.hooks.after_initialize { @called = true }
-  end
-  
-  test "after_initialize hook is called" do
-    RecordingStudioNotifications::Hooks.run(:after_initialize)
-    assert @called
-  end
-end
-```
-
----
-
-## Best Practices
-
-1. **Keep hooks lightweight** - Heavy processing should be queued as background jobs
-2. **Handle errors gracefully** - Don't let hook failures break core functionality  
-3. **Document custom hooks** - When adding hooks in services, document them
-4. **Test hooks in isolation** - Write unit tests for hook behavior
-5. **Use around hooks sparingly** - They add complexity; prefer before/after
-
----
-
-## Available Extension Points
-
-| Component | Extension Method |
-|-----------|------------------|
-| Models | `config.hooks.extend_model :ModelName` |
-| Controllers | `config.hooks.extend_controller :ControllerName` |
-| Services | `before_service`, `after_service`, `around_service` |
-| Views | `content_for` blocks, partial overrides |
-| Lifecycle | `before_initialize`, `after_initialize` |
-| Custom | `config.hooks.on :event_name` |
+`notify.recording_studio_notifications` fires inside the around block. `notify` fires it once per call. Fan-out fires it once per inserted recipient.

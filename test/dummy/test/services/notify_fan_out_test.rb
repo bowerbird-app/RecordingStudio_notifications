@@ -23,7 +23,7 @@ class NotifyFanOutTest < ActiveSupport::TestCase
   teardown do
     RecordingStudioNotifications.configuration.rollup_delivery_enabled = @original_rollup
     %i[before_service around_service after_service].each do |hook|
-      RecordingStudioNotifications.configuration.hooks.clear(hook)
+      RecordingStudio.configuration.hooks.clear(hook)
     end
     self.class.email_prefix = nil
     remove_time_zone
@@ -257,7 +257,7 @@ class NotifyFanOutTest < ActiveSupport::TestCase
   test "hooks and the notify event run once per inserted recipient" do
     create_users("fan-hooks", 3)
     seen = []
-    hooks = RecordingStudioNotifications.configuration.hooks
+    hooks = RecordingStudio.configuration.hooks
     hooks.before_service { |service, payload| seen << [:before, service, payload.fetch(:recipient).id] }
     hooks.around_service { |service, block| seen << [:around, service]; block.call }
     hooks.after_service { |service, result| seen << [:after, service, result.id] }

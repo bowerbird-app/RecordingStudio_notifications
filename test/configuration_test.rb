@@ -144,5 +144,6 @@ class ConfigurationTest < Minitest::Test
 
     assert_includes result.fetch(:notification_types), :generic
     assert_includes result.fetch(:channels), :in_app
+    refute result.key?(:hooks_registered)
   end
 end
