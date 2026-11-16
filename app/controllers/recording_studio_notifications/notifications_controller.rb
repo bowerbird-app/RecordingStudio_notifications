@@ -30,12 +30,12 @@ module RecordingStudioNotifications
       @current_root_recording = current_notifications_root_recording
 
       relation = scoped_notifications
-      visible = visible_notifications(relation)
       limit = normalized_menu_limit
-      groups = grouped_notification_sections(visible).flat_map(&:groups)
+      window = inbox_window(relation, limit:, offset: 0)
+      groups = grouped_notification_sections(window.rows).flat_map(&:groups)
       recent_groups = groups.sort_by { |group| [group.latest_notification.created_at, group.id] }.reverse.first(limit)
       payload = recent_groups.map { |group| menu_group_payload(group) }
-      unread_count = unread_count_for(relation, visible)
+      unread_count = window.unread_count
 
       render json: {
         unread_count: unread_count,
@@ -60,13 +60,28 @@ module RecordingStudioNotifications
 
       @inbox_scope = notifications_inbox_scope
       @current_root_recording = current_notifications_root_recording
-      @group = visible_notification_group(params[:group_id])
-      return head :not_found unless @group
-
       @group_page = current_group_page
       offset = (@group_page - 1) * GROUP_NOTIFICATIONS_PER_PAGE
-      @group_notifications = @group.notifications.slice(offset, GROUP_NOTIFICATIONS_PER_PAGE) || []
-      @has_next_group_page = @group.notifications.size > offset + @group_notifications.size
+      if Services::InboxScope.authorized_root_recording_ids_supported?
+        found = Services::InboxWindow.group_page(
+          scoped_notifications,
+          recipient: @recipient,
+          group_id: params[:group_id],
+          limit: GROUP_NOTIFICATIONS_PER_PAGE,
+          offset: offset
+        )
+        return head :not_found unless found
+
+        @group = found.group
+        @group_notifications = found.rows
+        @has_next_group_page = found.more
+      else
+        @group = visible_notification_group(params[:group_id])
+        return head :not_found unless @group
+
+        @group_notifications = @group.notifications.slice(offset, GROUP_NOTIFICATIONS_PER_PAGE) || []
+        @has_next_group_page = @group.notifications.size > offset + @group_notifications.size
+      end
 
       respond_to do |format|
         format.html
@@ -175,18 +190,15 @@ module RecordingStudioNotifications
       @inbox_scope = notifications_inbox_scope
       @current_root_recording = current_notifications_root_recording
       @page = current_page
-      relation = scoped_notifications
-      @visible_notifications = visible_notifications(relation)
-      @has_unread_notifications = unread_count_for(relation, @visible_notifications).positive?
-      @notification_sections, @has_next_page = visible_notification_sections_page(@visible_notifications)
+      window = inbox_window(scoped_notifications, limit: PER_PAGE, offset: (@page - 1) * PER_PAGE)
+      @visible_notifications = window.rows
+      @has_unread_notifications = window.unread_count.positive?
+      @notification_sections = grouped_notification_sections(window.rows)
+      @has_next_page = window.more
     end
 
     def visible_notifications(notifications)
       Services::InboxScope.rows(notifications) { |notification| visible_notification?(notification) }
-    end
-
-    def unread_count_for(relation, rows)
-      Services::InboxScope.unread_total(relation, rows)
     end
 
     def clear_visible_unread!
@@ -195,20 +207,10 @@ module RecordingStudioNotifications
       end
     end
 
-    def visible_notification_sections_page(notifications)
-      all_sections = grouped_notification_sections(notifications)
-      groups = all_sections.flat_map(&:groups)
-      page_groups = groups.slice((@page - 1) * PER_PAGE, PER_PAGE) || []
-      sections = page_groups.group_by(&:notification_type).map do |type, section_groups|
-        original_section = all_sections.find { |section| section.notification_type == type }
-        Services::InboxGrouping::Section.new(
-          notification_type: type,
-          label: original_section.label,
-          groups: section_groups
-        )
+    def inbox_window(relation, limit:, offset:)
+      Services::InboxWindow.page(relation, recipient: @recipient, limit:, offset:) do |notification|
+        visible_notification?(notification)
       end
-
-      [sections, groups.size > @page * PER_PAGE]
     end
 
     def visible_notification?(notification)

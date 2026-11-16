@@ -70,10 +70,22 @@ module RecordingStudioNotifications
         end
       end
 
-      def initialize(recipient:, notifications:, time_zone: nil, cadence_resolver: nil)
+      Identity = Struct.new(
+        :notification_type,
+        :cadence,
+        :starts_at,
+        :ends_at,
+        :notification_id,
+        :id,
+        keyword_init: true
+      )
+      IdentitySource = Struct.new(:notification_type, :created_at, :id)
+
+      def initialize(recipient:, notifications:, time_zone: nil, cadence_resolver: nil, preferences: nil)
         @recipient = recipient
         @notifications = Array(notifications)
         @time_zone = resolve_time_zone(time_zone)
+        @preferences = preferences
         @cadence_resolver = cadence_resolver || method(:effective_cadence_for)
       end
 
@@ -112,17 +124,45 @@ module RecordingStudioNotifications
                              .reverse
       end
 
+      def group_identity(notification_type:, created_at:, notification_id:)
+        source = IdentitySource.new(notification_type, created_at, notification_id)
+        type = notification_type_for(source)
+        cadence = @cadence_resolver.call(source, type)
+        starts_at, ends_at = period_for(created_at, cadence)
+        Identity.new(
+          notification_type: type.key,
+          cadence: cadence,
+          starts_at: starts_at,
+          ends_at: ends_at,
+          notification_id: notification_id,
+          id: group_id(type.key, cadence, starts_at, source)
+        )
+      end
+
       private
 
       def effective_cadence_for(notification, type)
+        key = type.respond_to?(:key) ? type.key : notification.notification_type
+        @cadence_for_type ||= {}
+        @cadence_for_type[key] ||= resolved_cadence_for(notification, type)
+      end
+
+      def resolved_cadence_for(notification, type)
         return :individual unless type.respond_to?(:default_cadence)
         return :individual unless RecordingStudioNotifications.configuration.rollup_delivery_enabled
+        return type.required_cadence.to_sym if type.required_cadence
+        return saved_cadence(notification, type) if @preferences
 
         Preference.cadence_for(
           recipient: @recipient,
           notification_type: notification.notification_type,
           default: type.default_cadence
         )
+      end
+
+      def saved_cadence(notification, type)
+        preference = @preferences[notification.notification_type.to_s]
+        preference ? preference.cadence.to_sym : type.default_cadence.to_sym
       end
 
       def notification_type_for(notification)

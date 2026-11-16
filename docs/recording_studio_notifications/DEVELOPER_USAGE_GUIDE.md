@@ -355,12 +355,17 @@ Inbox behavior:
 
 - The inbox index is current-root focused.
 - Rootless/global notifications are included alongside the current root.
+- The index shows 25 groups per page, newest group first. It does not load every visible notice to build that page.
+- The unread total is a `COUNT` of the whole visible inbox. It is not the number of rows on the page.
 
 Menu behavior:
 
 - The top-nav polling endpoint returns recent notifications across accessible scope.
 - Endpoint (under mount path): `GET /notifications/menu.json?limit=5`
 - Response includes unread count, recent items, and rendered menu HTML.
+- `limit` defaults to 5 and caps at 25. The unread count still covers notices that are not in that list.
+- With rollup delivery off and root ids in SQL, the menu query is the newest rows up to `limit`. With rollup delivery on, a shown group includes every notice in that group.
+- Without root ids in SQL, `visible_notification?` runs on each candidate before the list is cut.
 
 Open behavior:
 
