@@ -21,6 +21,8 @@ module RecordingStudioNotifications
     PREFERENCES_NAME = "notifications.preferences"
     UPDATE_PREFERENCES_NAME = "notifications.update_preferences"
     INDEX_PATH = "notifications"
+    # :id is a notification row, not a recording. API 0.26 raises ConfigurationError
+    # unless the endpoint passes recordable_type or scope_id: false.
     MEMBER_PATH = "notifications/:id"
     PREFERENCES_PATH = "notifications/preferences"
 
@@ -31,23 +33,23 @@ module RecordingStudioNotifications
       },
       {
         name: SHOW_NAME, http_verb: :get, path: MEMBER_PATH, handler: Show,
-        openapi: Show::OPENAPI, input_contract: Show::INPUT_CONTRACT
+        openapi: Show::OPENAPI, input_contract: Show::INPUT_CONTRACT, scope_id: false
       },
       {
         name: MARK_READ_NAME, http_verb: :post, path: "#{MEMBER_PATH}/mark_read", handler: MarkRead,
-        openapi: MarkRead::OPENAPI, input_contract: MarkRead::INPUT_CONTRACT
+        openapi: MarkRead::OPENAPI, input_contract: MarkRead::INPUT_CONTRACT, scope_id: false
       },
       {
         name: MARK_UNREAD_NAME, http_verb: :post, path: "#{MEMBER_PATH}/mark_unread", handler: MarkUnread,
-        openapi: MarkUnread::OPENAPI, input_contract: MarkUnread::INPUT_CONTRACT
+        openapi: MarkUnread::OPENAPI, input_contract: MarkUnread::INPUT_CONTRACT, scope_id: false
       },
       {
         name: ARCHIVE_NAME, http_verb: :post, path: "#{MEMBER_PATH}/archive", handler: Archive,
-        openapi: Archive::OPENAPI, input_contract: Archive::INPUT_CONTRACT
+        openapi: Archive::OPENAPI, input_contract: Archive::INPUT_CONTRACT, scope_id: false
       },
       {
         name: UNARCHIVE_NAME, http_verb: :post, path: "#{MEMBER_PATH}/unarchive", handler: Unarchive,
-        openapi: Unarchive::OPENAPI, input_contract: Unarchive::INPUT_CONTRACT
+        openapi: Unarchive::OPENAPI, input_contract: Unarchive::INPUT_CONTRACT, scope_id: false
       },
       {
         name: PREFERENCES_NAME, http_verb: :get, path: PREFERENCES_PATH, handler: Preferences,
@@ -73,15 +75,17 @@ module RecordingStudioNotifications
         existing = RecordingStudioApi.registered_endpoint(endpoint.fetch(:name), api: api)
         return if existing && existing.handler == endpoint.fetch(:handler)
 
-        RecordingStudioApi.register_endpoint(
-          endpoint.fetch(:name),
+        options = {
           api: api,
           http_verb: endpoint.fetch(:http_verb),
           path: endpoint.fetch(:path),
           handler: endpoint.fetch(:handler),
           openapi: endpoint.fetch(:openapi),
           input_contract: endpoint[:input_contract]
-        )
+        }
+        options[:scope_id] = false if endpoint[:scope_id] == false
+
+        RecordingStudioApi.register_endpoint(endpoint.fetch(:name), **options)
       end
     end
   end

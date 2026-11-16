@@ -16,10 +16,10 @@ This guide explains how to install the RecordingStudioNotifications engine in yo
 
 - Rails 8.1+ application
 - PostgreSQL (recommended for UUID compatibility)
-- `recording_studio` `>= 7.0, < 8.0` (development git tag `v7.0.0`). `root_recording_for` only finds a root. Create one with `RecordingStudio.create_root_recording!(recordable, actor:)`. Set `config.authorize_write`. A new root is authorized with `root_recording` nil.
+- `recording_studio` `>= 7.1, < 8.0` (development git tag `v7.3.0`). `root_recording_for` only finds a root. Create one with `RecordingStudio.create_root_recording!(recordable, actor:)`. Set `config.authorize_write`. A new root is authorized with `root_recording` nil.
 - `flat_pack` `>= 0.1.353`. Development pins GitHub tag `v0.1.356`. The bell menu uses `style: :plain` and `divider: true`, which need Flatpack `0.1.353` or newer.
 - `view_component` `>= 4.14, < 5` (development pins `4.19.0`)
-- Accessible: gemspec `>= 0.44.0, < 1.0`. Inbox, preference, and `creation_action` checks pass `controller:` to `authorized_action?`. Development and dummy Gemfiles pin `v0.44.0`. The inbox filters roots with `authorized_root_recording_ids(actor:, role: :view)`. Dummy Admin `v2.16.0`. Dummy pins Recording Studio API `v0.23.4` (plus Logs `v0.7.4`, Moveable `v4.1.1`, Icons `v0.2.1`, and Redis) so inbox endpoints can be exercised. The notifications gemspec does not depend on `recording_studio_api`. Metrics gemspec is `>= 0.9.0, < 1.0`.
+- Accessible: gemspec `>= 0.44.0, < 1.0`. Inbox, preference, and `creation_action` checks pass `controller:` to `authorized_action?`. Development and dummy Gemfiles pin `v0.44.0`. The inbox filters roots with `authorized_root_recording_ids(actor:, role: :view)`. Dummy Admin `v2.16.0`. Dummy pins Recording Studio API `v1.1.0` (plus Logs `v0.8.0`, Moveable `v5.0.0`, Icons `v0.2.1`, and Redis) so inbox endpoints can be exercised. The notifications gemspec requires `recording_studio_api` `>= 1.1, < 2.0`. API 1.1 requires Recording Studio `>= 7.1.0`, Logs `>= 0.8.0`, and Moveable `>= 5.0, < 6.0`. Metrics gemspec is `>= 0.9.0, < 1.0`.
 - A card drops `style:` and sets `border:` (`border: :strong` on an inbox card, `border: :default` otherwise)
 - TailwindCSS (optional, for styling engine views)
 
@@ -40,7 +40,7 @@ gem "recording_studio_notifications", path: "../recording_studio_notifications"
 
 # Or from RubyGems (after publishing)
 gem "recording_studio_notifications"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.0.0"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.3.0"
 gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.356"
 ```
 

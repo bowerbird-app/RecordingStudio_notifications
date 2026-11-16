@@ -7,8 +7,10 @@ module RecordingStudioNotifications
       OPENAPI = {
         title: TITLE,
         summary: TITLE,
-        description: "Paged inbox for the current Accessible actor. Uses the HTML inbox scopes " \
-                     "Notification.for_recipient.active.visible_in_inbox.in_inbox. Root view is " \
+        description: "Paged inbox for the current Accessible actor on this token's root, plus " \
+                     "rootless rows. Uses the HTML inbox scopes " \
+                     "Notification.for_recipient.active.visible_in_inbox.in_inbox with " \
+                     "inbox_scope current_root. Root view is " \
                      "authorized_root_recording_ids(actor:, role: :view) when " \
                      "authorized_root_recording_ids_supported? is true, and visible_notification? " \
                      "otherwise. Offset paging with page and per_page. The query uses LIMIT and OFFSET.",
@@ -48,7 +50,12 @@ module RecordingStudioNotifications
 
       def self.call(context)
         recipient = Gate.authorize_inbox!(context)
-        inbox = Services::InboxScope.relation(recipient: recipient, actor: recipient)
+        inbox = Services::InboxScope.relation(
+          recipient: recipient,
+          actor: recipient,
+          root_recording: context.root_recording,
+          inbox_scope: "current_root"
+        )
         unless Services::InboxScope.authorized_root_recording_ids_supported?
           inbox = inbox.select do |notification|
             Services::NotificationAuthorization.visible_notification?(

@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.19.0", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.19.1", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
     refute RecordingStudioNotifications.const_defined?(:Hooks)
     refute_respond_to RecordingStudioNotifications.configuration, :hooks
@@ -34,12 +34,13 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert(spec.files.none? { |path| path.start_with?(".cursor/") })
     refute_includes spec.dependencies.map(&:name), "recording_studio_internationalization"
     refute_includes spec.dependencies.map(&:name), "recording_studio_admin"
-    refute_includes spec.dependencies.map(&:name), "recording_studio_api"
     assert_includes spec.dependencies.map(&:name), "recording_studio_metrics"
+    api = spec.dependencies.find { |dependency| dependency.name == "recording_studio_api" }
+    assert_equal ">= 1.1, < 2.0", api.requirement.to_s
     flat_pack = spec.dependencies.find { |dependency| dependency.name == "flat_pack" }
     assert_equal ">= 0.1.353", flat_pack.requirement.to_s
     studio = spec.dependencies.find { |dependency| dependency.name == "recording_studio" }
-    assert_equal ">= 7.0, < 8.0", studio.requirement.to_s
+    assert_equal ">= 7.1, < 8.0", studio.requirement.to_s
     view_component = spec.dependencies.find { |dependency| dependency.name == "view_component" }
     assert_equal ">= 4.14, < 5", view_component.requirement.to_s
     accessible = spec.dependencies.find { |dependency| dependency.name == "recording_studio_accessible" }

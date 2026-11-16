@@ -4,9 +4,13 @@ module RecordingStudioNotifications
   module Api
     class MemberAction
       def self.call(context)
-        notification = Gate.visible_notification!(context)
+        notification = Gate.visible_notification!(context, include_archived: include_archived?)
         notification.public_send(mutation)
         Serialize.notification(notification)
+      end
+
+      def self.include_archived?
+        false
       end
 
       def self.mutation
@@ -79,12 +83,16 @@ module RecordingStudioNotifications
       TITLE = "Notifications - Unarchive"
       OPENAPI = openapi(
         TITLE,
-        "Calls Notification#unarchive! on a notification the current actor can see."
+        "Calls Notification#unarchive! on an inbox notification for this token, including an archived one."
       ).freeze
       INPUT_CONTRACT = id_contract.freeze
 
       def self.mutation
         :unarchive!
+      end
+
+      def self.include_archived?
+        true
       end
     end
   end

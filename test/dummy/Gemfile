@@ -6,7 +6,7 @@ gem "recording_studio_notifications_email",
     github: "bowerbird-app/RecordingStudio_notifications_email", tag: "v0.5.3"
 
 # RecordingStudio engine
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.0.0"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.3.0"
 gem "view_component", "4.19.0"
 gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.44.0"
 gem "recording_studio_commentable", github: "bowerbird-app/RecordingStudio_commentable", tag: "v0.7.0"
@@ -51,12 +51,12 @@ gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag
 gem "recording_studio_trashable", github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.17.0",
                                   require: false
 
-# Host registers Metrics definitions. Notifications does not depend on RecordingStudio API.
+# Host registers Metrics definitions. The notifications gemspec requires Recording Studio API.
 gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.9.0"
-# RS_API companions. This gem still has no gemspec runtime API dependency.
-gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "v0.23.4"
-gem "recording_studio_logs", github: "bowerbird-app/RecordingStudio_logs", tag: "v0.7.4"
-gem "recording_studio_moveable", github: "bowerbird-app/RecordingStudio_moveable", tag: "v4.1.1"
+# API 0.26 requires Logs >= 0.8 and Moveable >= 5, < 6.
+gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "v1.1.0"
+gem "recording_studio_logs", github: "bowerbird-app/RecordingStudio_logs", tag: "v0.8.0"
+gem "recording_studio_moveable", github: "bowerbird-app/RecordingStudio_moveable", tag: "v5.0.0"
 gem "recording_studio_icons", github: "bowerbird-app/RecordingStudio_icons", tag: "v0.2.1"
 gem "redis", "~> 5.3"
 
