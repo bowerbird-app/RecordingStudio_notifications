@@ -8,6 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-11-16
+
+### Removed
+- `RecordingStudioNotifications::Hooks` and `RecordingStudioNotifications.configuration.hooks`.
+- The engine initializers that ran `before_initialize`, `after_initialize`, and `on_configuration`.
+- `extend_model` and `extend_controller`.
+- `hooks_registered` from `Configuration#to_h`.
+
+### Changed
+- `Services::Notify` and `Services::FanOut` run `before_service`, `around_service`, and `after_service` on `RecordingStudio.configuration.hooks` (`RecordingStudio::Hooks`).
+- `Notify` still runs those hooks after validation and authorization, around create and deliver. It still returns the notification, or `nil` when no channel remains.
+- `FanOut` still runs those hooks once per inserted recipient, after the insert and before the chunk commits.
+- `before_service` and `after_service` receive the service class, `RecordingStudioNotifications::Services::Notify` or `RecordingStudioNotifications::Services::FanOut`. `around_service` still receives the service instance.
+- `notify.recording_studio_notifications` is unchanged.
+- The `recording_studio` gemspec requirement stays `>= 7.0, < 8.0`.
+
+### Upgrade notes
+- Bump to `0.19.0`. No migration. There is no compatibility shim.
+- Delete registrations on `RecordingStudioNotifications.configuration.hooks`. Register those blocks on `RecordingStudio.configuration.hooks`.
+- The registry is shared. Filter by the service class. From `around_service`, call the block for every other service.
+- `before_initialize`, `after_initialize`, `on_configuration`, `extend_model`, and `extend_controller` on this gem are removed. This gem does not re-fire those lifecycle events on the core registry.
+- `configuration.to_h` no longer includes `hooks_registered`.
+
 ## [0.18.1] - 2026-11-16
 
 ### Fixed
@@ -627,7 +650,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.18.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.0...HEAD
+[0.19.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.16.1...v0.17.0

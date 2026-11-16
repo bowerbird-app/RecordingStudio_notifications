@@ -139,13 +139,13 @@ module RecordingStudioNotifications
       end
 
       def run_hooks(inserted)
-        hooks.run(:before_service, self.class, hook_payload(inserted))
-        result = hooks.run_around(:around_service, self) do
+        RecordingStudio::Hooks.run(:before_service, self.class, hook_payload(inserted))
+        result = RecordingStudio::Hooks.run_around(:around_service, self) do
           ActiveSupport::Notifications.instrument("notify.recording_studio_notifications", event_payload(inserted)) do
             inserted.notification
           end
         end
-        hooks.run(:after_service, self.class, result)
+        RecordingStudio::Hooks.run(:after_service, self.class, result)
       end
 
       def hook_payload(inserted)
@@ -261,10 +261,6 @@ module RecordingStudioNotifications
         return if gid.blank?
 
         GlobalID::Locator.locate(gid)
-      end
-
-      def hooks
-        RecordingStudioNotifications.configuration.hooks
       end
     end
   end

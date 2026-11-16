@@ -82,32 +82,6 @@ class EngineTest < Minitest::Test
     assert_equal :default, RecordingStudioNotifications.configuration.queue_name
   end
 
-  def test_extensions_apply_once_and_skip_a_missing_target
-    widget = Class.new
-    widget.define_singleton_method(:name) { "CoverageWidget" }
-    model_calls = 0
-    RecordingStudioNotifications.configuration.hooks.extend_model(:CoverageWidget) do
-      model_calls += 1
-      def coverage_widget_ready?
-        true
-      end
-    end
-    RecordingStudioNotifications.configuration.hooks.extend_controller(:CoverageWidget) do
-      def coverage_controller_ready?
-        true
-      end
-    end
-
-    assert_nil RecordingStudioNotifications::Engine.send(:apply_extensions, nil, [])
-    RecordingStudioNotifications::Engine.apply_model_extensions(widget)
-    RecordingStudioNotifications::Engine.apply_model_extensions(widget)
-    RecordingStudioNotifications::Engine.apply_controller_extensions(widget)
-
-    assert_equal 1, model_calls
-    assert widget.new.coverage_widget_ready?
-    assert widget.new.coverage_controller_ready?
-  end
-
   def test_engine_loads_only_english_locale_files
     locale_dir = RecordingStudioNotifications::Engine.root.join("config/locales")
 

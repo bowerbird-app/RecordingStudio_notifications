@@ -219,7 +219,7 @@ RecordingStudioNotifications.notify_fan_out(
 )
 ```
 
-`idempotency_key` is required. The same key covers every recipient. The partial unique index on `(recipient_type, recipient_id, idempotency_key)` keeps the first write, including `inbox`. The job checks the type, title, channels, URL, root, and `creation_action` once, then inserts about 1,000 recipients per transaction. Each chunk loads preferences once. Cadence, time zone, and `available_for?` are applied per recipient. `inbox: false` skips `:in_app`. After the chunk commits, the job enqueues every still-pending immediate delivery for that idempotency key and those recipients. A crash between commit and enqueue is recovered on retry. Deferred deliveries are not enqueued. The delivery job calls `adapter.deliver` once per delivery and skips one that is already delivered, failed, or processing. Hooks and the notify event run only for rows that attempt inserted. `notify` stays synchronous. `DeliveryJob.perform(notification_id)` stays the single-notification job.
+`idempotency_key` is required. The same key covers every recipient. The partial unique index on `(recipient_type, recipient_id, idempotency_key)` keeps the first write, including `inbox`. The job checks the type, title, channels, URL, root, and `creation_action` once, then inserts about 1,000 recipients per transaction. Each chunk loads preferences once. Cadence, time zone, and `available_for?` are applied per recipient. `inbox: false` skips `:in_app`. After the chunk commits, the job enqueues every still-pending immediate delivery for that idempotency key and those recipients. A crash between commit and enqueue is recovered on retry. Deferred deliveries are not enqueued. The delivery job calls `adapter.deliver` once per delivery and skips one that is already delivered, failed, or processing. Service hooks and `notify.recording_studio_notifications` run only for rows this attempt inserted. `notify` stays synchronous. `DeliveryJob.perform(notification_id)` stays the single-notification job.
 
 Pass `channels:` to request a subset of a type's available channels. Required channels are always included. Optional channels respect each recipient's preference.
 
@@ -359,15 +359,15 @@ The engine resolves the current recipient from `current_user`, when available, t
 
 ## Hooks and instrumentation
 
-Hosts can register lifecycle hooks through `RecordingStudioNotifications.configuration.hooks`:
+`Notify` and `FanOut` run `before_service`, `around_service`, and `after_service` on `RecordingStudio.configuration.hooks`. Filter by `RecordingStudioNotifications::Services::Notify` or `RecordingStudioNotifications::Services::FanOut`. `around_service` receives the service instance. Call the block for every other service. Details are in [Service hooks](docs/recording_studio_notifications/HOOKS.md).
 
 ```ruby
-RecordingStudioNotifications.configuration.hooks.after_service do |service_class, notification|
-  Rails.logger.info("Created #{notification.id} via #{service_class.name}")
+RecordingStudio.configuration.hooks.after_service do |service_class, notification|
+  next unless service_class == RecordingStudioNotifications::Services::Notify
+
+  Rails.logger.info("Created #{notification.id}")
 end
 ```
-
-Available lifecycle/service hooks include `before_initialize`, `on_configuration`, `after_initialize`, `before_service`, `around_service`, and `after_service`. Model and controller extensions can be registered with `extend_model` and `extend_controller`.
 
 Subscribe to these ActiveSupport notifications:
 

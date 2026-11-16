@@ -19,7 +19,6 @@ Style/StringLiterals:
 Metrics/ClassLength:
   Exclude:
     - 'test/**/*'
-    - 'lib/recording_studio_notifications/hooks.rb'
 
 Metrics/MethodLength:
   Exclude:
