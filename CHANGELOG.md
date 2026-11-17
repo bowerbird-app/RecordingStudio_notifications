@@ -8,12 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.3] - 2026-11-17
+
 ### Changed
 - Mark read, mark unread, archive, unarchive, and preference update declare `required_role: :view`. Those writes are the recipient's own inbox state, so a view-only API key can call them. Index, show, and preference read stay on the GET default.
 
 ### Upgrade notes
-- No migration. Development and dummy Gemfiles stay on Recording Studio API `v1.2.1`, which accepts `required_role` on `register_endpoint`.
+- Bump to `0.19.3`. No migration. Development and dummy Gemfiles stay on Recording Studio API `v1.2.1`, which accepts `required_role` on `register_endpoint`.
 - When a later API release enforces the key role on endpoints with no record id or `scope_id: false`, these inbox writes stay available to a view-only key. Unset writes default to edit.
+
+## [0.19.2] - 2026-11-17
+
+### Changed
+- The eight notification API tools now say, in plain language, what they do, which values they accept, and which fields they return. The tools are `notifications.inbox`, `notifications.show`, `notifications.mark_read`, `notifications.mark_unread`, `notifications.archive`, `notifications.unarchive`, `notifications.preferences`, and `notifications.update_preferences`.
+
+### Upgrade notes
+- None needed. Tool behavior is unchanged.
 
 ## [0.19.1] - 2026-11-16
 

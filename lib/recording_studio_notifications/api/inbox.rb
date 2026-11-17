@@ -7,27 +7,21 @@ module RecordingStudioNotifications
       OPENAPI = {
         title: TITLE,
         summary: TITLE,
-        description: "Paged inbox for the current Accessible actor on this token's root, plus " \
-                     "rootless rows. Uses the HTML inbox scopes " \
-                     "Notification.for_recipient.active.visible_in_inbox.in_inbox with " \
-                     "inbox_scope current_root. Root view is " \
-                     "authorized_root_recording_ids(actor:, role: :view) when " \
-                     "authorized_root_recording_ids_supported? is true, and visible_notification? " \
-                     "otherwise. Offset paging with page and per_page. The query uses LIMIT and OFFSET.",
+        description: ToolDescriptions::INBOX,
         tags: ["Notifications"],
         parameters: [
           {
             name: "page",
             in: "query",
             required: false,
-            description: "Offset page. Defaults to 1.",
+            description: ToolDescriptions::PAGE,
             schema: { type: "integer" }
           },
           {
             name: "per_page",
             in: "query",
             required: false,
-            description: "Rows per page. Same default and cap as the HTML inbox.",
+            description: ToolDescriptions::PER_PAGE,
             schema: { type: "integer" }
           }
         ]
@@ -38,12 +32,12 @@ module RecordingStudioNotifications
           page: {
             type: :integer,
             required: false,
-            description: "Offset page. Defaults to 1."
+            description: ToolDescriptions::PAGE
           },
           per_page: {
             type: :integer,
             required: false,
-            description: "Rows per page. Same default and cap as the HTML inbox."
+            description: ToolDescriptions::PER_PAGE
           }
         }
       }.freeze

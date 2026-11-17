@@ -75,7 +75,9 @@ class ApiTest < Minitest::Test
     refute_includes member, "clear!"
     assert_includes prefs, "Preference.set!"
     assert_includes prefs, "Preference.set_cadence!"
-    assert_includes prefs, "manage_preferences"
+    refute_includes prefs, "manage_preferences"
+    authorization = File.read(File.expand_path("../lib/recording_studio_notifications/services/notification_authorization.rb", __dir__))
+    assert_includes authorization, "manage_preferences"
     refute_includes prefs, "to_unsafe_h"
     refute_includes prefs, 'attributes[:x] || attributes["x"]'
     refute_includes query, "def normalize_page"

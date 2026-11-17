@@ -562,7 +562,15 @@ When Recording Studio API is loaded, this engine registers public endpoints with
 | `notifications.preferences` | GET | `notifications/preferences` |
 | `notifications.update_preferences` | PATCH | `notifications/preferences` |
 
-Inbox index matches the HTML inbox: `active.visible_in_inbox.in_inbox`, then root view in SQL via `authorized_root_recording_ids(actor:, role: :view)` when `authorized_root_recording_ids_supported?` is true. Otherwise it uses `visible_notification?` under `:view_notifications`. Index pages with `page` and `per_page`, defaulting to and capped at `NotificationsController::PER_PAGE`. The query applies `LIMIT` and `OFFSET`. `total_count` is a `COUNT`. Member actions call the existing bang methods on a visible inbox row. A missing, archived, or `inbox: false` row is 404. A row the actor cannot see is 403. Preference get and update use `Preference.for_recipient` / `set!` / `set_cadence!` under `:manage_preferences`. Handlers also call `access_grant.authorize!` on the request root. `notify` and `notify_each` stay host emit. HTML `clear_all` is not an API endpoint.
+MCP advertises the same endpoints. The tool text says what each one does, which values it accepts, and which fields it returns.
+
+Inbox lists the signed-in person's notifications for this workspace, plus notifications with no workspace, newest first. Archived rows are left out. A row with the inbox turned off is left out. A notice still waiting on a grouped in-app delivery is left out. `page` starts at 1. `per_page` defaults to 25 and is capped at 25. The response has `records` and `meta` (`page`, `per_page`, `total_count`, `total_pages`).
+
+Show, mark read, mark unread, and archive return not found for a missing row, an archived row, a row with the inbox turned off, another person's row, or a row in another workspace. Unarchive puts an archived inbox row back, using the same id. A row the person is not allowed to see returns forbidden.
+
+Preferences lists the channel and cadence rows saved for that person. The rows cover every workspace. Update preferences changes one optional channel, one cadence, or both. Copy `notification_type` from a preferences record. The bundled channel is `in_app`. Cadence values are `individual`, `daily`, `every_other_day`, `weekly`, `biweekly`, and `monthly`. A type may reject some of those. A required channel is always delivered, and a preference cannot turn it off.
+
+`notify` and `notify_each` stay host emit. HTML clear-all is not an API endpoint.
 
 ## Operations metrics
 

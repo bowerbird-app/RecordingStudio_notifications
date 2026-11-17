@@ -3,6 +3,7 @@
 require_relative "api/gate"
 require_relative "api/query"
 require_relative "api/serialize"
+require_relative "api/tool_descriptions"
 require_relative "api/inbox"
 require_relative "api/show"
 require_relative "api/member_action"
