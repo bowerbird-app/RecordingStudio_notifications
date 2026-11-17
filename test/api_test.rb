@@ -46,7 +46,6 @@ class ApiTest < Minitest::Test
     assert_includes api, "notifications.preferences"
     assert_includes api, "notifications.update_preferences"
     refute_includes api, "register_capability_action"
-    refute_includes api, "required_role"
     refute File.exist?(File.expand_path("../lib/recording_studio_notifications/mcp.rb", __dir__))
     scope = File.read(File.expand_path("../lib/recording_studio_notifications/services/inbox_scope.rb", __dir__))
     assert_includes inbox, "InboxScope.relation"
@@ -96,14 +95,15 @@ class ApiTest < Minitest::Test
       registrations.find { |entry| entry.name == name && entry.api == api }
     }) do
       RecordingStudioApi.stub(:register_endpoint, lambda { |name, api: :public, **options|
-        registrations << Struct.new(:name, :api, :handler, :openapi, :http_verb, :path, :scope_id, keyword_init: true).new(
+        registrations << Struct.new(:name, :api, :handler, :openapi, :http_verb, :path, :scope_id, :required_role, keyword_init: true).new(
           name: name,
           api: api,
           handler: options.fetch(:handler),
           openapi: options.fetch(:openapi),
           http_verb: options.fetch(:http_verb),
           path: options.fetch(:path),
-          scope_id: options[:scope_id]
+          scope_id: options[:scope_id],
+          required_role: options[:required_role]
         )
       }) do
         RecordingStudioApi.configuration.stub(:each_api, lambda { |&block|
@@ -127,6 +127,13 @@ class ApiTest < Minitest::Test
       notifications.archive
       notifications.unarchive
     ]
+    view_role_names = %w[
+      notifications.mark_read
+      notifications.mark_unread
+      notifications.archive
+      notifications.unarchive
+      notifications.update_preferences
+    ]
     registrations.each do |registration|
       openapi = registration.openapi
       assert openapi[:title]
@@ -137,6 +144,11 @@ class ApiTest < Minitest::Test
         assert_equal false, registration.scope_id
       else
         assert_nil registration.scope_id
+      end
+      if view_role_names.include?(registration.name)
+        assert_equal :view, registration.required_role
+      else
+        assert_nil registration.required_role
       end
     end
   end

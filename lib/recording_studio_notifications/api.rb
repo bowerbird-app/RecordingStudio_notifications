@@ -24,6 +24,7 @@ module RecordingStudioNotifications
     INDEX_PATH = "notifications"
     # :id is a notification row, not a recording. API 0.26 raises ConfigurationError
     # unless the endpoint passes recordable_type or scope_id: false.
+    # Inbox writes set required_role to view. GET stays on the view default.
     MEMBER_PATH = "notifications/:id"
     PREFERENCES_PATH = "notifications/preferences"
 
@@ -38,19 +39,23 @@ module RecordingStudioNotifications
       },
       {
         name: MARK_READ_NAME, http_verb: :post, path: "#{MEMBER_PATH}/mark_read", handler: MarkRead,
-        openapi: MarkRead::OPENAPI, input_contract: MarkRead::INPUT_CONTRACT, scope_id: false
+        openapi: MarkRead::OPENAPI, input_contract: MarkRead::INPUT_CONTRACT,
+        scope_id: false, required_role: :view
       },
       {
         name: MARK_UNREAD_NAME, http_verb: :post, path: "#{MEMBER_PATH}/mark_unread", handler: MarkUnread,
-        openapi: MarkUnread::OPENAPI, input_contract: MarkUnread::INPUT_CONTRACT, scope_id: false
+        openapi: MarkUnread::OPENAPI, input_contract: MarkUnread::INPUT_CONTRACT,
+        scope_id: false, required_role: :view
       },
       {
         name: ARCHIVE_NAME, http_verb: :post, path: "#{MEMBER_PATH}/archive", handler: Archive,
-        openapi: Archive::OPENAPI, input_contract: Archive::INPUT_CONTRACT, scope_id: false
+        openapi: Archive::OPENAPI, input_contract: Archive::INPUT_CONTRACT,
+        scope_id: false, required_role: :view
       },
       {
         name: UNARCHIVE_NAME, http_verb: :post, path: "#{MEMBER_PATH}/unarchive", handler: Unarchive,
-        openapi: Unarchive::OPENAPI, input_contract: Unarchive::INPUT_CONTRACT, scope_id: false
+        openapi: Unarchive::OPENAPI, input_contract: Unarchive::INPUT_CONTRACT,
+        scope_id: false, required_role: :view
       },
       {
         name: PREFERENCES_NAME, http_verb: :get, path: PREFERENCES_PATH, handler: Preferences,
@@ -58,7 +63,8 @@ module RecordingStudioNotifications
       },
       {
         name: UPDATE_PREFERENCES_NAME, http_verb: :patch, path: PREFERENCES_PATH, handler: UpdatePreferences,
-        openapi: UpdatePreferences::OPENAPI, input_contract: UpdatePreferences::INPUT_CONTRACT
+        openapi: UpdatePreferences::OPENAPI, input_contract: UpdatePreferences::INPUT_CONTRACT,
+        required_role: :view
       }
     ].freeze
 
@@ -85,6 +91,7 @@ module RecordingStudioNotifications
           input_contract: endpoint[:input_contract]
         }
         options[:scope_id] = false if endpoint[:scope_id] == false
+        options[:required_role] = endpoint[:required_role] if endpoint.key?(:required_role)
 
         RecordingStudioApi.register_endpoint(endpoint.fetch(:name), **options)
       end
