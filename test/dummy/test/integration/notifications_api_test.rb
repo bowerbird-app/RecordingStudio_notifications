@@ -202,6 +202,63 @@ class NotificationsApiTest < ActionDispatch::IntegrationTest
     assert_equal inbox_ids.sort, (default_ids + next_ids).sort
   end
 
+  test "a view role key can mark, archive, and update preferences" do
+    actor = @issued.fetch(:access_recording).recordable.actor
+    assert RecordingStudioAccessible.authorized?(actor: actor, recording: @root, role: :view)
+    refute RecordingStudioAccessible.authorized?(actor: actor, recording: @root, role: :edit)
+
+    %w[
+      notifications.mark_read
+      notifications.mark_unread
+      notifications.archive
+      notifications.unarchive
+      notifications.update_preferences
+    ].each do |name|
+      assert_equal :view, RecordingStudioApi.registered_endpoint(name).required_role, name
+    end
+
+    %w[notifications.inbox notifications.show notifications.preferences].each do |name|
+      assert_nil RecordingStudioApi.registered_endpoint(name).required_role, name
+    end
+
+    token = @issued.fetch(:token)
+    post "#{API_ROOT}/notifications/#{@notification.id}/mark_read",
+         headers: bearer_headers(token),
+         as: :json
+    assert_response :success
+    assert @notification.reload.read?
+
+    post "#{API_ROOT}/notifications/#{@notification.id}/mark_unread",
+         headers: bearer_headers(token),
+         as: :json
+    assert_response :success
+    assert @notification.reload.unread?
+
+    post "#{API_ROOT}/notifications/#{@notification.id}/archive",
+         headers: bearer_headers(token),
+         as: :json
+    assert_response :success
+    assert @notification.reload.archived?
+
+    post "#{API_ROOT}/notifications/#{@notification.id}/unarchive",
+         headers: bearer_headers(token),
+         as: :json
+    assert_response :success
+    refute @notification.reload.archived?
+
+    patch "#{API_ROOT}/notifications/preferences",
+          headers: bearer_headers(token),
+          params: { notification_type: "page_comment", channel: "email", enabled: false },
+          as: :json
+    assert_response :success
+    refute RecordingStudioNotifications::Preference.enabled_for?(
+      recipient: @actor,
+      notification_type: :page_comment,
+      channel: :email,
+      default: true
+    )
+  end
+
   test "preferences get and update work for the current actor" do
     get "#{API_ROOT}/notifications/preferences",
         headers: bearer_headers(@issued.fetch(:token)),

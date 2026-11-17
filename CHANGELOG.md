@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Mark read, mark unread, archive, unarchive, and preference update declare `required_role: :view`. Those writes are the recipient's own inbox state, so a view-only API key can call them. Index, show, and preference read stay on the GET default.
+
+### Upgrade notes
+- No migration. Development and dummy Gemfiles stay on Recording Studio API `v1.2.1`, which accepts `required_role` on `register_endpoint`.
+- When a later API release enforces the key role on endpoints with no record id or `scope_id: false`, these inbox writes stay available to a view-only key. Unset writes default to edit.
+
 ## [0.19.1] - 2026-11-16
 
 ### Fixed
