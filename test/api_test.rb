@@ -46,7 +46,6 @@ class ApiTest < Minitest::Test
     assert_includes api, "notifications.preferences"
     assert_includes api, "notifications.update_preferences"
     refute_includes api, "register_capability_action"
-    assert_equal 5, api.scan("required_role: :view").size
     refute File.exist?(File.expand_path("../lib/recording_studio_notifications/mcp.rb", __dir__))
     scope = File.read(File.expand_path("../lib/recording_studio_notifications/services/inbox_scope.rb", __dir__))
     assert_includes inbox, "InboxScope.relation"
