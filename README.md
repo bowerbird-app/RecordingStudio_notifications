@@ -551,18 +551,18 @@ The engine registers Accessible actions for viewing notifications and managing p
 
 When Recording Studio API is loaded, this engine registers public endpoints with `RecordingStudioApi.register_endpoint`. MCP picks those up. There is no MCP tool code here, and no permission logic in RS_API or MCP.
 
-| Name | Verb | Path |
-| --- | --- | --- |
-| `notifications.inbox` | GET | `notifications` |
-| `notifications.show` | GET | `notifications/:id` |
-| `notifications.mark_read` | POST | `notifications/:id/mark_read` |
-| `notifications.mark_unread` | POST | `notifications/:id/mark_unread` |
-| `notifications.archive` | POST | `notifications/:id/archive` |
-| `notifications.unarchive` | POST | `notifications/:id/unarchive` |
-| `notifications.preferences` | GET | `notifications/preferences` |
-| `notifications.update_preferences` | PATCH | `notifications/preferences` |
+| Name | Title | Verb | Path |
+| --- | --- | --- | --- |
+| `notifications.inbox` | Show inbox | GET | `notifications` |
+| `notifications.show` | Show notification | GET | `notifications/:id` |
+| `notifications.mark_read` | Mark notification read | POST | `notifications/:id/mark_read` |
+| `notifications.mark_unread` | Mark notification unread | POST | `notifications/:id/mark_unread` |
+| `notifications.archive` | Archive notification | POST | `notifications/:id/archive` |
+| `notifications.unarchive` | Unarchive notification | POST | `notifications/:id/unarchive` |
+| `notifications.preferences` | Show notification preferences | GET | `notifications/preferences` |
+| `notifications.update_preferences` | Update notification preferences | PATCH | `notifications/preferences` |
 
-MCP advertises the same endpoints. The tool text says what each one does, which values it accepts, and which fields it returns.
+MCP advertises the same endpoints and shows the Title column as written. The tool text says what each one does, which values it accepts, and which fields it returns.
 
 Inbox lists the signed-in person's notifications for this workspace, plus notifications with no workspace, newest first. Archived rows are left out. A row with the inbox turned off is left out. A notice still waiting on a grouped in-app delivery is left out. `page` starts at 1. `per_page` defaults to 25 and is capped at 25. The response has `records` and `meta` (`page`, `per_page`, `total_count`, `total_pages`).
 

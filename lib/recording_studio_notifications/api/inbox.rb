@@ -3,7 +3,7 @@
 module RecordingStudioNotifications
   module Api
     class Inbox
-      TITLE = "Notifications - Inbox"
+      TITLE = "Show inbox"
       OPENAPI = {
         title: TITLE,
         summary: TITLE,

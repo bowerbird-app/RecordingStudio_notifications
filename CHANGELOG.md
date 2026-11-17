@@ -8,6 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.4] - 2026-11-17
+
+### Changed
+- The eight notification API tools use these display titles.
+  - `notifications.inbox` is Show inbox.
+  - `notifications.show` is Show notification.
+  - `notifications.mark_read` is Mark notification read.
+  - `notifications.mark_unread` is Mark notification unread.
+  - `notifications.archive` is Archive notification.
+  - `notifications.unarchive` is Unarchive notification.
+  - `notifications.preferences` is Show notification preferences.
+  - `notifications.update_preferences` is Update notification preferences.
+
+### Upgrade notes
+- None needed. Only the displayed titles changed.
+
 ## [0.19.3] - 2026-11-17
 
 ### Changed

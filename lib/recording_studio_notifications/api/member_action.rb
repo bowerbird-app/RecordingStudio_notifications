@@ -41,7 +41,7 @@ module RecordingStudioNotifications
     end
 
     class MarkRead < MemberAction
-      TITLE = "Notifications - Mark read"
+      TITLE = "Mark notification read"
       OPENAPI = openapi(
         TITLE,
         ToolDescriptions::MARK_READ
@@ -54,7 +54,7 @@ module RecordingStudioNotifications
     end
 
     class MarkUnread < MemberAction
-      TITLE = "Notifications - Mark unread"
+      TITLE = "Mark notification unread"
       OPENAPI = openapi(
         TITLE,
         ToolDescriptions::MARK_UNREAD
@@ -67,7 +67,7 @@ module RecordingStudioNotifications
     end
 
     class Archive < MemberAction
-      TITLE = "Notifications - Archive"
+      TITLE = "Archive notification"
       OPENAPI = openapi(
         TITLE,
         ToolDescriptions::ARCHIVE
@@ -80,7 +80,7 @@ module RecordingStudioNotifications
     end
 
     class Unarchive < MemberAction
-      TITLE = "Notifications - Unarchive"
+      TITLE = "Unarchive notification"
       OPENAPI = openapi(
         TITLE,
         ToolDescriptions::UNARCHIVE

@@ -171,4 +171,38 @@ class ApiTest < Minitest::Test
     expected = RecordingStudioNotifications::Api::ENDPOINTS.map { |endpoint| endpoint.fetch(:name) }
     assert_equal expected, calls
   end
+
+  def test_notification_tool_titles_are_action_first
+    expected = {
+      "notifications.inbox" => "Show inbox",
+      "notifications.show" => "Show notification",
+      "notifications.mark_read" => "Mark notification read",
+      "notifications.mark_unread" => "Mark notification unread",
+      "notifications.archive" => "Archive notification",
+      "notifications.unarchive" => "Unarchive notification",
+      "notifications.preferences" => "Show notification preferences",
+      "notifications.update_preferences" => "Update notification preferences"
+    }
+    seen = {}
+
+    RecordingStudioApi.stub(:registered_endpoint, ->(*) {}) do
+      RecordingStudioApi.stub(:register_endpoint, lambda { |name, **options|
+        seen[name] = options.fetch(:openapi)
+      }) do
+        RecordingStudioApi.configuration.stub(:each_api, lambda { |&block|
+          block.call(Struct.new(:name).new(:public))
+        }) do
+          RecordingStudioNotifications::Api.register!
+        end
+      end
+    end
+
+    assert_equal expected.keys, seen.keys
+    seen.each do |name, openapi|
+      title = openapi.fetch(:title)
+      assert_equal expected.fetch(name), title
+      assert_equal title, openapi.fetch(:summary)
+      refute_match(/\ANotifications -/, title)
+    end
+  end
 end
