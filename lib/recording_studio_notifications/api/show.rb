@@ -7,10 +7,7 @@ module RecordingStudioNotifications
       OPENAPI = {
         title: TITLE,
         summary: TITLE,
-        description: "One notification for the current actor. Looks up Notification.for_recipient, " \
-                     "requires inbox? like HTML show, then visible_notification? under " \
-                     ":view_notifications. Missing, archived, and inbox: false rows are 404. " \
-                     "A row the actor cannot see is 403.",
+        description: ToolDescriptions::SHOW,
         tags: ["Notifications"]
       }.freeze
       INPUT_CONTRACT = {
@@ -19,7 +16,7 @@ module RecordingStudioNotifications
           id: {
             type: :string,
             required: true,
-            description: "Notification id."
+            description: ToolDescriptions::ID
           }
         }
       }.freeze

@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.2] - 2026-11-17
+
+### Changed
+- The eight notification API tools now say, in plain language, what they do, which values they accept, and which fields they return. The tools are `notifications.inbox`, `notifications.show`, `notifications.mark_read`, `notifications.mark_unread`, `notifications.archive`, `notifications.unarchive`, `notifications.preferences`, and `notifications.update_preferences`.
+
+### Upgrade notes
+- None needed. Tool behavior is unchanged.
+
 ## [0.19.1] - 2026-11-16
 
 ### Fixed

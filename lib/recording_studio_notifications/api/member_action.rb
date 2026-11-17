@@ -24,7 +24,7 @@ module RecordingStudioNotifications
             id: {
               type: :string,
               required: true,
-              description: "Notification id the current actor can see."
+              description: ToolDescriptions::ID
             }
           }
         }
@@ -44,7 +44,7 @@ module RecordingStudioNotifications
       TITLE = "Notifications - Mark read"
       OPENAPI = openapi(
         TITLE,
-        "Calls Notification#mark_read! on a notification the current actor can see."
+        ToolDescriptions::MARK_READ
       ).freeze
       INPUT_CONTRACT = id_contract.freeze
 
@@ -57,7 +57,7 @@ module RecordingStudioNotifications
       TITLE = "Notifications - Mark unread"
       OPENAPI = openapi(
         TITLE,
-        "Calls Notification#mark_unread! on a notification the current actor can see."
+        ToolDescriptions::MARK_UNREAD
       ).freeze
       INPUT_CONTRACT = id_contract.freeze
 
@@ -70,7 +70,7 @@ module RecordingStudioNotifications
       TITLE = "Notifications - Archive"
       OPENAPI = openapi(
         TITLE,
-        "Calls Notification#archive! on a notification the current actor can see."
+        ToolDescriptions::ARCHIVE
       ).freeze
       INPUT_CONTRACT = id_contract.freeze
 
@@ -83,7 +83,7 @@ module RecordingStudioNotifications
       TITLE = "Notifications - Unarchive"
       OPENAPI = openapi(
         TITLE,
-        "Calls Notification#unarchive! on an inbox notification for this token, including an archived one."
+        ToolDescriptions::UNARCHIVE
       ).freeze
       INPUT_CONTRACT = id_contract.freeze
 
