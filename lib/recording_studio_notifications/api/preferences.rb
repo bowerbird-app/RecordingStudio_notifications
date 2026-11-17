@@ -7,8 +7,7 @@ module RecordingStudioNotifications
       OPENAPI = {
         title: TITLE,
         summary: TITLE,
-        description: "Channel and cadence rows for the current actor. Uses Preference.for_recipient " \
-                     "under :manage_preferences.",
+        description: ToolDescriptions::PREFERENCES,
         tags: ["Notifications"]
       }.freeze
 
@@ -25,8 +24,7 @@ module RecordingStudioNotifications
       OPENAPI = {
         title: TITLE,
         summary: TITLE,
-        description: "Writes one channel preference with Preference.set! and/or one cadence with " \
-                     "Preference.set_cadence! for the current actor, under :manage_preferences.",
+        description: ToolDescriptions::UPDATE_PREFERENCES,
         tags: ["Notifications"]
       }.freeze
       INPUT_CONTRACT = {
@@ -35,22 +33,22 @@ module RecordingStudioNotifications
           notification_type: {
             type: :string,
             required: true,
-            description: "Registered notification type key."
+            description: ToolDescriptions::NOTIFICATION_TYPE
           },
           channel: {
             type: :string,
             required: false,
-            description: "Optional channel for Preference.set!. Required when enabled is sent."
+            description: ToolDescriptions::CHANNEL
           },
           enabled: {
             type: :boolean,
             required: false,
-            description: "Whether that optional channel is on. Used with channel."
+            description: ToolDescriptions::ENABLED
           },
           cadence: {
             type: :string,
             required: false,
-            description: "Cadence for Preference.set_cadence!. Omit to leave cadence unchanged."
+            description: ToolDescriptions::CADENCE
           }
         }
       }.freeze

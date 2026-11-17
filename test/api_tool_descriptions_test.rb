@@ -60,7 +60,8 @@ class ApiToolDescriptionsTest < Minitest::Test
     per_page = field_text(inbox, :per_page)
 
     assert_includes page, "1"
-    assert_includes per_page, RecordingStudioNotifications::NotificationsController::PER_PAGE.to_s
+    assert_equal inbox_page_size, RecordingStudioNotifications::Api::ToolDescriptions::PAGE_SIZE.to_s
+    assert_includes per_page, inbox_page_size
     assert_equal page, openapi_parameter_text(inbox, "page")
     assert_equal per_page, openapi_parameter_text(inbox, "per_page")
 
@@ -77,7 +78,8 @@ class ApiToolDescriptionsTest < Minitest::Test
 
     assert_match(/\bnotifications\.preferences\b/, field_text(update, :notification_type))
 
-    RecordingStudioNotifications::Configuration.new.channels.each_key do |key|
+    bundled_channels = RecordingStudioNotifications::Configuration.new.channels.keys
+    bundled_channels.each do |key|
       assert_match(/\b#{Regexp.escape(key)}\b/, channel, key.to_s)
       assert_match(/\b#{Regexp.escape(key)}\b/, tool, key.to_s)
     end
@@ -107,6 +109,13 @@ class ApiToolDescriptionsTest < Minitest::Test
   end
 
   private
+
+  def inbox_page_size
+    controller = File.read(
+      File.expand_path("../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__)
+    )
+    controller[/PER_PAGE = (\d+)/, 1] || flunk("inbox page size missing")
+  end
 
   def endpoints
     RecordingStudioNotifications::Api::ENDPOINTS
