@@ -3,7 +3,7 @@
 module RecordingStudioNotifications
   module Api
     class Preferences
-      TITLE = "Notifications - Preferences"
+      TITLE = "Show notification preferences"
       OPENAPI = {
         title: TITLE,
         summary: TITLE,
@@ -20,7 +20,7 @@ module RecordingStudioNotifications
     end
 
     class UpdatePreferences
-      TITLE = "Notifications - Update preferences"
+      TITLE = "Update notification preferences"
       OPENAPI = {
         title: TITLE,
         summary: TITLE,

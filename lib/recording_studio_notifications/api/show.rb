@@ -3,7 +3,7 @@
 module RecordingStudioNotifications
   module Api
     class Show
-      TITLE = "Notifications - Show"
+      TITLE = "Show notification"
       OPENAPI = {
         title: TITLE,
         summary: TITLE,
