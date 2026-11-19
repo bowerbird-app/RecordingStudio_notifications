@@ -205,6 +205,61 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_equal :"recording_studio_notifications.manage_preferences", calls.last.fetch(:action)
   end
 
+  def test_reply_visibility_allows_a_recording_grant_when_the_root_is_hidden
+    actor = FakeActor.new("1")
+    root = Object.new
+    recording = Object.new
+    notification = FakeNotification.new(actor, root, recording)
+    asked = install_view_check { |target| target.equal?(recording) }
+
+    assert reply_visible?(actor, notification)
+    assert_includes asked, recording
+
+    asked.clear
+    refute notification_visible?(actor, notification)
+    assert_equal [root], asked
+  end
+
+  def test_reply_visibility_falls_back_to_the_root_when_the_recording_is_hidden
+    actor = FakeActor.new("1")
+    root = Object.new
+    recording = Object.new
+    notification = FakeNotification.new(actor, root, recording)
+    asked = install_view_check { |target| target.equal?(root) }
+
+    assert reply_visible?(actor, notification)
+    assert_includes asked, recording
+    assert_includes asked, root
+  end
+
+  def test_reply_visibility_rejects_when_neither_recording_nor_root_is_visible
+    actor = FakeActor.new("1")
+    notification = FakeNotification.new(actor, Object.new, Object.new)
+    install_view_check { false }
+
+    refute reply_visible?(actor, notification)
+    refute notification_visible?(actor, notification)
+  end
+
+  def test_reply_visibility_rejects_a_different_actor_who_can_view_the_recording
+    recipient = FakeActor.new("1")
+    stranger = FakeActor.new("2")
+    recording = Object.new
+    notification = FakeNotification.new(recipient, Object.new, recording)
+    install_view_check { |target| target.equal?(recording) }
+
+    refute reply_visible?(stranger, notification)
+  end
+
+  def test_reply_visibility_without_accessible_matches_root_visibility
+    Object.send(:remove_const, :RecordingStudioAccessible) if defined?(RecordingStudioAccessible)
+    actor = FakeActor.new("1")
+    notification = FakeNotification.new(actor, Object.new, Object.new)
+
+    assert notification_visible?(actor, notification)
+    assert_equal notification_visible?(actor, notification), reply_visible?(actor, notification)
+  end
+
   def test_inbox_is_current_root_only_with_rootless_notifications
     controller = File.read(File.expand_path(
                              "../app/controllers/recording_studio_notifications/notifications_controller.rb", __dir__
@@ -524,5 +579,32 @@ class NotificationAcceptanceTest < Minitest::Test
     assert_includes show_view, "FlatPack::Card::Component"
     refute_includes index_view, "<style"
     refute_includes show_view, "<style"
+  end
+
+  def notification_visible?(actor, notification)
+    RecordingStudioNotifications::Services::NotificationAuthorization.visible_notification?(
+      actor: actor,
+      notification: notification
+    )
+  end
+
+  def reply_visible?(actor, notification)
+    RecordingStudioNotifications::Services::NotificationAuthorization.visible_for_reply?(
+      actor: actor,
+      notification: notification
+    )
+  end
+
+  def install_view_check(&allow)
+    Object.send(:remove_const, :RecordingStudioAccessible) if defined?(RecordingStudioAccessible)
+    asked = []
+    fake_accessible = Module.new do
+      define_singleton_method(:authorized_action?) do |**kwargs|
+        asked << kwargs.fetch(:recording)
+        kwargs[:action] == :view && allow.call(kwargs.fetch(:recording))
+      end
+    end
+    Object.const_set(:RecordingStudioAccessible, fake_accessible)
+    asked
   end
 end

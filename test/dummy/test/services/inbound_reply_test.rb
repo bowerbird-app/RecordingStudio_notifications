@@ -200,6 +200,95 @@ class InboundReplyTest < ActiveSupport::TestCase
     assert_equal 0, calls
   end
 
+  test "a recipient with a grant on the recording but not the root can reply" do
+    owner = create_user("reply-recording-owner")
+    root = reply_root(owner)
+    conversation = conversation_recording(root, owner)
+    grant!(conversation, @recipient, :view, manager: owner)
+    notification = rooted_notification(root: root, recording: conversation, actor: owner)
+    calls = 0
+    register_handler(:inbound_reply_rooted) do
+      calls += 1
+      RecordingStudioNotifications::ReplyResult.ok
+    end
+
+    assert RecordingStudioAccessible.authorized?(actor: @recipient, recording: conversation, role: :view)
+    assert_not RecordingStudioAccessible.authorized?(actor: @recipient, recording: root, role: :view)
+    assert_not RecordingStudioNotifications::Services::NotificationAuthorization.visible_notification?(
+      actor: @recipient,
+      notification: notification
+    )
+    inbox = RecordingStudioNotifications::Services::InboxScope.relation(
+      recipient: @recipient,
+      actor: @recipient,
+      root_recording: root,
+      inbox_scope: "all"
+    )
+    assert_not_includes inbox.pluck(:id), notification.id
+
+    result = reply(notification)
+
+    assert result.ok?, result.reason.inspect
+    assert_nil result.reason
+    assert_equal 1, calls
+  end
+
+  test "a recipient with neither a recording grant nor a root grant is rejected" do
+    owner = create_user("reply-neither-owner")
+    root = reply_root(owner)
+    conversation = conversation_recording(root, owner)
+    notification = rooted_notification(root: root, recording: conversation, actor: owner)
+    calls = 0
+    register_handler(:inbound_reply_rooted) do
+      calls += 1
+      RecordingStudioNotifications::ReplyResult.ok
+    end
+
+    assert_no_difference -> { RecordingStudioNotifications::Reply.count } do
+      result = reply(notification)
+      assert result.rejected?
+      assert_equal :not_visible, result.reason
+    end
+    assert_equal 0, calls
+  end
+
+  test "a recipient who can view the root can still reply" do
+    owner = create_user("reply-root-owner")
+    root = reply_root(owner)
+    grant!(root, @recipient, :view, manager: owner)
+    notification = rooted_notification(root: root, actor: owner)
+    calls = 0
+    register_handler(:inbound_reply_rooted) do
+      calls += 1
+      RecordingStudioNotifications::ReplyResult.ok
+    end
+
+    result = reply(notification)
+
+    assert result.ok?
+    assert_equal 1, calls
+  end
+
+  test "a non owner is rejected even with a grant on the recording" do
+    owner = create_user("reply-mismatch-owner")
+    root = reply_root(owner)
+    conversation = conversation_recording(root, owner)
+    grant!(conversation, @other, :view, manager: owner)
+    notification = rooted_notification(root: root, recording: conversation, actor: owner)
+    calls = 0
+    register_handler(:inbound_reply_rooted) do
+      calls += 1
+      RecordingStudioNotifications::ReplyResult.ok
+    end
+
+    assert_no_difference -> { RecordingStudioNotifications::Reply.count } do
+      result = reply(notification, recipient: @other)
+      assert result.rejected?
+      assert_equal :recipient_mismatch, result.reason
+    end
+    assert_equal 0, calls
+  end
+
   test "a type without a handler is not replyable" do
     notification = notify
     RecordingStudioNotifications.reply_handlers.clear!
@@ -337,5 +426,62 @@ class InboundReplyTest < ActiveSupport::TestCase
   def bootstrap_owner!(recording, actor)
     result = RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: actor)
     raise result.error if result.failure?
+  end
+
+  def reply_root(owner)
+    Current.actor = owner
+    workspace = Workspace.create!(name: "Reply root #{SecureRandom.hex(4)}")
+    root = RecordingStudio.create_root_recording!(workspace, actor: owner)
+    bootstrap_owner!(root, owner)
+    root
+  end
+
+  def conversation_recording(root, owner)
+    RecordingStudio.enable_capability(:accessible, on: Page)
+    page = Page.create!(title: "Conversation #{SecureRandom.hex(4)}")
+    RecordingStudio.record!(
+      action: "created",
+      recordable: page,
+      root_recording: root,
+      parent_recording: root,
+      actor: owner
+    ).recording
+  end
+
+  def rooted_notification(root:, actor:, recording: nil)
+    RecordingStudioNotifications.notification_types.register(
+      :inbound_reply_rooted,
+      label: "Inbound reply rooted",
+      scope: :root,
+      default_channels: [:in_app],
+      available_channels: [:in_app]
+    )
+    RecordingStudioNotifications.notify(
+      notification_type: :inbound_reply_rooted,
+      recipient: @recipient,
+      actor: actor,
+      recording: recording,
+      root_recording: root,
+      title: "Rooted reply",
+      idempotency_key: "reply-rooted-#{SecureRandom.hex(4)}",
+      deliver_later: true
+    )
+  end
+
+  def grant!(recording, actor, role, manager:)
+    return if RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: role)
+
+    configuration = RecordingStudioAccessible.configuration
+    original = configuration.access_management_authorizer
+    configuration.access_management_authorizer = ->(**) { true }
+    result = RecordingStudioAccessible.grant_access(
+      recording: recording,
+      actor: actor,
+      role: role,
+      manager_actor: manager
+    )
+    raise result.error if result.failure?
+  ensure
+    configuration.access_management_authorizer = original if configuration
   end
 end
