@@ -63,7 +63,7 @@ module RecordingStudioNotifications
       end
 
       def visible?
-        NotificationAuthorization.visible_notification?(actor: @recipient, notification: @notification)
+        NotificationAuthorization.visible_for_reply?(actor: @recipient, notification: @notification)
       end
 
       def claim_and_handle

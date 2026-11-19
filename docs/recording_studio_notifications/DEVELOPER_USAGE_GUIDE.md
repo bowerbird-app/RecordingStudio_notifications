@@ -541,7 +541,7 @@ RecordingStudioNotifications.handle_reply(
 
 The handler runs inside the claim transaction. Save the owning gem's rows there. Enqueue a job, broadcast, or call `notify` from `after_commit` on those rows. If the handler later raises, the claim rolls back. Work that already left the transaction is left behind.
 
-The gem rejects `:recipient_mismatch` when the person is not the notification's recipient, `:not_visible` when that person can no longer see the notification, and `:not_replyable` when the type has no handler. Those three write no reply row. A replay returns `rejected` again, not `duplicate`. That is intended. A handler returns `ReplyResult.rejected(:your_reason)` for its own refusal. That row stays. A second call with the same channel and idempotency key returns duplicate and does not call the handler.
+The gem rejects `:recipient_mismatch` when the person is not the notification's recipient, `:not_visible` when that person cannot view the notification recording and cannot view the root, and `:not_replyable` when the type has no handler. Those three write no reply row. A replay returns `rejected` again, not `duplicate`. That is intended. A handler returns `ReplyResult.rejected(:your_reason)` for its own refusal. That row stays. A second call with the same channel and idempotency key returns duplicate and does not call the handler.
 
 If the handler raises, the result is `failed(:handler_error)`. If it returns anything other than ok or rejected, the result is `failed(:invalid_result)`. Both roll back the claim, so a retry with the same key runs the handler again. The log line contains the exception class or the return value's class, not the reply text.
 

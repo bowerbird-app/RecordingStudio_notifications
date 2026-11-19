@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.21.0", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.21.1", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
     refute RecordingStudioNotifications.const_defined?(:Hooks)
     refute_respond_to RecordingStudioNotifications.configuration, :hooks
