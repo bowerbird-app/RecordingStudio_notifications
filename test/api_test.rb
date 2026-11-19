@@ -18,7 +18,7 @@ class ApiTest < Minitest::Test
 
     assert_includes gemspec, 'spec.add_dependency "recording_studio_api", ">= 1.1", "< 2.0"'
     refute_includes gemspec, 'spec.add_development_dependency "recording_studio_api"'
-    assert_includes gemfile, 'tag: "v1.2.1"'
+    assert_includes gemfile, 'tag: "v1.19.0"'
   end
 
   def test_engine_registers_api_when_present

@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.5] - 2026-11-19
+
+### Changed
+- Development and dummy Gemfiles pin Recording Studio `v7.7.2`, Flatpack `v0.1.380`, Accessible `v0.55.0`, API `v1.19.0`, Metrics `v0.9.2`, Trashable `v1.2.3`, Icons `v0.4.2`, Logs `v0.8.2`, and Moveable `v6.0.3`.
+- Dummy Gemfile pins Commentable `v0.12.1`, Root Switchable `v0.16.1`, Cache `v0.7.1`, Internationalization `v0.3.1`, and Admin `v2.19.1`. Notifications Email stays `v0.5.4`.
+- `view_component` is `~> 4.19`. Dummy `simplecov` is `~> 0.22`.
+- Dummy `config/recording_studio_api.yml` lets API 1.19 boot. Dummy copies API migration `add_owner_to_recording_studio_api_api_clients` so an API client can store `owner`.
+
+### Upgrade notes
+- Bump to `0.19.5`. This gem ships no new migration. Gemspec floors stay the same.
+- Hosts MUST run the Recording Studio 7.4, 7.5, and 7.7 migrations (`add_recording_studio_recordings_root_type_creation_index`, `enforce_recording_studio_recording_root_invariant`, and `replace_recording_studio_recordings_root_index`) before writing with Recording Studio 7.7. The dummy app does not copy those migrations.
+- Hosts on Recording Studio API `v1.19.0` need `config/recording_studio_api.yml` and `add_owner_to_recording_studio_api_api_clients`.
+
 ## [0.19.4] - 2026-11-17
 
 ### Changed
@@ -700,7 +713,12 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.5...HEAD
+[0.19.5]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.4...v0.19.5
+[0.19.4]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.3...v0.19.4
+[0.19.3]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.2...v0.19.3
+[0.19.2]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.1...v0.19.2
+[0.19.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.0...v0.19.1
 [0.19.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.18.1...v0.19.0
 [0.18.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.17.0...v0.18.0
