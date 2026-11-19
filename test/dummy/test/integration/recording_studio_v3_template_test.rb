@@ -48,7 +48,7 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     assert_includes api_config, "timeout: 5"
   end
 
-  test "Gemfiles pin Recording Studio to ~> 7.8, Accessible to ~> 0.59, Commentable to v0.12.1, and Admin to ~> 2.20" do
+  test "Gemfiles pin Recording Studio to ~> 7.8, Accessible to ~> 0.58, Commentable to v0.12.1, and Admin to ~> 2.20" do
     root_gemfile = File.read(Rails.root.join("../../Gemfile"))
     dummy_gemfile = File.read(Rails.root.join("Gemfile"))
 
@@ -60,8 +60,8 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     refute_match(/ref: "1fcbafe/, dummy_gemfile)
     assert_includes root_gemfile, 'gem "view_component", "~> 4.19"'
     assert_includes dummy_gemfile, 'gem "view_component", "~> 4.19"'
-    assert_includes root_gemfile, 'gem "recording_studio_accessible", "~> 0.59", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.59.0"'
-    assert_includes dummy_gemfile, 'gem "recording_studio_accessible", "~> 0.59", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.59.0"'
+    assert_includes root_gemfile, 'gem "recording_studio_accessible", "~> 0.58", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.58.0"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_accessible", "~> 0.58", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.58.0"'
     assert_includes dummy_gemfile, 'gem "recording_studio_commentable", github: "bowerbird-app/RecordingStudio_commentable", tag: "v0.12.1"'
     assert_includes dummy_gemfile, 'gem "recording_studio_admin", "~> 2.20", github: "bowerbird-app/RecordingStudio_admin", tag: "v2.20.0"'
     assert_includes dummy_gemfile, 'gem "recording_studio_root_switchable", "~> 0.17", github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.17.0"'

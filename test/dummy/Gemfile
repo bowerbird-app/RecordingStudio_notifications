@@ -8,7 +8,7 @@ gem "recording_studio_notifications_email",
 # RecordingStudio engine
 gem "recording_studio", "~> 7.8", github: "bowerbird-app/RecordingStudio", tag: "v7.8.0"
 gem "view_component", "~> 4.19"
-gem "recording_studio_accessible", "~> 0.59", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.59.0"
+gem "recording_studio_accessible", "~> 0.58", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.58.0"
 gem "recording_studio_commentable", github: "bowerbird-app/RecordingStudio_commentable", tag: "v0.12.1"
 
 # Root switcher for the top nav
