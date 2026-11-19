@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-11-19
+
+### Changed
+- Development and dummy Gemfiles pin Recording Studio `~> 7.8` / `v7.8.0`, Flatpack `~> 0.2` / `v0.2.0`, Accessible `~> 0.59` / `v0.59.0`, API `~> 1.21` / `v1.21.2`, Metrics `~> 0.10` / `v0.10.0`, Trashable `~> 1.3` / `v1.3.0`, Icons `~> 0.5` / `v0.5.0`, Logs `~> 0.9` / `v0.9.0`, and Moveable `~> 6.1` / `v6.1.0`.
+- Dummy Gemfile pins Root Switchable `~> 0.17` / `v0.17.0`, Cache `~> 0.8` / `v0.8.0`, and Admin `~> 2.20` / `v2.20.0`. Commentable stays `v0.12.1`, Internationalization stays `v0.3.1`, and Notifications Email stays `v0.5.4`.
+- The dummy drops the manual `flat_pack/heroicons` importmap pin and the icon controller entries in `install_page.html`. Admin and sidebar icons use `shield-check`.
+
+### Upgrade notes
+- Bump to `0.21.0`. This gem ships no new migration. Gemspec floors stay the same.
+- Hosts MUST run the Recording Studio 7.4, 7.5 and 7.7 migrations if they have not.
+- flat_pack 0.2.0 is supported; hosts moving to 0.2 must remove the manual `flat_pack/heroicons` importmap pin and any `flat-pack--icon` controller registration.
+- Compare [v0.20.0...v0.21.0](https://github.com/bowerbird-app/RecordingStudio_notifications/compare/v0.20.0...v0.21.0).
+
 ## [0.20.0] - 2026-11-19
 
 ### Added
@@ -732,7 +745,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.20.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.21.0...HEAD
+[0.21.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.5...v0.20.0
 [0.19.5]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.4...v0.19.5
 [0.19.4]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.3...v0.19.4

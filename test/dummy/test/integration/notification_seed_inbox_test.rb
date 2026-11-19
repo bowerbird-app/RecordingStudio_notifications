@@ -27,8 +27,11 @@ class NotificationSeedInboxTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "System announcement 50"
 
     %w[at-symbol check-circle chat-bubble-left-ellipsis document-text bell exclamation-triangle].each do |icon|
-      assert_includes response.body, "data-flat-pack--icon-name-value=\"#{icon}\""
+      markup = FlatPack::Heroicons.fetch("outline", icon)
+      assert markup, "expected outline SVG for #{icon}"
+      assert_includes response.body, markup
     end
+    refute_includes response.body, "data-flat-pack--icon-name-value"
 
     assert_includes response.body, "absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-600"
     refute_includes response.body, "fp-red-dot"
