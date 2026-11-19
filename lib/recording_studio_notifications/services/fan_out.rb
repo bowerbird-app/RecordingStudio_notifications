@@ -11,7 +11,7 @@ module RecordingStudioNotifications
       Request = Struct.new(
         :notification_type, :type_definition, :title, :body, :url, :metadata, :actor, :notifiable,
         :recording, :recording_id, :root_recording_id, :idempotency_key, :idempotency_index, :inbox,
-        :requested_channels, :rollup_enabled, :preference_table,
+        :requested_channels, :rollup_enabled, :preference_table, :thread_key,
         keyword_init: true
       )
 
@@ -38,6 +38,7 @@ module RecordingStudioNotifications
         @metadata = @attributes[:metadata].presence || {}
         @requested_channels = restore_channels(@attributes[:channels])
         @inbox_override = @attributes[:inbox]
+        @thread_key = @attributes[:thread_key].to_s.strip.presence
         @actor = locate(@attributes[:actor_gid])
         @notifiable = locate(@attributes[:notifiable_gid])
         @recording = locate(@attributes[:recording_gid])
@@ -187,7 +188,8 @@ module RecordingStudioNotifications
           inbox: inbox?,
           requested_channels: @requested_channels,
           rollup_enabled: RecordingStudioNotifications.configuration.rollup_delivery_enabled,
-          preference_table: preference_table?
+          preference_table: preference_table?,
+          thread_key: @thread_key
         )
       end
 

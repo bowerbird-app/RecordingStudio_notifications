@@ -139,6 +139,7 @@ module RecordingStudioNotifications
           metadata: @request.metadata.deep_dup,
           idempotency_key: @request.idempotency_key,
           inbox: @request.inbox,
+          thread_key: @request.thread_key,
           created_at: timestamp,
           updated_at: timestamp
         }

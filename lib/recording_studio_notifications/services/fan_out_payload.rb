@@ -4,7 +4,7 @@ module RecordingStudioNotifications
   module Services
     class FanOutPayload
       OPTIONS = %i[
-        notification_type title body url metadata actor notifiable recording root_recording channels inbox
+        notification_type title body url metadata actor notifiable recording root_recording channels inbox thread_key
       ].freeze
 
       def self.build(recipient_scope:, idempotency_key:, **attributes)
@@ -23,7 +23,8 @@ module RecordingStudioNotifications
           "actor_gid" => global_id(actor),
           "notifiable_gid" => global_id(attributes[:notifiable]),
           "recording_gid" => global_id(attributes[:recording]),
-          "root_recording_gid" => global_id(attributes[:root_recording])
+          "root_recording_gid" => global_id(attributes[:root_recording]),
+          "thread_key" => attributes[:thread_key].to_s.strip.presence
         }
       end
 

@@ -16,6 +16,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 - FlatPack/Tailwind inbox, notification menu, and preference UI
 - Engine-owned Stimulus polling controller for the async notification menu
 - Recording Studio Accessible authorization, ActiveSupport instrumentation, hooks, and install/migration generators
+- Inbound replies. A channel gem resolves a delivery and hands the reply to the handler registered for that notification type
 - Recording Studio API endpoints for the token root inbox (plus rootless rows), member actions, and preferences (`recording_studio_api` `>= 1.1, < 2.0`; MCP advertises them; this gem adds no MCP tools)
 
 ## Requirements
@@ -226,6 +227,55 @@ Pass `channels:` to request a subset of a type's available channels. Required ch
 
 Pass `inbox: false` to keep the notification and its email (and any other non-in-app) deliveries without listing it in the inbox, menu, unread count, or clear-all. The type can default `inbox:` too. A per-call value wins. `inbox: false` does not create an `:in_app` delivery, and it raises `ArgumentError` when `:in_app` is required. The default is `true`, so existing rows stay in the inbox. A retry with the same `idempotency_key` keeps the first `inbox` flag and the first set of channels. `open` still marks a hidden notification read and redirects. `show`, mark read, mark unread, archive, and unarchive return 404.
 
+Pass `thread_key:` on `notify` or `notify_fan_out` when the sender needs an opaque thread id on the notification. The string is stored as given, after stripping blank space. This gem does not parse it. A retry with the same `idempotency_key` keeps the first `thread_key`.
+
+## Inbound replies
+
+A channel gem can hand a recipient's reply to the gem that owns the notification type. This gem does not depend on email or on Messages. It does not read or store the reply text. `notifications_email` (Action Mailbox) and Messages will call this API. They are not required to install notifications.
+
+The reply handler is a separate registry from notification types. Hosts re-register types in `to_prepare`. That does not remove the handler. Registering a handler again for the same type replaces it. `replyable?(type)` is true only when a handler is registered.
+
+```ruby
+RecordingStudioNotifications.register_reply_handler(:message_received) do |notification:, recipient:, body:, attachments:|
+  filed = file_reply(notification:, recipient:, body:, attachments:)
+  filed ? RecordingStudioNotifications::ReplyResult.ok : RecordingStudioNotifications::ReplyResult.rejected(:closed)
+end
+```
+
+Return `ReplyResult.ok` or `ReplyResult.rejected(:reason)`. A reason is a symbol. Do not put an address or other personal data in it. `handle_reply` does not take `thread_key` and does not pass it as a handler argument. Read `notification.thread_key` when the owning gem needs the id it stored at send time.
+
+A channel gem resolves the delivery, then submits the reply. It does not query these tables.
+
+```ruby
+target = RecordingStudioNotifications.reply_target(delivery_id: delivery_id)
+return if target.nil?
+
+result = RecordingStudioNotifications.handle_reply(
+  notification: target.notification,
+  recipient: target.recipient,
+  body: text,
+  attachments: blobs,
+  channel: :email,
+  idempotency_key: message_id
+)
+```
+
+`reply_target` returns a `ReplyTarget` with `notification` and `recipient`, or nil when the id is missing or not a delivery id. `handle_reply` returns a `ReplyResult` and does not raise for an expected outcome.
+
+| Result | Meaning |
+| --- | --- |
+| `ok` | The handler returned `ReplyResult.ok`. |
+| `rejected(:reason)` | The recipient does not match, the recipient can no longer see the notification, the type has no handler, or the handler returned `ReplyResult.rejected`. |
+| `duplicate` | This channel and idempotency key were already claimed. The handler is not called again. |
+| `failed(:handler_error)` | The handler raised. The claim is rolled back, so the same key can be retried. |
+| `failed(:invalid_result)` | The handler returned something other than ok or rejected. The claim is rolled back. |
+
+The claim and the handler run in one transaction. The unique key is `(channel, idempotency_key)`. A key is unique inside one channel, so the same string on another channel is a different reply. The reply row stores the channel, the key, the status (`ok` or `rejected`), and the reason. It does not store the body or the attachments. Attachments are passed through to the handler as given.
+
+Rejected reasons from this gem are `:recipient_mismatch`, `:not_visible`, and `:not_replyable`. `:not_visible` uses the same check as the inbox. The actor is the recipient.
+
+`Notify` and `FanOut` still run `RecordingStudio.configuration.hooks`. `handle_reply` does not. Subscribe to `reply.recording_studio_notifications` for `type`, `channel`, `outcome`, and `reason`. The event does not include the body.
+
 ## Open link
 
 ```ruby
@@ -375,6 +425,7 @@ Subscribe to these ActiveSupport notifications:
 - `notify.recording_studio_notifications`
 - `deliver.recording_studio_notifications`
 - `deliver_rollup.recording_studio_notifications`
+- `reply.recording_studio_notifications` (`type`, `channel`, `outcome`, `reason`)
 
 ## Cloud Agent boot
 

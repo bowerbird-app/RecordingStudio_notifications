@@ -16,7 +16,7 @@ module RecordingStudioNotifications
 
       def initialize(notification_type:, recipient:, title:, body: nil, url: nil, metadata: {}, actor: nil, # rubocop:disable Metrics/ParameterLists
                      notifiable: nil, recording: nil, root_recording: nil, channels: nil, idempotency_key: nil,
-                     deliver_later: nil, inbox: nil)
+                     deliver_later: nil, inbox: nil, thread_key: nil)
         @notification_type = notification_type.to_s
         @recipient = recipient
         @title = title
@@ -31,6 +31,7 @@ module RecordingStudioNotifications
         @idempotency_key = idempotency_key.presence
         @deliver_later = deliver_later
         @inbox_override = inbox.nil? ? nil : ActiveModel::Type::Boolean.new.cast(inbox)
+        @thread_key = thread_key.to_s.strip.presence
       end
 
       def call
@@ -165,7 +166,8 @@ module RecordingStudioNotifications
           url: @url,
           metadata: @metadata,
           idempotency_key: @idempotency_key,
-          inbox: inbox?
+          inbox: inbox?,
+          thread_key: @thread_key
         )
       rescue ActiveRecord::RecordNotUnique
         retry unless (existing = find_idempotent_notification)
