@@ -4,7 +4,7 @@ Object.send(:remove_const, :AdminRootSection) if defined?(AdminRootSection)
 
 class AdminRootSection < RecordingStudioAdmin::Section
   key :root
-  icon :shield
+  icon :shield_check
   title "Admin"
   subtitle "Admin dashboard"
 

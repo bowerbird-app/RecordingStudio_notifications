@@ -48,41 +48,39 @@ class RecordingStudioV3TemplateTest < ActiveSupport::TestCase
     assert_includes api_config, "timeout: 5"
   end
 
-  test "Gemfiles pin Recording Studio to v7.7.2, Accessible to v0.55.0, Commentable to v0.12.1, and Admin to v2.19.1" do
+  test "Gemfiles pin Recording Studio to ~> 7.8, Accessible to ~> 0.58, Commentable to v0.12.1, and Admin to ~> 2.20" do
     root_gemfile = File.read(Rails.root.join("../../Gemfile"))
     dummy_gemfile = File.read(Rails.root.join("Gemfile"))
 
-    assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v7.7.2"/, root_gemfile)
-    assert_match(/gem "recording_studio", github: "bowerbird-app\/RecordingStudio", tag: "v7.7.2"/, dummy_gemfile)
-    assert_match(/tag: "v0.1.380"/, root_gemfile)
-    assert_match(/tag: "v0.1.380"/, dummy_gemfile)
-    refute_match(/tag: "v0.2.0"/, root_gemfile)
-    refute_match(/tag: "v0.2.0"/, dummy_gemfile)
+    assert_includes root_gemfile, 'gem "recording_studio", "~> 7.8", github: "bowerbird-app/RecordingStudio", tag: "v7.8.0"'
+    assert_includes dummy_gemfile, 'gem "recording_studio", "~> 7.8", github: "bowerbird-app/RecordingStudio", tag: "v7.8.0"'
+    assert_includes root_gemfile, 'gem "flat_pack", "~> 0.2", github: "bowerbird-app/flatpack", tag: "v0.2.0"'
+    assert_includes dummy_gemfile, 'gem "flat_pack", "~> 0.2", github: "bowerbird-app/flatpack", tag: "v0.2.0"'
     refute_match(/ref: "1fcbafe/, root_gemfile)
     refute_match(/ref: "1fcbafe/, dummy_gemfile)
-    assert_match(/gem "view_component", "~> 4.19"/, root_gemfile)
-    assert_match(/gem "view_component", "~> 4.19"/, dummy_gemfile)
-    assert_match(/recording_studio_accessible.*, tag: "v0.55.0"/, root_gemfile)
-    assert_match(/recording_studio_accessible.*, tag: "v0.55.0"/, dummy_gemfile)
-    assert_match(/recording_studio_commentable.*, tag: "v0.12.1"/, dummy_gemfile)
-    assert_match(/recording_studio_admin.*, tag: "v2.19.1"/, dummy_gemfile)
-    assert_match(/recording_studio_root_switchable.*, tag: "v0.16.1"/, dummy_gemfile)
-    assert_match(/recording_studio_trashable.*, tag: "v1.2.3"/, root_gemfile)
-    assert_match(/recording_studio_trashable.*, tag: "v1.2.3"/, dummy_gemfile)
-    assert_match(/recording_studio_metrics.*, tag: "v0.9.2"/, root_gemfile)
-    assert_match(/recording_studio_metrics.*, tag: "v0.9.2"/, dummy_gemfile)
-    assert_match(/recording_studio_notifications_email.*\n.*tag: "v0.5.4"/, dummy_gemfile)
-    assert_match(/recording_studio_cache.*, tag: "v0.7.1"/, dummy_gemfile)
-    assert_match(/recording_studio_internationalization.*, tag: "v0.3.1"/, dummy_gemfile)
-    assert_match(/recording_studio_api.*, tag: "v1.19.0"/, root_gemfile)
-    assert_match(/recording_studio_api.*, tag: "v1.19.0"/, dummy_gemfile)
-    assert_match(/recording_studio_logs.*, tag: "v0.8.2"/, root_gemfile)
-    assert_match(/recording_studio_logs.*, tag: "v0.8.2"/, dummy_gemfile)
-    assert_match(/recording_studio_moveable.*, tag: "v6.0.3"/, root_gemfile)
-    assert_match(/recording_studio_moveable.*, tag: "v6.0.3"/, dummy_gemfile)
-    assert_match(/recording_studio_icons.*, tag: "v0.4.2"/, root_gemfile)
-    assert_match(/recording_studio_icons.*, tag: "v0.4.2"/, dummy_gemfile)
-    assert_match(/gem "simplecov", "~> 0.22"/, dummy_gemfile)
+    assert_includes root_gemfile, 'gem "view_component", "~> 4.19"'
+    assert_includes dummy_gemfile, 'gem "view_component", "~> 4.19"'
+    assert_includes root_gemfile, 'gem "recording_studio_accessible", "~> 0.58", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.58.0"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_accessible", "~> 0.58", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.58.0"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_commentable", github: "bowerbird-app/RecordingStudio_commentable", tag: "v0.12.1"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_admin", "~> 2.20", github: "bowerbird-app/RecordingStudio_admin", tag: "v2.20.0"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_root_switchable", "~> 0.17", github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.17.0"'
+    assert_includes root_gemfile, 'gem "recording_studio_trashable", "~> 1.3", github: "bowerbird-app/RecordingStudio_trashable", tag: "v1.3.0"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_trashable", "~> 1.3", github: "bowerbird-app/RecordingStudio_trashable", tag: "v1.3.0"'
+    assert_includes root_gemfile, 'gem "recording_studio_metrics", "~> 0.10", github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.10.0"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_metrics", "~> 0.10", github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.10.0"'
+    assert_includes dummy_gemfile, "gem \"recording_studio_notifications_email\",\n    github: \"bowerbird-app/RecordingStudio_notifications_email\", tag: \"v0.5.4\""
+    assert_includes dummy_gemfile, 'gem "recording_studio_cache", "~> 0.8", github: "bowerbird-app/RecordingStudio_cache", tag: "v0.8.0"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_internationalization", github: "bowerbird-app/RecordingStudio_Internationalization", tag: "v0.3.1"'
+    assert_includes root_gemfile, 'gem "recording_studio_api", "~> 1.21", github: "bowerbird-app/RecordingStudio_api", tag: "v1.21.2"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_api", "~> 1.21", github: "bowerbird-app/RecordingStudio_api", tag: "v1.21.2"'
+    assert_includes root_gemfile, 'gem "recording_studio_logs", "~> 0.9", github: "bowerbird-app/RecordingStudio_logs", tag: "v0.9.0"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_logs", "~> 0.9", github: "bowerbird-app/RecordingStudio_logs", tag: "v0.9.0"'
+    assert_includes root_gemfile, 'gem "recording_studio_moveable", "~> 6.1", github: "bowerbird-app/RecordingStudio_moveable", tag: "v6.1.0"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_moveable", "~> 6.1", github: "bowerbird-app/RecordingStudio_moveable", tag: "v6.1.0"'
+    assert_includes root_gemfile, 'gem "recording_studio_icons", "~> 0.5", github: "bowerbird-app/RecordingStudio_icons", tag: "v0.5.0"'
+    assert_includes dummy_gemfile, 'gem "recording_studio_icons", "~> 0.5", github: "bowerbird-app/RecordingStudio_icons", tag: "v0.5.0"'
+    assert_includes dummy_gemfile, 'gem "simplecov", "~> 0.22"'
   end
 
   test "dummy seeds use v3 hierarchy idempotently and restore current actor" do

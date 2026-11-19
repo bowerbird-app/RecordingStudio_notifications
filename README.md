@@ -25,12 +25,12 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 - Rails 8.1 (development and dummy locks: `8.1.4.1`)
 - `recording_studio` `>= 7.1, < 8.0`, `recording_studio_accessible` `>= 0.44.0, < 1.0` (inbox, preferences, and `creation_action` pass `controller:` to `authorized_action?`), `flat_pack` `>= 0.1.353`, and `view_component` `>= 4.14, < 5`
 - `recording_studio_metrics` `>= 0.9.0, < 1.0` for operations metrics registration
-- `recording_studio_api` `>= 1.1, < 2.0` (API `v1.19.0` requires Recording Studio `>= 7.7.0`, Accessible `>= 0.50.0`, Logs `>= 0.8.0, < 2.0`, Moveable `>= 5.0, < 7.0`, Metrics `>= 0.9.0`, and Trashable `>= 0.17.0`)
+- `recording_studio_api` `>= 1.1, < 2.0` (API `v1.21.2` requires Recording Studio `>= 7.7.0`, Accessible `>= 0.50.0`, Logs `>= 0.8.0, < 2.0`, Moveable `>= 5.0, < 7.0`, Metrics `>= 0.9.0`, and Trashable `>= 0.17.0`)
 - A host application with a current actor resolver and `config.authorize_write`; the bundled UI also expects FlatPack and Stimulus
 
-Development and dummy Gemfiles pin Recording Studio to GitHub tag `v7.7.2`, API to `v1.19.0`, and Accessible to `v0.55.0`. Hosts MUST run the Recording Studio 7.4, 7.5, and 7.7 migrations (`add_recording_studio_recordings_root_type_creation_index`, `enforce_recording_studio_recording_root_invariant`, and `replace_recording_studio_recordings_root_index`) before writing with Recording Studio 7.7. The dummy app does not copy those migrations. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
+Development and dummy Gemfiles pin Recording Studio to `~> 7.8` / `v7.8.0`, API to `~> 1.21` / `v1.21.2`, and Accessible to `~> 0.58` / `v0.58.0`. Hosts MUST run the Recording Studio 7.4, 7.5, and 7.7 migrations (`add_recording_studio_recordings_root_type_creation_index`, `enforce_recording_studio_recording_root_invariant`, and `replace_recording_studio_recordings_root_index`) before writing with Recording Studio 7.7. The dummy app does not copy those migrations. From `0.11` onward access roles are strings with invitation plus dependent-grant columns; `0.12`–`0.15` move Accessible copy to Rails I18n (English shipped in the gem; rendered English unchanged). Accessible `0.14` adds optional action-audience tables; `0.17` filters kept rows through Trashable query helpers; `0.18` adds `ControllerAuth` for sibling engines. The dummy app copies those 0.8–0.14 migrations and grants seed access through `RecordingStudioAccessible.bootstrap_owner_access!` and `grant_access`. Hosts should run `bin/rails generate recording_studio_accessible:migrations` then `bin/rails db:migrate`; do not write `RecordingStudio::Access` rows directly.
 
-Root and dummy Gemfiles pin Trashable `v1.2.3` (`require: false`, query helpers only) next to Accessible. The dummy does not boot the Trashable engine, so it does not install the `purge_at` column. The dummy Gemfile also pins Admin to GitHub tag `v2.19.1` and Metrics `v0.9.2`. Both Gemfiles pin Flatpack to GitHub tag `v0.1.380` and `view_component` `~> 4.19`. Inbox cards use `border: :strong`. `Card` no longer takes `style:`.
+Root and dummy Gemfiles pin Trashable `~> 1.3` / `v1.3.0` (`require: false`, query helpers only) next to Accessible. The dummy does not boot the Trashable engine, so it does not install the `purge_at` column. The dummy Gemfile also pins Admin to `~> 2.20` / `v2.20.0` and Metrics `~> 0.10` / `v0.10.0`. Both Gemfiles pin Flatpack to `~> 0.2` / `v0.2.0` and `view_component` `~> 4.19`. Icons are server-rendered. Hosts moving to Flatpack 0.2 remove the manual `flat_pack/heroicons` importmap pin and any `flat-pack--icon` controller registration. Inbox cards use `border: :strong`. `Card` no longer takes `style:`.
 
 Hosts need Recording Studio `>= 7.1, < 8.0`, Flatpack `>= 0.1.353`, `view_component` `>= 4.14, < 5`, and Admin `>= 2.16.0` when they mount Admin. The gemspec requires Accessible `>= 0.44.0, < 1.0` and Metrics `>= 0.9.0, < 1.0`. Inbox root view uses `authorized_root_recording_ids(actor:, role: :view)`. `root_recording_for` only finds a root. Create one with `RecordingStudio.create_root_recording!(recordable, actor:)`. Set `config.authorize_write`. A new root is authorized with `root_recording` nil. A card that still passes `style:` drops that keyword and sets `border:` instead.
 
@@ -40,8 +40,8 @@ Add the gem to the host application's `Gemfile`:
 
 ```ruby
 gem "recording_studio_notifications"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.7.2"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.380"
+gem "recording_studio", "~> 7.8", github: "bowerbird-app/RecordingStudio", tag: "v7.8.0"
+gem "flat_pack", "~> 0.2", github: "bowerbird-app/flatpack", tag: "v0.2.0"
 ```
 
 Install the engine, copy migrations, and migrate:
@@ -485,8 +485,8 @@ Add the gem and install it in your host app:
 
 ```ruby
 gem "recording_studio_notifications"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.7.2"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.380"
+gem "recording_studio", "~> 7.8", github: "bowerbird-app/RecordingStudio", tag: "v7.8.0"
+gem "flat_pack", "~> 0.2", github: "bowerbird-app/flatpack", tag: "v0.2.0"
 ```
 
 ```bash

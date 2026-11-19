@@ -16,10 +16,10 @@ This guide explains how to install the RecordingStudioNotifications engine in yo
 
 - Rails 8.1+ application
 - PostgreSQL (recommended for UUID compatibility)
-- `recording_studio` `>= 7.1, < 8.0` (development git tag `v7.7.2`). `root_recording_for` only finds a root. Create one with `RecordingStudio.create_root_recording!(recordable, actor:)`. Set `config.authorize_write`. A new root is authorized with `root_recording` nil. Hosts MUST run the Recording Studio 7.4, 7.5, and 7.7 migrations (`add_recording_studio_recordings_root_type_creation_index`, `enforce_recording_studio_recording_root_invariant`, and `replace_recording_studio_recordings_root_index`) before writing with Recording Studio 7.7. The dummy app does not copy those migrations.
-- `flat_pack` `>= 0.1.353`. Development pins GitHub tag `v0.1.380`. The bell menu uses `style: :plain` and `divider: true`, which need Flatpack `0.1.353` or newer.
+- `recording_studio` `>= 7.1, < 8.0` (development pin `~> 7.8`, GitHub tag `v7.8.0`). `root_recording_for` only finds a root. Create one with `RecordingStudio.create_root_recording!(recordable, actor:)`. Set `config.authorize_write`. A new root is authorized with `root_recording` nil. Hosts MUST run the Recording Studio 7.4, 7.5, and 7.7 migrations (`add_recording_studio_recordings_root_type_creation_index`, `enforce_recording_studio_recording_root_invariant`, and `replace_recording_studio_recordings_root_index`) if they have not. The dummy app does not copy those migrations.
+- `flat_pack` `>= 0.1.353`. Development pins `~> 0.2`, GitHub tag `v0.2.0`. Icons are server-rendered. Hosts moving to 0.2 must remove the manual `flat_pack/heroicons` importmap pin and any `flat-pack--icon` controller registration. The bell menu uses `style: :plain` and `divider: true`, which need Flatpack `0.1.353` or newer.
 - `view_component` `>= 4.14, < 5` (development pins `~> 4.19`)
-- Accessible: gemspec `>= 0.44.0, < 1.0`. Inbox, preference, and `creation_action` checks pass `controller:` to `authorized_action?`. Development and dummy Gemfiles pin `v0.55.0`. The inbox filters roots with `authorized_root_recording_ids(actor:, role: :view)`. Dummy Admin `v2.19.1`. Dummy pins Recording Studio API `v1.19.0` (plus Logs `v0.8.2`, Moveable `v6.0.3`, Icons `v0.4.2`, and Redis) so inbox endpoints can be exercised. The notifications gemspec requires `recording_studio_api` `>= 1.1, < 2.0`. API 1.19 requires Recording Studio `>= 7.7.0`, Accessible `>= 0.50.0`, Logs `>= 0.8.0, < 2.0`, Moveable `>= 5.0, < 7.0`, Metrics `>= 0.9.0`, and Trashable `>= 0.17.0`. Metrics gemspec is `>= 0.9.0, < 1.0`. Hosts on API 1.19 need `config/recording_studio_api.yml` and `add_owner_to_recording_studio_api_api_clients`.
+- Accessible: gemspec `>= 0.44.0, < 1.0`. Inbox, preference, and `creation_action` checks pass `controller:` to `authorized_action?`. Development and dummy Gemfiles pin `~> 0.58` / `v0.58.0`. The inbox filters roots with `authorized_root_recording_ids(actor:, role: :view)`. Dummy Admin `~> 2.20` / `v2.20.0`. Dummy pins Recording Studio API `~> 1.21` / `v1.21.2` (plus Logs `~> 0.9` / `v0.9.0`, Moveable `~> 6.1` / `v6.1.0`, Icons `~> 0.5` / `v0.5.0`, and Redis) so inbox endpoints can be exercised. The notifications gemspec requires `recording_studio_api` `>= 1.1, < 2.0`. API 1.21 requires Recording Studio `>= 7.7.0`, Accessible `>= 0.50.0`, Logs `>= 0.8.0, < 2.0`, Moveable `>= 5.0, < 7.0`, Metrics `>= 0.9.0`, and Trashable `>= 0.17.0`. Metrics gemspec is `>= 0.9.0, < 1.0`. Development pins Metrics `~> 0.10` / `v0.10.0` and Trashable `~> 1.3` / `v1.3.0`. Hosts on API 1.21 need `config/recording_studio_api.yml` and `add_owner_to_recording_studio_api_api_clients`.
 - A card drops `style:` and sets `border:` (`border: :strong` on an inbox card, `border: :default` otherwise)
 - TailwindCSS (optional, for styling engine views)
 
@@ -40,8 +40,8 @@ gem "recording_studio_notifications", path: "../recording_studio_notifications"
 
 # Or from RubyGems (after publishing)
 gem "recording_studio_notifications"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.7.2"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.380"
+gem "recording_studio", "~> 7.8", github: "bowerbird-app/RecordingStudio", tag: "v7.8.0"
+gem "flat_pack", "~> 0.2", github: "bowerbird-app/flatpack", tag: "v0.2.0"
 ```
 
 ### 2. Install Dependencies
