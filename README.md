@@ -244,10 +244,16 @@ end
 
 Return `ReplyResult.ok` or `ReplyResult.rejected(:reason)`. A reason is a symbol. Do not put an address or other personal data in it. `handle_reply` does not take `thread_key` and does not pass it as a handler argument. Read `notification.thread_key` when the owning gem needs the id it stored at send time.
 
-A channel gem resolves the delivery, then submits the reply. It does not query these tables.
+`notification.metadata` keys are strings after the row is saved. A symbol key passed to `notify` is stored under that string. Read `notification.metadata["comment_id"]`. `notification.metadata[:comment_id]` is nil. Nested hash keys are strings too.
+
+`attachments` is an Array of `ActiveStorage::Blob`. The array may be empty. The handler receives that array as given. This gem does not store it.
+
+The handler runs inside the claim transaction. Save the reply's own records there. Enqueue a job, broadcast, or call `notify` from an `after_commit` callback on those records. A rollback removes the claim and the records saved in the transaction. It does not cancel a job or broadcast that already left the transaction.
+
+A channel gem resolves the delivery, then submits the reply. It does not query these tables. Confirm the delivery id before calling `reply_target`. A signed token is the usual check. `reply_target` only loads the row.
 
 ```ruby
-target = RecordingStudioNotifications.reply_target(delivery_id: delivery_id)
+target = RecordingStudioNotifications.reply_target(delivery_id: delivery_id, channel: :email)
 return if target.nil?
 
 result = RecordingStudioNotifications.handle_reply(
@@ -260,7 +266,7 @@ result = RecordingStudioNotifications.handle_reply(
 )
 ```
 
-`reply_target` returns a `ReplyTarget` with `notification` and `recipient`, or nil when the id is missing or not a delivery id. `handle_reply` returns a `ReplyResult` and does not raise for an expected outcome.
+`reply_target` returns a `ReplyTarget` with `notification` and `recipient`, or nil when the id is missing or not a delivery id. Pass `channel:` to require that channel. `:email` and `"email"` match the same row. A different channel returns nil. Omit `channel:` to match the id on any channel. `handle_reply` returns a `ReplyResult` and does not raise for an expected outcome.
 
 | Result | Meaning |
 | --- | --- |
@@ -272,7 +278,7 @@ result = RecordingStudioNotifications.handle_reply(
 
 The claim and the handler run in one transaction. The unique key is `(channel, idempotency_key)`. A key is unique inside one channel, so the same string on another channel is a different reply. The reply row stores the channel, the key, the status (`ok` or `rejected`), and the reason. It does not store the body or the attachments. Attachments are passed through to the handler as given.
 
-Rejected reasons from this gem are `:recipient_mismatch`, `:not_visible`, and `:not_replyable`. `:not_visible` uses the same check as the inbox. The actor is the recipient.
+Rejected reasons from this gem are `:recipient_mismatch`, `:not_visible`, and `:not_replyable`. `:not_visible` uses the same check as the inbox. The actor is the recipient. Those three are decided before a reply row is written, so they are not stored. A replay of the same key returns `rejected` again, not `duplicate`. That is intended. A handler's own `ReplyResult.rejected` is stored, and a replay of that key returns `duplicate`.
 
 `Notify` and `FanOut` still run `RecordingStudio.configuration.hooks`. `handle_reply` does not. Subscribe to `reply.recording_studio_notifications` for `type`, `channel`, `outcome`, and `reason`. The event does not include the body.
 

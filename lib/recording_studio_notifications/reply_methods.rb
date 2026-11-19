@@ -14,8 +14,8 @@ module RecordingStudioNotifications
       reply_handlers.replyable?(type)
     end
 
-    def reply_target(delivery_id:)
-      Services::ReplyLookup.call(delivery_id:)
+    def reply_target(delivery_id:, channel: nil)
+      Services::ReplyLookup.call(delivery_id:, channel:)
     end
 
     def handle_reply(...)

@@ -63,6 +63,12 @@ class InboundReplyTest < ActiveSupport::TestCase
     assert_nil RecordingStudioNotifications.reply_target(delivery_id: SecureRandom.uuid)
     assert_nil RecordingStudioNotifications.reply_target(delivery_id: "not-a-delivery")
     assert_nil RecordingStudioNotifications.reply_target(delivery_id: nil)
+
+    matched = RecordingStudioNotifications.reply_target(delivery_id: delivery.id, channel: :in_app)
+    assert_equal notification, matched.notification
+    assert_equal notification, RecordingStudioNotifications.reply_target(delivery_id: delivery.id, channel: "in_app").notification
+    assert_nil RecordingStudioNotifications.reply_target(delivery_id: delivery.id, channel: :email)
+    assert_nil RecordingStudioNotifications.reply_target(delivery_id: delivery.id, channel: " ")
   end
 
   test "a handler accepts the reply and the body is not stored" do

@@ -227,7 +227,7 @@ notification = RecordingStudioNotifications.notify(
 - `title:` required
 - `body:` optional
 - `url:` optional, sanitized for safety
-- `metadata:` optional JSON-like hash
+- `metadata:` optional hash. After save, keys are strings. Read `notification.metadata["comment_id"]`, not a symbol key.
 - `actor:` optional, falls back to configured resolver
 - `notifiable:` optional polymorphic association
 - `recording:` optional Recording Studio recording context
@@ -517,12 +517,12 @@ RecordingStudioNotifications.register_reply_handler(:message_received) do |notif
 end
 ```
 
-2. When you send, pass `thread_key:` if the owning gem needs to recognize the thread later. Read it from `notification.thread_key` inside the handler. `handle_reply` does not pass `thread_key` as its own argument.
+2. When you send, pass `thread_key:` if the owning gem needs to recognize the thread later. Read it from `notification.thread_key` inside the handler. `handle_reply` does not pass `thread_key` as its own argument. Read metadata with string keys. `notification.metadata["comment_id"]` is the stored value. `notification.metadata[:comment_id]` is nil, including for keys inside a nested hash.
 
-3. In the channel gem, resolve the delivery id, then hand off the reply. Do not query `recording_studio_notifications_deliveries` yourself.
+3. In the channel gem, confirm the delivery id, then resolve it. A signed token is the usual check. `reply_target` does not authenticate the caller. Do not query `recording_studio_notifications_deliveries` yourself. Pass `channel:` when the reply arrived on a known channel. The lookup then matches that channel only.
 
 ```ruby
-target = RecordingStudioNotifications.reply_target(delivery_id: delivery_id)
+target = RecordingStudioNotifications.reply_target(delivery_id: delivery_id, channel: :email)
 return if target.nil?
 
 RecordingStudioNotifications.handle_reply(
@@ -535,9 +535,13 @@ RecordingStudioNotifications.handle_reply(
 )
 ```
 
+`attachments` is an Array of `ActiveStorage::Blob`. Pass `[]` when there are none. The handler receives that array. This gem does not store the blobs.
+
 `handle_reply` returns `ReplyResult` and does not raise for an expected outcome. Check `ok?`, `rejected?`, `duplicate?`, or `failed?`. `reason` is a symbol or nil.
 
-The gem rejects `:recipient_mismatch` when the person is not the notification's recipient, `:not_visible` when that person can no longer see the notification, and `:not_replyable` when the type has no handler. A handler returns `ReplyResult.rejected(:your_reason)` for its own refusal. Those rows stay. A second call with the same channel and idempotency key returns duplicate and does not call the handler.
+The handler runs inside the claim transaction. Save the owning gem's rows there. Enqueue a job, broadcast, or call `notify` from `after_commit` on those rows. If the handler later raises, the claim rolls back. Work that already left the transaction is left behind.
+
+The gem rejects `:recipient_mismatch` when the person is not the notification's recipient, `:not_visible` when that person can no longer see the notification, and `:not_replyable` when the type has no handler. Those three write no reply row. A replay returns `rejected` again, not `duplicate`. That is intended. A handler returns `ReplyResult.rejected(:your_reason)` for its own refusal. That row stays. A second call with the same channel and idempotency key returns duplicate and does not call the handler.
 
 If the handler raises, the result is `failed(:handler_error)`. If it returns anything other than ok or rejected, the result is `failed(:invalid_result)`. Both roll back the claim, so a retry with the same key runs the handler again. The log line contains the exception class or the return value's class, not the reply text.
 
