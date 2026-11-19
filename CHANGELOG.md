@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-11-19
+
+### Added
+- `RecordingStudioNotifications.register_reply_handler` stores a reply handler separately from the notification type registry. Re-registering a type does not remove the handler. Registering a handler again for the same type replaces it. `replyable?(type)` is true only when a handler is registered.
+- `notify` and `notify_fan_out` accept an optional `thread_key:` string. It is stored on the notification and is not interpreted. `handle_reply` does not take it and does not pass it as a handler argument. The handler can read `notification.thread_key`.
+- `RecordingStudioNotifications.reply_target(delivery_id:, channel: nil)` returns the notification and recipient for a delivery id, or nil. Pass `channel:` to match that channel only. Omit it to match the id on any channel. Channel gems use this instead of querying the tables. Confirm the delivery id, usually with a signed token, before calling it.
+- `RecordingStudioNotifications.handle_reply` returns a `ReplyResult` (`ok`, `rejected(reason)`, `duplicate`, `failed(reason)`) and does not raise for those outcomes. Reasons are symbols. The reply row stores channel, idempotency key, status, and reason. It does not store the body or attachments. `attachments` is an Array of `ActiveStorage::Blob` and may be empty.
+- The unique reply key is `(channel, idempotency_key)`. A key is unique inside one channel. The same string on another channel is a different reply. A handler error rolls the claim back, so the same key can be retried. A second call after ok or a handler rejection returns duplicate and does not call the handler. `:recipient_mismatch`, `:not_visible`, and `:not_replyable` are not stored, so a replay returns `rejected` again.
+- `reply.recording_studio_notifications` reports `type`, `channel`, `outcome`, and `reason`. The payload has no body.
+- Migration `add_inbound_replies_to_recording_studio_notifications` adds nullable `thread_key` on notifications and the `recording_studio_notifications_replies` table.
+
+### Upgrade notes
+- Bump to `0.20.0`. Run `bin/rails generate recording_studio_notifications:migrations`, then `bin/rails db:migrate`. The migration is additive. Existing `notify` and `notify_fan_out` calls stay valid. Their return values are unchanged.
+- Register a reply handler for each type that should accept replies. A channel gem resolves `reply_target` and calls `handle_reply`. This gem does not depend on `notifications_email` or Messages. Those gems will build on this API.
+- A handler returns `ReplyResult.ok` or `ReplyResult.rejected(:some_reason)`. Raise only for an unexpected failure. A raised handler returns `failed(:handler_error)` and removes the claim. Any other return value returns `failed(:invalid_result)` and removes the claim.
+- Do not put an address or other personal data in a reason symbol.
+- Read `notification.metadata` with string keys. Symbol keys are not present after save.
+- The handler runs inside the claim transaction. Enqueue jobs, broadcast, or call `notify` from `after_commit`. A rollback does not cancel work that already left the transaction.
+
 ## [0.19.5] - 2026-11-19
 
 ### Changed
@@ -713,7 +732,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.5...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.20.0...HEAD
+[0.20.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.5...v0.20.0
 [0.19.5]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.4...v0.19.5
 [0.19.4]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.3...v0.19.4
 [0.19.3]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.2...v0.19.3

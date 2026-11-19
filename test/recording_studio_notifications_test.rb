@@ -4,7 +4,7 @@ require "test_helper"
 
 class RecordingStudioNotificationsTest < Minitest::Test
   def test_version_and_engine_exist
-    assert_equal "0.19.5", ::RecordingStudioNotifications::VERSION
+    assert_equal "0.20.0", ::RecordingStudioNotifications::VERSION
     assert_kind_of Class, ::RecordingStudioNotifications::Engine
     refute RecordingStudioNotifications.const_defined?(:Hooks)
     refute_respond_to RecordingStudioNotifications.configuration, :hooks
@@ -17,6 +17,10 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_respond_to RecordingStudioNotifications, :register_recipient_scope
     assert_respond_to RecordingStudioNotifications, :register_notification_type
     assert_respond_to RecordingStudioNotifications, :register_channel
+    assert_respond_to RecordingStudioNotifications, :register_reply_handler
+    assert_respond_to RecordingStudioNotifications, :replyable?
+    assert_respond_to RecordingStudioNotifications, :reply_target
+    assert_respond_to RecordingStudioNotifications, :handle_reply
     assert_respond_to RecordingStudioNotifications, :notification_url
     assert_respond_to RecordingStudioNotifications, :unsubscribe_url
     assert_respond_to RecordingStudioNotifications, :list_unsubscribe_headers

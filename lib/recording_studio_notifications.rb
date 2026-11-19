@@ -19,6 +19,11 @@ require "recording_studio_notifications/services/inbox_window"
 require "recording_studio_notifications/services/root_resolver"
 require "recording_studio_notifications/services/notification_authorization"
 require "recording_studio_notifications/delivery_payload_registry"
+require "recording_studio_notifications/reply_handler_registry"
+require "recording_studio_notifications/reply_result"
+require "recording_studio_notifications/reply_target"
+require "recording_studio_notifications/reply_methods"
+require "recording_studio_notifications/services/handle_reply"
 require "recording_studio_notifications/metrics"
 require "recording_studio_notifications/api"
 
@@ -66,12 +71,11 @@ module RecordingStudioNotifications
     end
 
     def notify_each(recipients:, **attributes)
-      Array(recipients).map do |recipient|
-        notify(recipient: recipient, **attributes)
-      end
+      Array(recipients).map { |recipient| notify(recipient: recipient, **attributes) }
     end
 
     include FanOutMethods
+    include ReplyMethods
 
     def unsubscribe_purpose(notification_type, channel)
       "recording_studio_notifications.unsubscribe.#{notification_type.to_s.strip}.#{channel.to_s.strip}"
