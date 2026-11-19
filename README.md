@@ -278,7 +278,7 @@ result = RecordingStudioNotifications.handle_reply(
 
 The claim and the handler run in one transaction. The unique key is `(channel, idempotency_key)`. A key is unique inside one channel, so the same string on another channel is a different reply. The reply row stores the channel, the key, the status (`ok` or `rejected`), and the reason. It does not store the body or the attachments. Attachments are passed through to the handler as given.
 
-Rejected reasons from this gem are `:recipient_mismatch`, `:not_visible`, and `:not_replyable`. `:not_visible` uses the same check as the inbox. The actor is the recipient. Those three are decided before a reply row is written, so they are not stored. A replay of the same key returns `rejected` again, not `duplicate`. That is intended. A handler's own `ReplyResult.rejected` is stored, and a replay of that key returns `duplicate`.
+Rejected reasons from this gem are `:recipient_mismatch`, `:not_visible`, and `:not_replyable`. `:not_visible` on a reply means the recipient cannot view the notification recording and cannot view the root. The inbox still checks the root. The actor is the recipient. Those three are decided before a reply row is written, so they are not stored. A replay of the same key returns `rejected` again, not `duplicate`. That is intended. A handler's own `ReplyResult.rejected` is stored, and a replay of that key returns `duplicate`.
 
 `Notify` and `FanOut` still run `RecordingStudio.configuration.hooks`. `handle_reply` does not. Subscribe to `reply.recording_studio_notifications` for `type`, `channel`, `outcome`, and `reason`. The event does not include the body.
 

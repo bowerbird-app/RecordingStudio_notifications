@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.1] - 2026-11-19
+
+### Fixed
+- `handle_reply` accepts a reply when the recipient can view `notification.recording`, including when they cannot view the root. A notification with no recording, or a recording the recipient cannot view, still uses the root check. The inbox, the menu, and show keep the root check.
+
+### Upgrade notes
+- Bump to `0.21.1`. There is no migration. This gem still grants nothing. A reply asks Accessible `authorized_action?(action: :view, recording:)` for the notification recording, then for the root.
+
 ## [0.21.0] - 2026-11-19
 
 ### Changed
@@ -745,7 +753,8 @@ fetch at Build.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.21.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.21.1...HEAD
+[0.21.1]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.21.0...v0.21.1
 [0.21.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.20.0...v0.21.0
 [0.20.0]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.5...v0.20.0
 [0.19.5]: https://github.com/bowerbird-app/recording_studio_notifications/compare/v0.19.4...v0.19.5
