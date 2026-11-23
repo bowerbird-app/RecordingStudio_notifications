@@ -154,6 +154,22 @@ class RecordingStudioNotificationsTest < Minitest::Test
     assert_includes views, "overflow: visible"
   end
 
+  def test_dummy_security_pins_match_ci
+    root = File.expand_path("..", __dir__)
+    lockfile = File.read(File.join(root, "test/dummy/Gemfile.lock"))
+    dummy_ruby = File.read(File.join(root, "test/dummy/.ruby-version")).strip
+    gem_ruby = File.read(File.join(root, ".ruby-version")).strip
+    changelog = File.read(File.join(root, "CHANGELOG.md"))
+
+    assert_match(/^    puma \(8\.1\.2\)$/, lockfile)
+    assert_match(/^    brakeman \(8\.1\.1\)$/, lockfile)
+    assert_match(/^    net-ssh \(7\.3\.10\)$/, lockfile)
+    assert_equal "3.3.14", dummy_ruby
+    assert_equal "3.3.6", gem_ruby
+    assert_includes changelog, "Dummy Puma is `8.1.2`"
+    assert_includes changelog, "Dummy Brakeman is `8.1.1`"
+  end
+
   def test_template_leftovers_are_gone
     root = File.expand_path("..", __dir__)
 

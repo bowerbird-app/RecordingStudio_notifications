@@ -13,8 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Named MCP tools for the existing notification endpoints, on both the public and operations APIs: `list_notifications` (`notifications.inbox`), `show_notification` (`notifications.show`), `mark_notification_read` (`notifications.mark_read`), `mark_notification_unread` (`notifications.mark_unread`), `archive_notification` (`notifications.archive`), `unarchive_notification` (`notifications.unarchive`), `list_notification_preferences` (`notifications.preferences`), and `update_notification_preferences` (`notifications.update_preferences`). Types are `Notification` and `NotificationPreference`. `McpCopy.register!` no-ops when Recording Studio MCP is not loaded. This gem still does not depend on `recording_studio_mcp`.
 
+### Fixed
+- Dummy Puma is `8.1.2` so `bin/bundler-audit` is clean of GHSA-4v6q-hvv7-49h9 and GHSA-rhww-p99c-hgj9. Dummy `net-ssh` is `7.3.10` for GHSA-hjwv-j52r-xcg7 and GHSA-qcf4-j55x-72hv.
+- Dummy Brakeman is `8.1.1`. Dummy `.ruby-version` is `3.3.14` so `bin/brakeman --ensure-latest` is clean of CVE-2026-132825. Gem development `.ruby-version` stays `3.3.6`.
+
 ### Upgrade notes
 - Bump to `0.21.2`. There is no migration. Gemspec floors stay the same. This gem still does not depend on `recording_studio_mcp`.
+- Dummy `.ruby-version` is `3.3.14`. Hosts stay on `>= 3.3.0`.
 - Hosts that load MCP `0.40.0` or newer include the eight tool names on the public and operations MCP servers. Named tools need MCP `register_tool` (MCP `0.43.0` shape, `0.45.2` current). Older MCP gems skip those calls. Authorization stays Recording Studio Accessible. HTTP endpoint names are unchanged.
 
 ## [0.21.1] - 2026-11-19

@@ -47,6 +47,7 @@ end
 ### Dependencies
 - **Status**: ✅ Current
 - Rails 8.1 (latest stable)
+- Dummy CI pins: Puma `8.1.2`, Brakeman `8.1.1`, `net-ssh` `7.3.10`, dummy `.ruby-version` `3.3.14`
 - All gems from trusted sources (rubygems.org)
 - Gemspec includes `rubygems_mfa_required = true` for publishing security
 
