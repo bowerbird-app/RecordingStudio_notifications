@@ -92,6 +92,21 @@ class McpCopyTest < Minitest::Test
     assert_equal api::NOTIFICATION_SHAPE, mcp::NOTIFICATION_SHAPE
     assert_equal api::PREFERENCE_SHAPE, mcp::PREFERENCE_SHAPE
     assert_equal api::HIDDEN, mcp::HIDDEN
+    show_body = format(
+      api::SHOW_FORMAT,
+      inbox: "list_notifications",
+      read: "mark_notification_read",
+      unread: "mark_notification_unread",
+      archive: "archive_notification"
+    )
+    assert_equal "#{mcp::NOTIFICATION} #{show_body}", mcp::SHOW
+    assert_includes mcp::LIST, format(
+      api::INBOX_TAIL_FORMAT,
+      show: "show_notification",
+      read: "mark_notification_read",
+      unread: "mark_notification_unread",
+      archive: "archive_notification"
+    )
     assert_equal format(
       api::MARK_READ_FORMAT,
       inbox: "list_notifications",

@@ -5,20 +5,27 @@ require_relative "tool_description_formats"
 module RecordingStudioNotifications
   module Api
     module ToolDescriptions
-      INBOX = "List the signed-in person's notifications for this workspace, newest first. " \
-              "Notifications with no workspace are included. Archived notifications are left out. " \
-              "A notification sent with the inbox turned off is left out. A notice still waiting on a " \
-              "grouped in-app delivery is left out. Another person's notifications are left out. " \
-              "Pass page and per_page to choose the page. Use notifications.show when you need one item. " \
-              "Use notifications.mark_read, notifications.mark_unread, or notifications.archive to change one. " \
-              "Take id from a record in this list. Returns records and meta. Each record has " \
-              "#{NOTIFICATION_FIELDS}. type is the string notification. read is true when read_at or " \
-              "cleared_at is set. meta has page, per_page, total_count, and total_pages.".freeze
+      INBOX = (
+        "List the signed-in person's notifications for this workspace, newest first. " \
+        "Notifications with no workspace are included. Archived notifications are left out. " \
+        "A notification sent with the inbox turned off is left out. A notice still waiting on a " \
+        "grouped in-app delivery is left out. Another person's notifications are left out. " +
+        format(
+          INBOX_TAIL_FORMAT,
+          show: "notifications.show",
+          read: "notifications.mark_read",
+          unread: "notifications.mark_unread",
+          archive: "notifications.archive"
+        )
+      ).freeze
 
-      SHOW = "Read one notification for the signed-in person in this workspace, or one with no workspace. " \
-             "Use this when you have an id from notifications.inbox and need the full item. #{HIDDEN} " \
-             "Use notifications.mark_read, notifications.mark_unread, or notifications.archive to change it. " \
-             "#{NOTIFICATION_SHAPE}".freeze
+      SHOW = format(
+        SHOW_FORMAT,
+        inbox: "notifications.inbox",
+        read: "notifications.mark_read",
+        unread: "notifications.mark_unread",
+        archive: "notifications.archive"
+      ).freeze
 
       MARK_READ = format(
         MARK_READ_FORMAT,

@@ -23,6 +23,17 @@ module RecordingStudioNotifications
         "A notification with the inbox turned off, a missing id, " \
         "another person's notification, or a notification in another workspace returns not found. " \
         "A notification this person is not allowed to see returns forbidden."
+      SHOW_FORMAT =
+        "Read one notification for the signed-in person in this workspace, or one with no workspace. " \
+        "Use this when you have an id from %<inbox>s and need the full item. #{HIDDEN} " \
+        "Use %<read>s, %<unread>s, or %<archive>s to change it. " \
+        "#{NOTIFICATION_SHAPE}".freeze
+      INBOX_TAIL_FORMAT =
+        "Pass page and per_page to choose the page. Use %<show>s when you need one item. " \
+        "Use %<read>s, %<unread>s, or %<archive>s to change one. " \
+        "Take id from a record in this list. Returns records and meta. Each record has " \
+        "#{NOTIFICATION_FIELDS}. type is the string notification. read is true when read_at or " \
+        "cleared_at is set. meta has page, per_page, total_count, and total_pages.".freeze
 
       MARK_READ_FORMAT =
         "Mark one notification read for the signed-in person. Use this when a %<inbox>s " \
