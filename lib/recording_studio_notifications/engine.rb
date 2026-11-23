@@ -128,6 +128,10 @@ module RecordingStudioNotifications
       config.to_prepare { RecordingStudioNotifications::Api.register! }
     end
 
+    initializer "recording_studio_notifications.mcp", after: "recording_studio_notifications.api" do
+      config.to_prepare { RecordingStudioNotifications::McpCopy.register! }
+    end
+
     initializer "recording_studio_notifications.register_admin_capabilities",
                 after: "recording_studio_notifications.load_config" do |_app|
       next unless defined?(RecordingStudioAdmin)

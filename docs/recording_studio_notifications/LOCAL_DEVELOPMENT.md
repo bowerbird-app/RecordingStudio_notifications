@@ -195,7 +195,7 @@ bin/rails db:migrate
 | Tailwind styles missing | Run `bin/rails tailwindcss:build`. |
 | Port 3000 in use | Use `PORT=3001 bin/dev`. |
 | Redis connection refused | Start Redis: `redis-server` or `brew services start redis`. |
-| Bundle install fails | Check Ruby version matches `.ruby-version` (3.3.0). |
+| Bundle install fails | Check Ruby version matches `.ruby-version` (dummy `3.3.14`). |
 | Couldn't decrypt credentials | Set `RAILS_MASTER_KEY` to the shared Recording Studio dummy key, or write it to `test/dummy/config/master.key`. Do not generate a new key. |
 
 ---

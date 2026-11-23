@@ -31,6 +31,33 @@ class ApiToolDescriptionsTest < Minitest::Test
     notifications.unarchive
   ].freeze
 
+  def test_inbox_and_show_match_main_copy
+    api = RecordingStudioNotifications::Api::ToolDescriptions
+    inbox = "List the signed-in person's notifications for this workspace, newest first. " \
+            "Notifications with no workspace are included. Archived notifications are left out. " \
+            "A notification sent with the inbox turned off is left out. A notice still waiting on a " \
+            "grouped in-app delivery is left out. Another person's notifications are left out. " \
+            "Pass page and per_page to choose the page. Use notifications.show when you need one item. " \
+            "Use notifications.mark_read, notifications.mark_unread, or notifications.archive to change one. " \
+            "Take id from a record in this list. Returns records and meta. Each record has " \
+            "#{api::NOTIFICATION_FIELDS}. type is the string notification. read is true when read_at or " \
+            "cleared_at is set. meta has page, per_page, total_count, and total_pages."
+    show = "Read one notification for the signed-in person in this workspace, or one with no workspace. " \
+           "Use this when you have an id from notifications.inbox and need the full item. #{api::HIDDEN} " \
+           "Use notifications.mark_read, notifications.mark_unread, or notifications.archive to change it. " \
+           "#{api::NOTIFICATION_SHAPE}"
+
+    assert_equal inbox, api::INBOX
+    assert_equal show, api::SHOW
+    assert_equal format(
+      api::SHOW_FORMAT,
+      inbox: "notifications.inbox",
+      read: "notifications.mark_read",
+      unread: "notifications.mark_unread",
+      archive: "notifications.archive"
+    ), api::SHOW
+  end
+
   def test_each_tool_description_is_plain_language
     assert_equal 8, endpoints.size
 

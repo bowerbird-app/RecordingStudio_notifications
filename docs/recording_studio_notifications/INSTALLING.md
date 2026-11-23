@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/recording_studio_notifications](https://github.com/bowerbird-app/recording_studio_notifications/tree/main/docs/recording_studio_notifications)
-> *   **Last Updated:** November 19, 2026
+> *   **Last Updated:** November 23, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
