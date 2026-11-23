@@ -619,7 +619,7 @@ When Recording Studio API is loaded, this engine registers public endpoints with
 | `notifications.preferences` | Show notification preferences | GET | `notifications/preferences` |
 | `notifications.update_preferences` | Update notification preferences | PATCH | `notifications/preferences` |
 
-When Recording Studio MCP defines `register_tool`, `McpCopy.register!` registers named tools for both the public and operations surfaces. Include those names on the host MCP servers.
+When Recording Studio MCP defines `register_tool`, `McpCopy.register!` registers named tools for both the public and operations surfaces. Hosts include `McpCopy.tool_names[:public]` on the public MCP server and `[:operations]` on operations. Both lists are the eight names below.
 
 | Tool | Endpoint | Type |
 | --- | --- | --- |

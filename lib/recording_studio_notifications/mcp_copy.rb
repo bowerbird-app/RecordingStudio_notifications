@@ -79,7 +79,8 @@ module RecordingStudioNotifications
     end
 
     def tool_names
-      TOOLS.map { |tool| tool.fetch(:name) }
+      names = TOOLS.map { |tool| tool.fetch(:name) }
+      { public: names, operations: names }
     end
 
     def register_types

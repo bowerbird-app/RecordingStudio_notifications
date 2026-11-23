@@ -33,7 +33,11 @@ class McpCopyTest < Minitest::Test
   ].freeze
 
   def test_tool_names_are_the_eight_notification_endpoints
-    assert_equal EXPECTED_TOOLS.keys, RecordingStudioNotifications::McpCopy.tool_names
+    names = tool_names_on_surfaces
+
+    assert_equal EXPECTED_TOOLS.keys, names.fetch(:public)
+    assert_equal EXPECTED_TOOLS.keys, names.fetch(:operations)
+    assert_equal names.fetch(:public), names.fetch(:operations)
   end
 
   def test_named_tools_map_to_existing_api_endpoints
@@ -73,8 +77,47 @@ class McpCopyTest < Minitest::Test
       assert_includes %w[Notification NotificationPreference], type
       next unless WRITE_TOOLS.include?(name)
 
-      assert_match(/first|after archive_notification/, description, name)
+      assert_match(
+        /list_notifications|list_notification_preferences|mark_notification_read|archive_notification/,
+        description,
+        name
+      )
     end
+  end
+
+  def test_shared_tool_bodies_interpolate_mcp_names
+    api = RecordingStudioNotifications::Api::ToolDescriptions
+    mcp = RecordingStudioNotifications::McpCopy::Descriptions
+
+    assert_equal api::NOTIFICATION_SHAPE, mcp::NOTIFICATION_SHAPE
+    assert_equal api::PREFERENCE_SHAPE, mcp::PREFERENCE_SHAPE
+    assert_equal api::HIDDEN, mcp::HIDDEN
+    assert_equal format(
+      api::MARK_READ_FORMAT,
+      inbox: "list_notifications",
+      show: "show_notification",
+      unread: "mark_notification_unread"
+    ), mcp::MARK_READ
+    assert_equal format(api::MARK_UNREAD_FORMAT, read: "mark_notification_read"), mcp::MARK_UNREAD
+    assert_equal format(
+      api::ARCHIVE_FORMAT,
+      inbox: "list_notifications",
+      show: "show_notification",
+      read: "mark_notification_read",
+      unread: "mark_notification_unread",
+      unarchive: "unarchive_notification"
+    ), mcp::ARCHIVE
+    assert_equal format(
+      api::UNARCHIVE_FORMAT,
+      archive: "archive_notification",
+      inbox: "list_notifications"
+    ), mcp::UNARCHIVE
+    assert_equal format(api::UPDATE_PREFERENCES_FORMAT, preferences: "list_notification_preferences"),
+                 mcp::UPDATE_PREFERENCES
+    assert_equal format(api::ID_FORMAT, inbox: "list_notifications", unarchive: "unarchive_notification"),
+                 mcp::ID
+    assert_equal format(api::NOTIFICATION_TYPE_FORMAT, preferences: "list_notification_preferences"),
+                 mcp::NOTIFICATION_TYPE_FIELD
   end
 
   def test_member_tools_use_the_notification_type
@@ -122,6 +165,11 @@ class McpCopyTest < Minitest::Test
   end
 
   private
+
+  def tool_names_on_surfaces
+    names = RecordingStudioNotifications::McpCopy.tool_names
+    { public: names.fetch(:public), operations: names.fetch(:operations) }
+  end
 
   def refute_banned(text, label)
     BANNED.each do |word|

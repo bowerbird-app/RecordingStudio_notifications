@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Upgrade notes
 - Bump to `0.21.2`. There is no migration. Gemspec floors stay the same. This gem still does not depend on `recording_studio_mcp`.
 - Dummy `.ruby-version` is `3.3.14`. Hosts stay on `>= 3.3.0`.
-- Hosts that load MCP `0.40.0` or newer include the eight tool names on the public and operations MCP servers. Named tools need MCP `register_tool` (MCP `0.43.0` shape, `0.45.2` current). Older MCP gems skip those calls. Authorization stays Recording Studio Accessible. HTTP endpoint names are unchanged.
+- Hosts that load MCP `0.40.0` or newer include `McpCopy.tool_names[:public]` on the public MCP server and `[:operations]` on operations. Both lists are the eight named tools. Named tools need MCP `register_tool` (MCP `0.43.0` shape, `0.45.2` current). Older MCP gems skip those calls. Authorization stays Recording Studio Accessible. HTTP endpoint names are unchanged.
 
 ## [0.21.1] - 2026-11-19
 
