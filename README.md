@@ -17,7 +17,7 @@ RecordingStudioNotifications is a mountable Rails engine for root-aware, idempot
 - Engine-owned Stimulus polling controller for the async notification menu
 - Recording Studio Accessible authorization, ActiveSupport instrumentation, hooks, and install/migration generators
 - Inbound replies. A channel gem resolves a delivery and hands the reply to the handler registered for that notification type
-- Recording Studio API endpoints for the token root inbox (plus rootless rows), member actions, and preferences (`recording_studio_api` `>= 1.1, < 2.0`; MCP advertises them; this gem adds no MCP tools)
+- Recording Studio API endpoints for the token root inbox (plus rootless rows), member actions, and preferences (`recording_studio_api` `>= 1.1, < 2.0`). When Recording Studio MCP is loaded, named tools map to those endpoints on the public and operations APIs
 
 ## Requirements
 
@@ -606,7 +606,7 @@ The engine registers Accessible actions for viewing notifications and managing p
 
 ## JSON API
 
-When Recording Studio API is loaded, this engine registers public endpoints with `RecordingStudioApi.register_endpoint`. MCP picks those up. There is no MCP tool code here, and no permission logic in RS_API or MCP.
+When Recording Studio API is loaded, this engine registers public endpoints with `RecordingStudioApi.register_endpoint` on every named API. There is no permission logic in RS_API or MCP.
 
 | Name | Title | Verb | Path |
 | --- | --- | --- | --- |
@@ -619,7 +619,20 @@ When Recording Studio API is loaded, this engine registers public endpoints with
 | `notifications.preferences` | Show notification preferences | GET | `notifications/preferences` |
 | `notifications.update_preferences` | Update notification preferences | PATCH | `notifications/preferences` |
 
-MCP advertises the same endpoints and shows the Title column as written. The tool text says what each one does, which values it accepts, and which fields it returns.
+When Recording Studio MCP defines `register_tool`, `McpCopy.register!` registers named tools for both the public and operations surfaces. Include those names on the host MCP servers.
+
+| Tool | Endpoint | Type |
+| --- | --- | --- |
+| `list_notifications` | `notifications.inbox` | `Notification` |
+| `show_notification` | `notifications.show` | `Notification` |
+| `mark_notification_read` | `notifications.mark_read` | `Notification` |
+| `mark_notification_unread` | `notifications.mark_unread` | `Notification` |
+| `archive_notification` | `notifications.archive` | `Notification` |
+| `unarchive_notification` | `notifications.unarchive` | `Notification` |
+| `list_notification_preferences` | `notifications.preferences` | `NotificationPreference` |
+| `update_notification_preferences` | `notifications.update_preferences` | `NotificationPreference` |
+
+This gem does not depend on `recording_studio_mcp`. Older MCP gems skip `register_tool`. The HTTP Title column is unchanged. MCP copy lives in `mcp_copy/descriptions.rb`.
 
 Inbox lists the signed-in person's notifications for this workspace, plus notifications with no workspace, newest first. Archived rows are left out. A row with the inbox turned off is left out. A notice still waiting on a grouped in-app delivery is left out. `page` starts at 1. `per_page` defaults to 25 and is capped at 25. The response has `records` and `meta` (`page`, `per_page`, `total_count`, `total_pages`).
 

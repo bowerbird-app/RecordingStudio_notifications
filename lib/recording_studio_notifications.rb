@@ -26,6 +26,7 @@ require "recording_studio_notifications/reply_methods"
 require "recording_studio_notifications/services/handle_reply"
 require "recording_studio_notifications/metrics"
 require "recording_studio_notifications/api"
+require "recording_studio_notifications/mcp_copy"
 
 if defined?(RecordingStudioAdmin)
   require "recording_studio_notifications/admin/failed_deliveries_chart"

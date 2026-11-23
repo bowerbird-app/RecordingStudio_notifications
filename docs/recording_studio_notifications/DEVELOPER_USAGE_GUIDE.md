@@ -411,7 +411,7 @@ Delivery selection rules:
 
 ## 12. JSON API (Recording Studio API)
 
-This gem depends on `recording_studio_api` `>= 1.1, < 2.0`. The engine registers inbox, member, and preference endpoints. MCP advertises them. Do not add MCP tools in this gem. `notify` / `notify_each` stay host emit.
+This gem depends on `recording_studio_api` `>= 1.1, < 2.0`. The engine registers inbox, member, and preference endpoints on every named API. When Recording Studio MCP is loaded, `McpCopy.register!` adds named tools that map to those endpoints on the public and operations surfaces (`list_notifications`, `show_notification`, `mark_notification_read`, `mark_notification_unread`, `archive_notification`, `unarchive_notification`, `list_notification_preferences`, `update_notification_preferences`). Types are `Notification` and `NotificationPreference`. This gem does not depend on `recording_studio_mcp`. Hosts include the tool names on their MCP servers. `notify` / `notify_each` stay host emit.
 
 `:id` on a member path is a notification row, not a recording. Those endpoints pass `scope_id: false`. API 1.1 still raises `ConfigurationError` at registration without `recordable_type:` or `scope_id: false`. Mark read, mark unread, archive, unarchive, and preference update declare `required_role: :view`. Those writes are the recipient's own inbox state, so a view-only key can call them. Index, show, and preference read stay on the GET default, which is view.
 

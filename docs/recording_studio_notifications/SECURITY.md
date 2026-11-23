@@ -7,7 +7,7 @@ This document outlines the security considerations for the recording_studio_noti
 ### JSON API
 - **Status**: ✅ Accessible
 - Inbox, member, and preference endpoints register on Recording Studio API. The gemspec requires `recording_studio_api` `>= 1.1, < 2.0`.
-- Handlers call `access_grant.authorize!` on the token root and the existing named actions. Inbox and member lookup return that root plus rootless notifications. There is no parallel ACL in RS_API or MCP.
+- Handlers call `access_grant.authorize!` on the token root and the existing named actions. Inbox and member lookup return that root plus rootless notifications. Named MCP tools call those same endpoints. There is no parallel ACL in RS_API or MCP.
 
 ### CSRF Protection
 - **Status**: ✅ Enabled

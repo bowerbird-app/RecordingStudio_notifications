@@ -11,7 +11,6 @@ require_relative "api/preferences"
 
 module RecordingStudioNotifications
   # Registers public inbox, member, and preference endpoints when Recording Studio API is loaded.
-  # MCP advertises registered endpoints automatically. This gem adds no MCP tools.
   module Api
     INDEX_NAME = "notifications.inbox"
     SHOW_NAME = "notifications.show"
